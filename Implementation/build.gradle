@@ -1,0 +1,27 @@
+plugins {
+    id 'application'
+    id 'java'
+}
+
+group 'at.aau.serg'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    ant.importBuild 'build-properties.xml'
+
+    def jpfCoreLibs = files(ant.properties['jpf-core.native_classpath'].split(';'))
+    def jpfSymbcLibs = files(ant.properties['jpf-symbc.native_classpath'].split(';'))
+    def extLibs = fileTree(dir: 'target/artifacts', include: ['**/*.jar'])
+    def libs = extLibs + jpfCoreLibs + jpfSymbcLibs
+
+    implementation libs
+}
+
+application {
+    mainClass = 'Runner'
+}
+
