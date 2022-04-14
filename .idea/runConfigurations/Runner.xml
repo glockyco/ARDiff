@@ -1,9 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Runner" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="Runner.Runner" />
-    <module name="ARDiff" />
+    <module name="at.aau.serg.ARDiff.main" />
     <option name="PROGRAM_PARAMETERS" value="--path1 ../benchmarks/Airy/MAX/Eq/oldV.java --path2 ../benchmarks/Airy/MAX/Eq/newV.java --tool D" />
-    <option name="VM_PARAMETERS" value="-Djava.library.path=&quot;jpf-git/jpf-symbc/lib&quot;" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Implementation" />
     <extension name="coverage">
       <pattern>
