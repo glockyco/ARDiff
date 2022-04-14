@@ -1,9 +1,42 @@
+local.properties
+.version
+build.properties
+
+####### General #######
+*.swo
+trace
+activity*.png
+*.class
+*.orig
+*~
+*.DS_Store
+
 ####### Ant #######
-/build/
+build/**/*
 
 ####### Gradle #######
 .gradle/
 reports/
+
+####### Covers NetBeans IDE #######
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+####### Covers Eclipse IDE #######
+.metadata
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+.settings/
+.loadpath
+.recommenders
+.classpath
+.project
 
 ####### Covers JetBrains IDE: IntelliJ #######
 *.iml
@@ -43,19 +76,3 @@ out/
 atlassian-ide-plugin.xml
 /.idea/
 /test.bat
-
-####### ARDiff #######
-
-!target/classes/
-/target/classes/*
-!/target/classes/equiv/
-/target/classes/equiv/*
-!/target/classes/equiv/checking/
-/target/classes/equiv/checking/*
-!target/classes/equiv/checking/symbex
-/target/generated-sources
-.idea
-pom.xml
-
-.version
-build.properties
