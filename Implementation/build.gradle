@@ -21,6 +21,11 @@ dependencies {
     implementation libs
 }
 
+compileJava {
+    dependsOn(':jpf-core:buildJars')
+    dependsOn(':jpf-symbc:buildJars')
+}
+
 application {
     mainClass = 'Runner'
 }
