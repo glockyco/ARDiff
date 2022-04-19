@@ -15,7 +15,7 @@ dependencies {
 
     def jpfCoreLibs = files(ant.properties['jpf-core.native_classpath'].split(';'))
     def jpfSymbcLibs = files(ant.properties['jpf-symbc.native_classpath'].split(';'))
-    def extLibs = fileTree(dir: 'target/artifacts', include: ['**/*.jar'])
+    def extLibs = fileTree(dir: 'target/artifacts', include: ['**/*.jar'], exclude: "Implementation.jar")
     def libs = extLibs + jpfCoreLibs + jpfSymbcLibs
 
     implementation libs
@@ -30,3 +30,16 @@ application {
     mainClass = 'Runner'
 }
 
+jar {
+    destinationDirectory = file("target/artifacts/Implementation_jar")
+    archiveFileName = "Implementation.jar"
+
+    manifest {
+        attributes(
+                'Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join(' '),
+                'Main-Class': 'Runner.Runner'
+        )
+    }
+}
+
+defaultTasks "jar"

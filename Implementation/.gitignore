@@ -46,6 +46,8 @@ atlassian-ide-plugin.xml
 
 ####### ARDiff #######
 
+/target/artifacts/Implementation_jar/Implementation.jar
+
 !target/classes/
 /target/classes/*
 !/target/classes/equiv/
