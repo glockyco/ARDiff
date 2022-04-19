@@ -44,6 +44,10 @@ dependencies {
     testImplementation "junit:junit:4.12"
 }
 
+compileJava {
+    dependsOn(':jpf-core:buildJars')
+}
+
 task compile {
     group = "SPF Build"
     description = "Compiles all JPF symbc sources."
