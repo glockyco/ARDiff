@@ -38,3 +38,9 @@ out/
 atlassian-ide-plugin.xml
 /.idea/
 /test.bat
+
+####### ARDiff #######
+
+/benchmarks/**/instrumented/*
+/benchmarks/**/outputs/*
+/benchmarks/**/z3models/*
