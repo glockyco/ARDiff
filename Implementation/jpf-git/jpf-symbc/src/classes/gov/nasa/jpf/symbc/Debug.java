@@ -68,7 +68,10 @@ public class Debug {
     native public static boolean isSymbolicShort(short v);
     native public static boolean isSymbolicByte(byte v);
     native public static boolean isSymbolicChar(char v);
-    
+    native public static boolean isSymbolicReal(double v);
+    native public static boolean isSymbolicBoolean(boolean v);
+    native public static boolean isSymbolicString(String v);
+
     native public static boolean checkAccuracy(double v, double err); 
     // check accuracy of floating point computation
     // wrt given error

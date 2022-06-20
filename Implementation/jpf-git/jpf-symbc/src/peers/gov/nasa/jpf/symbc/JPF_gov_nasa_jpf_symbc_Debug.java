@@ -191,6 +191,40 @@ public class JPF_gov_nasa_jpf_symbc_Debug extends NativePeer {
     }
 
     @MJI
+    public static boolean isSymbolicReal(MJIEnv env, int objRef, double v) {
+        Object[] attrs = env.getArgAttributes();
+        if (attrs != null) {
+            RealExpression sym_arg = (RealExpression) attrs[0];
+            if (sym_arg != null)
+                return true;
+        }
+        return false;
+    }
+
+    @MJI
+    public static boolean isSymbolicBoolean(MJIEnv env, int objRef, boolean v) {
+        Object[] attrs = env.getArgAttributes();
+        if (attrs != null) {
+            IntegerExpression sym_arg = (IntegerExpression) attrs[0];
+            if (sym_arg != null)
+                return true;
+        }
+        return false;
+    }
+
+    @MJI
+    public static boolean isSymbolicString(MJIEnv env, int objRef, int stringRef) {
+        Object[] attrs = env.getArgAttributes();
+        if (attrs != null) {
+            StringExpression sym_arg = (StringExpression) attrs[0];
+            if (sym_arg != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @MJI
     public static int getSymbolicRealValue(MJIEnv env, int objRef, double v) {
         Object[] attrs = env.getArgAttributes();
         RealExpression sym_arg = (RealExpression) attrs[0];
