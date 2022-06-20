@@ -303,7 +303,7 @@ public class SymbolicExecutionRunner {
 	public void creatingJpfFiles() throws IOException{
 		String JPFMethodInputs=createSymbolicInputParametersForInstrumentedJPF();
 		String fixed=
-        "classpath="+classpath+" \n"+
+        "classpath="+classpath.replace("\\", "\\\\")+" \n"+
 		"symbolic.min_int="+this.minInt+"\n"+
         "symbolic.max_int="+this.maxInt+"\n"+
         "symbolic.min_long="+this.minLong+"\n"+

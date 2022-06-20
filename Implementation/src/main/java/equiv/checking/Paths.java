@@ -12,10 +12,12 @@
 package equiv.checking;
 
 public final class Paths {
-    public static String classpath="target/classes";
-    public static String sourcepath="src/examples/demo/instrumented";
-    public static final String jpf_symbc="./jpf-git/jpf-symbc";
-    public static final String jpf_core="./jpf-git/jpf-core";
+    public static String classpath = java.nio.file.Paths.get("target", "classes").toAbsolutePath().toString();
+    public static String sourcepath = java.nio.file.Paths.get("src", "examples", "demo", "instrumented").toAbsolutePath().toString();
+    public static final String jpf_symbc = java.nio.file.Paths.get("jpf-git", "jpf-symbc").toAbsolutePath().toString();
+    public static final String jpf_symbc_jar = java.nio.file.Paths.get(jpf_symbc, "build", "jpf-symbc.jar").toAbsolutePath().toString();
+    public static final String jpf_core = java.nio.file.Paths.get("jpf-git", "jpf-core").toAbsolutePath().toString();
+    public static final String jpf_core_jar = java.nio.file.Paths.get(jpf_core, "build", "jpf.jar").toAbsolutePath().toString();
     public static String z3 = "z3";
-    public static String dp = "./jpf-git/jpf-symbc/lib/";
+    public static String dp = java.nio.file.Paths.get( "jpf-git", "jpf-symbc", "lib").toAbsolutePath().toString();
 }

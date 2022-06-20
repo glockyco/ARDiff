@@ -21,6 +21,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithBody;
 import com.github.javaparser.ast.stmt.*;
 import javafx.util.Pair;
+import org.apache.commons.lang.SystemUtils;
 
 import javax.tools.*;
 import java.io.*;
@@ -50,12 +51,14 @@ public interface Utils {
         //Think about whether to do it for the classpaths in the tool as well (maybe folder instrumented not automatically created)
         if(!path.exists())
             path.mkdir();
-        ArrayList<String> options = new ArrayList<>();
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<>();
 
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnosticCollector, null, null);
-        options.addAll(Arrays.asList("-g", "-d", classpath));
+        String dir = classpath;
+        List<String> classpathParts = Arrays.asList(classpath, Paths.jpf_core_jar, Paths.jpf_symbc_jar);
+        classpath = String.join(SystemUtils.IS_OS_WINDOWS ? ";" : ":", classpathParts);
+        List<String> options = Arrays.asList("-g", "-cp", classpath, "-d", dir);
         Iterable<? extends JavaFileObject> cpu =
                 fileManager.getJavaFileObjectsFromFiles(Arrays.asList(new File[]{newFile}));
         boolean success = compiler.getTask(null, fileManager, diagnosticCollector, options, null, cpu).call();
