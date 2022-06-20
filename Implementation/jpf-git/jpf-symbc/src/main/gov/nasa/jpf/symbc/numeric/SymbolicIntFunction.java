@@ -48,12 +48,14 @@ import gov.nasa.jpf.util.FileUtils;
 import gov.nasa.jpf.vm.ClassLoaderInfo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.lang.reflect.*;
 //import java.net.MalformedURLException;
 //import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.stream.Collectors;
 
 public class SymbolicIntFunction  extends SymbolicInteger implements SymbolicFunction
 {
@@ -179,6 +181,22 @@ public class SymbolicIntFunction  extends SymbolicInteger implements SymbolicFun
             name = "AF_"+method_name;
         return  name + "_SYMINT(" + result + ")";
     }
+
+    public String prefix_notation()
+    {
+        String name = method_name.startsWith("UF_") ?  method_name : "AF_" + method_name;
+
+        if (sym_args.length <= 0) {
+            return name;
+        }
+
+        String args = Arrays.stream(sym_args)
+            .map(Expression::prefix_notation)
+            .collect(Collectors.joining(" "));
+
+        return "(" + name + " " + args + ")";
+    }
+
 
     @Override
     public void accept(ConstraintExpressionVisitor visitor) {

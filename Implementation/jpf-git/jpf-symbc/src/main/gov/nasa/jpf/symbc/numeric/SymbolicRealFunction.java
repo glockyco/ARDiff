@@ -55,6 +55,7 @@ import java.lang.reflect.*;
 //import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.stream.Collectors;
 
 public class SymbolicRealFunction extends SymbolicReal implements SymbolicFunction
 { //Maybe the solution should be changed, right now it looks concolic
@@ -196,6 +197,21 @@ public class SymbolicRealFunction extends SymbolicReal implements SymbolicFuncti
         if(!method_name.startsWith("UF_"))
             name = "AF_"+method_name;
         return  name + "_SYMREAL(" + result + ")";
+    }
+
+    public String prefix_notation()
+    {
+        String name = method_name.startsWith("UF_") ?  method_name : "AF_" + method_name;
+
+        if (sym_args.length <= 0) {
+            return name;
+        }
+
+        String args = Arrays.stream(sym_args)
+            .map(Expression::prefix_notation)
+            .collect(Collectors.joining(" "));
+
+        return "(" + name + " " + args + ")";
     }
 
     @Override
