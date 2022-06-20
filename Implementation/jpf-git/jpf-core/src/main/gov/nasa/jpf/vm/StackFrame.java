@@ -1774,7 +1774,7 @@ public abstract class StackFrame implements Cloneable {
   public void printOperands (PrintStream pw){
     pw.print("operands = [");
     for (int i=stackBase; i<=top; i++){
-      if (i>0){
+      if (i>stackBase){
         pw.print(',');
       }
       if (isOperandRef(i)){
