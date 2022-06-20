@@ -9,8 +9,8 @@
   <property file="${user.home}/.jpf/site.properties"/>
 
   <!-- if there is no site.properties in the home dir, default to peer dirs -->
-  <property name="jpf-core" value = "../jpf-core"/>
-  <property name="jpf-symbc" value = "../jpf-symbc"/>
+  <property name="jpf-core" value = "${user.dir}/jpf-git/jpf-core"/>
+  <property name="jpf-symbc" value = "${user.dir}/jpf-git/jpf-symbc"/>
 
   <!-- get the jpf-core path properties -->
   <property file="${jpf-core}/jpf.properties"/>
