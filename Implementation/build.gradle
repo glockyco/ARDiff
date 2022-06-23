@@ -19,6 +19,8 @@ dependencies {
     def libs = extLibs + jpfCoreLibs + jpfSymbcLibs
 
     implementation libs
+
+    implementation group: 'org.freemarker', name: 'freemarker', version: '2.3.31'
 }
 
 compileJava {

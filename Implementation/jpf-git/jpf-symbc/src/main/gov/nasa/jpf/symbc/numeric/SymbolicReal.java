@@ -38,6 +38,7 @@
 package gov.nasa.jpf.symbc.numeric;
 
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
 import java.util.Random;
@@ -116,7 +117,8 @@ public class SymbolicReal extends RealExpression {
 
 	public String prefix_notation ()
 	{
-		return (name != null) ? name : "REAL_" + hashCode();
+		return StringUtils.substringBefore(name, "_");
+		//return (name != null) ? name : "REAL_" + hashCode();
 	}
 
 	public double solution() {
