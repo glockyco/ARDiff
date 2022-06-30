@@ -29,7 +29,7 @@ compileJava {
 }
 
 application {
-    mainClass = 'Runner'
+    mainClass = 'Runner.Runner'
 }
 
 jar {
