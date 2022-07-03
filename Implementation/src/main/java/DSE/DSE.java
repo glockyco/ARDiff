@@ -19,17 +19,13 @@ import com.microsoft.z3.Status;
 import com.microsoft.z3.Tactic;
 import equiv.checking.*;
 import equiv.checking.SymbolicExecutionRunner.SMTSummary;
-import gov.nasa.jpf.Config;
-import gov.nasa.jpf.JPF;
 import javafx.util.Pair;
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static equiv.checking.Paths.z3;
 import static equiv.checking.Utils.DEBUG;
@@ -300,45 +296,18 @@ public class DSE {
             String outputs = path.split("instrumented")[0];
 
             /**********************Running the differencing ******************/
-
-            String symbolicParameters = String.join("#", Collections.nCopies(methodParams.length, "sym"));
-
-            String inputParameters = Arrays.stream(methodParams)
-                .map(p -> Type.getType(variablesNamesTypesMapping1.get(p)).getClassName() + " " + p)
-                .collect(Collectors.joining(", "));
-
-            String inputVariables = String.join(", ", methodParams);
-
-            String inputValues = Arrays.stream(methodParams)
-                    .map(p -> instrument.valueBasedOnType(Type.getType(variablesNamesTypesMapping1.get(p)).getClassName()))
-                    .collect(Collectors.joining(", "));
-
-            DifferencingParameters parameters = new DifferencingParameters(
+            new DifferencingRunner(
+                methodParams,
+                variablesNamesTypesMapping1,
+                summary.declarations,
                 this.path,
-                instrument.packageName(),
-                "IDiffDSE",
-
-                symbolicParameters,
-                inputParameters,
-                inputVariables,
-                inputValues,
-
-                instrument.packageName(),
-                v1ClassName + this.toolName,
-                Type.getMethodType(method1.desc).getReturnType().getClassName(),
-
-                instrument.packageName(),
-                v2ClassName + this.toolName,
-                Type.getMethodType(method2.desc).getReturnType().getClassName()
-            );
-
-            instrument.saveDifferencingDriverClass(parameters);
-            File configFile = instrument.saveDifferencingJpfConfiguration(parameters);
-
-            Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
-            JPF jpf = new JPF(config);
-            jpf.addListener(new DifferencingListener(parameters, summary));
-            jpf.run();
+                v1ClassName,
+                method1.desc,
+                v2ClassName,
+                method2.desc,
+                this.toolName,
+                instrument
+            ).runDifferencing();
 
             return summary;
     }

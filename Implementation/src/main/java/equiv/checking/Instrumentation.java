@@ -14,9 +14,6 @@ package equiv.checking;
 import java.io.*;
 import java.util.*;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateExceptionHandler;
 import javafx.util.Pair;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -312,77 +309,5 @@ public class Instrumentation implements Utils{
 		writer.write(newProgram);
 		writer.close();
 		compile(classpath,newFile);
-	}
-
-	public void saveDifferencingDriverClass(DifferencingParameters parameters) throws Exception {
-		/* ------------------------------------------------------------------------ */
-		/* You should do this ONLY ONCE in the whole application life-cycle:        */
-		// @TODO: Only do this once...
-
-		/* Create and adjust the configuration singleton */
-		Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
-		cfg.setDirectoryForTemplateLoading(new File("src/main/resources/templates"));
-		// Recommended settings for new projects:
-		cfg.setDefaultEncoding("UTF-8");
-		cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-		cfg.setLogTemplateExceptions(false);
-		cfg.setWrapUncheckedExceptions(true);
-		cfg.setFallbackOnNullLoopVariable(false);
-
-		/* ------------------------------------------------------------------------ */
-		/* You usually do these for MULTIPLE TIMES in the application life-cycle:   */
-
-		/* Create a data-model */
-		Map<String, Object> root = new HashMap<>();
-		root.put("parameters", parameters);
-
-		/* Get the template (uses cache internally) */
-		Template template = cfg.getTemplate("DifferencingDriverClass.ftl");
-
-		/* Merge data-model with template */
-		File file = new File(parameters.getTargetDirectory() + "/" + parameters.getTargetClassName() + ".java");
-		file.getParentFile().mkdirs();
-
-		try (PrintWriter writer = new PrintWriter(file)) {
-			template.process(root, writer);
-		}
-
-		compile(classpath, file);
-	}
-
-	public File saveDifferencingJpfConfiguration(DifferencingParameters parameters) throws Exception {
-		/* ------------------------------------------------------------------------ */
-		/* You should do this ONLY ONCE in the whole application life-cycle:        */
-		// @TODO: Only do this once...
-
-		/* Create and adjust the configuration singleton */
-		Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
-		cfg.setDirectoryForTemplateLoading(new File("src/main/resources/templates"));
-		// Recommended settings for new projects:
-		cfg.setDefaultEncoding("UTF-8");
-		cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-		cfg.setLogTemplateExceptions(false);
-		cfg.setWrapUncheckedExceptions(true);
-		cfg.setFallbackOnNullLoopVariable(false);
-
-		/* ------------------------------------------------------------------------ */
-		/* You usually do these for MULTIPLE TIMES in the application life-cycle:   */
-
-		/* Create a data-model */
-		Map<String, Object> root = new HashMap<>();
-		root.put("parameters", parameters);
-
-		/* Get the template (uses cache internally) */
-		Template template = cfg.getTemplate("DifferencingConfiguration.ftl");
-
-		/* Merge data-model with template */
-		File file = new File(parameters.getTargetDirectory() + "/" + parameters.getTargetClassName() + ".jpf");
-		file.getParentFile().mkdirs();
-
-		try (PrintWriter writer = new PrintWriter(file)) {
-			template.process(root, writer);
-		}
-
-		return file;
 	}
 }

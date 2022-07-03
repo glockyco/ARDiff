@@ -1,6 +1,5 @@
 package equiv.checking;
 
-import equiv.checking.SymbolicExecutionRunner.SMTSummary;
 import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.jvm.bytecode.JVMReturnInstruction;
 import gov.nasa.jpf.symbc.numeric.*;
@@ -16,14 +15,14 @@ import java.util.ArrayList;
 
 public class DifferencingListener extends PropertyListenerAdapter {
     final DifferencingParameters parameters;
-    final SMTSummary summary;
+    final String declarations;
     final ArrayList<MethodSpec> areEquivalentMethods = new ArrayList<>();
 
     public int count =  0;
 
-    public DifferencingListener(DifferencingParameters parameters, SMTSummary summary) {
+    public DifferencingListener(DifferencingParameters parameters, String declarations) {
         this.parameters = parameters;
-        this.summary = summary;
+        this.declarations = declarations;
 
         // @TODO: Check if we can make do with fewer method specs.
         this.areEquivalentMethods.add(MethodSpec.createMethodSpec("*.areEquivalent(int,int)"));
@@ -97,7 +96,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
         // @TODO: Check if the path condition is satisfiable.
 
         String z3Query = "";
-        z3Query += this.summary.declarations + "\n";
+        z3Query += this.declarations + "\n";
         z3Query += "; Path Condition:\n";
         z3Query += "(assert " + pcString + ")\n\n";
         z3Query += "; Equivalence Check:\n";
