@@ -128,12 +128,6 @@ public class ${parameters.targetClassName} {
             error_new = e;
         }
 
-<#--        boolean areResultsEquivalent = result_old == result_new;-->
-<#--        boolean areResultsEquivalent = Double.compare(result_old, result_new) == 0;-->
-<#--        boolean areResultsEquivalent = Objects.equals(result_old, result_new);-->
-        System.out.println("error old: " + error_old);
-        System.out.println("error new: " + error_new);
-
         String result_old_str = "";
         if (${isSymbolic(parameters.oldReturnType, "result_old")}) {
             result_old_str = ${toString(parameters.oldReturnType, "result_old")};
@@ -150,6 +144,13 @@ public class ${parameters.targetClassName} {
 
         boolean areErrorsEquivalent = Objects.equals(error_old, error_new);
 
+        System.out.println("Differencing Driver Output:");
+
+        System.out.println("  Errors:");
+        System.out.println("  - Old: " + error_old);
+        System.out.println("  - New: " + error_new);
+        System.out.println("  - Equivalent: " + areErrorsEquivalent);
+
         if (!areErrorsEquivalent) {
             if (error_old != null && error_new != null) {
                 String msg = "result_old (" + error_old + ") != result_new (" + error_new + ")";
@@ -165,7 +166,10 @@ public class ${parameters.targetClassName} {
 
         boolean areResultsEquivalent = areEquivalent(result_old, result_new);
 
-        System.out.println("areResultsEquivalent: " + areResultsEquivalent);
+        System.out.println("  Results:");
+        System.out.println("  - Old: " + result_old_str);
+        System.out.println("  - New: " + result_new_str);
+        System.out.println("  - Equivalent: " + areResultsEquivalent);
 
         if (!areResultsEquivalent) {
             String msg = "result_old (" + result_old_str + ") != result_new (" + result_new_str + ")";
