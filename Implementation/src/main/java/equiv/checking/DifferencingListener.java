@@ -11,8 +11,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class DifferencingListener extends PropertyListenerAdapter {
     final DifferencingParameters parameters;
@@ -78,11 +78,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
                     // -------------------------------------------------------
                     // Check equivalence of the two parameters using an SMT solver.
 
-                    // @TODO: Idea -> Store all states of the old (and new?) version and do alignment when (or after?) executing the new version.
-                    // @TODO: Idea -> Think about doing semantic alignment based on branching points (is this shadow SE?).
-
                     this.count++;
-                    System.out.println("Count: " + this.count);
 
                     boolean areEquivalent;
 
@@ -105,40 +101,48 @@ public class DifferencingListener extends PropertyListenerAdapter {
                         z3Query += "(check-sat)\n";
                         z3Query += "(get-model)\n";
 
-                        String filename = parameters.getTargetClassName() + "ToSolve" + this.count + ".txt";
-                        java.nio.file.Path z3QueryPath  = java.nio.file.Paths.get(parameters.getTargetDirectory(), filename).toAbsolutePath();
-
+                        String z3QueryFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-ToSolve.txt";
+                        Path z3QueryPath  = java.nio.file.Paths.get(this.parameters.getTargetDirectory(), z3QueryFilename).toAbsolutePath();
                         Files.write(z3QueryPath, z3Query.getBytes());
-
-                        // @TODO: Check why bessi0-Eq has some satisfiable queries (7, 8, 14, 15).
-                        // @TODO: Log the z3 outputs.
 
                         String mainCommand = Paths.z3 +" -smt2 " + z3QueryPath + " -T:1";
 
                         Process z3Process = Runtime.getRuntime().exec(mainCommand);
                         BufferedReader in = new BufferedReader(new InputStreamReader(z3Process.getInputStream()));
                         BufferedReader err = new BufferedReader(new InputStreamReader(z3Process.getErrorStream()));
-                        String answer = in.readLine();
+                        String z3Answer = in.readLine();
 
-                        String model = "";
                         String line = "";
+
+                        String z3Model = "";
                         while ((line = in.readLine()) != null) {
-                            model += line+"\n";
+                            z3Model += line + "\n";
+                        }
+
+                        String z3Errors = "";
+                        while ((line = err.readLine()) != null) {
+                            z3Errors += line + "\n";
                         }
 
                         // @TODO: Differentiate "sat" (NEQ) vs "unknown" (might be EQ/NEQ).
-                        areEquivalent = answer.equals("unsat");
+                        areEquivalent = z3Answer.equals("unsat");
 
-                        // @TODO: Check why ARDiff claims that unreachable-Eq is "unknown".
-                        // @TODO: Does abstraction lead to "unknown" equality as often as ARDiff claims?
-                        // @TODO: Can we build a non-CEGAR (e.g., AbsInt-based) approach that works better than ARDiff?
-                        //  => Check whether a given input partition actually contains abstractions when "unknown" would be reported.
-                        // @TODO: Can we produce "better" results by only abstracting unchanged code that cannot be symbolically executed?
-                        // @TODO: Can we "infer"/"estimate"/"guess" whether a program is suitable for symbolic execution?
+                        String z3AnswerFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Answer.txt";
+                        Path z3AnswerPath  = java.nio.file.Paths.get(this.parameters.getTargetDirectory(), z3AnswerFilename).toAbsolutePath();
+                        Files.write(z3AnswerPath, z3Answer.getBytes());
 
-                        System.out.println(z3Query);
-                        System.out.println(answer);
-                        System.out.println(model);
+                        // A model (i.e., counterexample) only exists if the two programs are NOT equivalent.
+                        if (!areEquivalent) {
+                            String z3ModelFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Model.txt";
+                            Path z3ModelPath  = java.nio.file.Paths.get(this.parameters.getTargetDirectory(), z3ModelFilename).toAbsolutePath();
+                            Files.write(z3ModelPath, z3Model.getBytes());
+                        }
+
+                        if (!z3Errors.isEmpty()) {
+                            String z3ErrorsFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Errors.txt";
+                            Path z3ErrorsPath  = java.nio.file.Paths.get(this.parameters.getTargetDirectory(), z3ErrorsFilename).toAbsolutePath();
+                            Files.write(z3ErrorsPath, z3Errors.getBytes());
+                        }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
