@@ -98,7 +98,7 @@ public class GradDiff extends DSE {
             writer.close();
             fwNew.close();
 
-            File file = new File(outputs+"z3models/ARDiff.txt");
+            File file = new File(outputs+"z3models/" + this.toolName + ".txt");
             file.getParentFile().mkdir();
             if(!file.exists())
                 file.createNewFile();

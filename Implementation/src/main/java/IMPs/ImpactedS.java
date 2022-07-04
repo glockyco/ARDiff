@@ -257,7 +257,7 @@ public class ImpactedS {
             times[3] = end - start;
             times[4] = symbEx.z3time;
             String outputs = path.split("instrumented")[0];
-            File file = new File(outputs+"z3models/Impacted.txt");
+            File file = new File(outputs+"z3models/" + this.toolName + ".txt");
             file.getParentFile().mkdir();
             if(!file.exists())
                 file.createNewFile();

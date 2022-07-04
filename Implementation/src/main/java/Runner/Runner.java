@@ -148,19 +148,22 @@ public class Runner{
                 boolean H2 = true;
                 boolean H31 = true;
                 boolean H32 = true;
+                String toolName = "ARDiff";
                 if(strategy.equals("R")){
                     H1 = H2 = H32 = H31 = false;
+                    toolName += "R";
                     System.out.println("------------------------------------ARDIFF-R-----------------------------------");
                 }
                 else if(strategy.equals("H3")){
                     H1 = H2 = false;
+                    toolName += "H3";
                     System.out.println("------------------------------------ARDIFF-H3-----------------------------------");
                 }
                 else
                     System.out.println("------------------------------------ARDIFF-----------------------------------");
                 System.out.println("*****************************************************************************");
                 boolean parseFromSMTLib = true ;
-                GradDiff gradDiff = new GradDiff(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "ARDiff", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib, H1, H2, H31, H32, strategy, true,z3Terminal);
+                GradDiff gradDiff = new GradDiff(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, toolName, SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib, H1, H2, H31, H32, strategy, true,z3Terminal);
                 boolean finished2 = gradDiff.runTool();
                 if (finished2==true)
                     System.exit(0);
