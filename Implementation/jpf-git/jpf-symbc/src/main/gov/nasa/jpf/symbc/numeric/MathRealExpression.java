@@ -160,7 +160,19 @@ public class MathRealExpression extends RealExpression
 		else //op == MathFunction.POW || op == MathFunction.ATAN2
 			return  op.toString() + "(" + arg1.toString() + "," + arg2.toString() + ")";
 	}
-	
+
+	public String prefix_notation ()
+	{
+		if (op == MathFunction.SIN || op == MathFunction.COS ||
+			op == MathFunction.EXP ||
+			op == MathFunction.ASIN || op == MathFunction.ACOS ||
+			op == MathFunction.ATAN || op == MathFunction.LOG ||
+			op == MathFunction.TAN || op == MathFunction.SQRT)
+			return  "(" + op.toString().trim() + " " + arg1.prefix_notation() + ")";
+		else //op == MathFunction.POW || op == MathFunction.ATAN2
+			return  "(" + op.toString().trim() + " " + arg1.prefix_notation() + " " + arg2.prefix_notation() + ")";
+	}
+
 	@Override
 	public void accept(ConstraintExpressionVisitor visitor) {
 		visitor.preVisit(this);
