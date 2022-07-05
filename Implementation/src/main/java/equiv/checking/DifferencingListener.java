@@ -89,7 +89,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
         boolean aIsConcrete = expressionA == null;
         boolean bIsConcrete = expressionB == null;
 
-        String pcString = pcConstraint.prefix_notation();
+        String pcString = pcConstraint != null ? pcConstraint.prefix_notation() : "true";
         String aString = aIsConcrete ? valueA.toString() : expressionA.prefix_notation();
         String bString = bIsConcrete ? valueB.toString() : expressionB.prefix_notation();
 
