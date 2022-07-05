@@ -128,12 +128,16 @@ public class DifferencingListener extends PropertyListenerAdapter {
                 z3Errors += line + "\n";
             }
 
-            // @TODO: Differentiate "sat" (NEQ) vs "unknown" (might be EQ/NEQ).
-            areEquivalent = z3Answer.equals("unsat");
-
             String z3AnswerFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Answer.txt";
             Path z3AnswerPath  = java.nio.file.Paths.get(this.parameters.getTargetDirectory(), z3AnswerFilename).toAbsolutePath();
             Files.write(z3AnswerPath, z3Answer.getBytes());
+
+            if (z3Answer.startsWith("(error")) {
+                throw new RuntimeException("z3 Error: " + z3Answer);
+            }
+
+            // @TODO: Differentiate "sat" (NEQ) vs "unknown" (might be EQ/NEQ).
+            areEquivalent = z3Answer.equals("unsat");
 
             // A model (i.e., counterexample) only exists if the two programs are NOT equivalent.
             if (!areEquivalent) {
