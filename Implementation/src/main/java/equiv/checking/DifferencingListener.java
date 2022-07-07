@@ -12,6 +12,12 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DifferencingListener extends PropertyListenerAdapter {
     final DifferencingParameters parameters;
@@ -102,7 +108,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
         // @TODO: Check if the path condition is satisfiable.
 
         String z3Query = "";
-        z3Query += this.declarations + "\n";
+        z3Query += this.getDeclarations(pcString) + "\n\n";
         z3Query += "; Path Condition:\n";
         z3Query += "(assert " + pcString + ")\n\n";
         z3Query += "; Equivalence Check:\n";
@@ -171,5 +177,45 @@ public class DifferencingListener extends PropertyListenerAdapter {
         // with the result of the equivalence check.
 
         stackFrame.setOperand(0, Types.booleanToInt(areEquivalent), false);
+    }
+
+    private String getDeclarations(String pcString) {
+        String intDeclarations = this.getIntDeclarations(pcString);
+        String realDeclarations = this.getRealDeclarations(pcString);
+        String powDeclaration = "(define-fun pow ((a Real) (b Real)) Real (^ a b))";
+
+        return Stream.of(this.declarations.trim(), intDeclarations, realDeclarations, powDeclaration)
+            .filter(s -> s != null && !s.isEmpty())
+            .collect(Collectors.joining("\n"));
+    }
+
+    private String getIntDeclarations(String pcString) {
+        Pattern pattern = Pattern.compile("(INT\\d+)");
+        Matcher matcher = pattern.matcher(pcString);
+
+        Set<String> matches = new HashSet<>();
+        while (matcher.find()) {
+            matches.add(matcher.group());
+        }
+
+        return matches.stream()
+            .map(match -> "(declare-fun " + match + " () Int)")
+            .filter(declaration -> !this.declarations.contains(declaration))
+            .collect(Collectors.joining("\n"));
+    }
+
+    private String getRealDeclarations(String pcString) {
+        Pattern pattern = Pattern.compile("(REAL_\\d+)");
+        Matcher matcher = pattern.matcher(pcString);
+
+        Set<String> matches = new HashSet<>();
+        while (matcher.find()) {
+            matches.add(matcher.group());
+        }
+
+        return matches.stream()
+            .map(match -> "(declare-fun " + match + " () Real)")
+            .filter(declaration -> !this.declarations.contains(declaration))
+            .collect(Collectors.joining("\n"));
     }
 }
