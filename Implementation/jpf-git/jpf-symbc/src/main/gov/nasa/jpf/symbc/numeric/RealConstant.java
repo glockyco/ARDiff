@@ -168,9 +168,17 @@ public class RealConstant extends RealExpression {
 
   public String prefix_notation ()
 	{
-		return ""+value;
+		String valueString = Double.toString(this.value);
+
+		if (!valueString.contains("E")) {
+			return valueString;
+		}
+
+		 String mantissa = valueString.split("E")[0];
+		 String exponent = valueString.split("E")[1];
+		 return "(* " + mantissa + " (^ 10 " + exponent + "))";
 	}
-  
+
   public String stringPC () {
     return "CONST_" + value + "";
   }
