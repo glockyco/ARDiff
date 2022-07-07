@@ -117,8 +117,17 @@ public class SymbolicReal extends RealExpression {
 
 	public String prefix_notation ()
 	{
-		return StringUtils.substringBefore(name, "_");
-		//return (name != null) ? name : "REAL_" + hashCode();
+		if (this.name == null) {
+			return "REAL_" + hashCode();
+		}
+
+		if (this.name.endsWith("SYMREAL")) {
+			// {variable_name}_{unique_id}_SYMREAL => {variable_name}
+			return name.replaceFirst("_\\d+_SYMREAL$", "");
+		}
+
+		// REAL_{unique_id}
+		return this.name;
 	}
 
 	public double solution() {

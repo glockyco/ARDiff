@@ -121,8 +121,17 @@ public class SymbolicInteger extends LinearIntegerExpression
 
 	public String prefix_notation ()
 	{
-		return StringUtils.substringBefore(name, "_");
-		//return (name != null) ? name : "INT_" + hashCode();
+		if (this.name == null) {
+			return "INT_" + hashCode();
+		}
+
+		if (this.name.endsWith("SYMINT")) {
+			// {variable_name}_{unique_id}_SYMINT => {variable_name}
+			return name.replaceFirst("_\\d+_SYMINT$", "");
+		}
+
+		// INT_{unique_id}
+		return this.name;
 	}
 
 	public long solution() {
