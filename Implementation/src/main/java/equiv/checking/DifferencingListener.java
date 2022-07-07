@@ -93,6 +93,12 @@ public class DifferencingListener extends PropertyListenerAdapter {
         String aString = aIsConcrete ? valueA.toString() : expressionA.prefix_notation();
         String bString = bIsConcrete ? valueB.toString() : expressionB.prefix_notation();
 
+        boolean pcHasUninterpretedFunctions = pcString.contains("UF_");
+        boolean aHasUninterpretedFunctions = aString.contains("UF_");
+        boolean bHasUninterpretedFunctions = bString.contains("UF_");
+
+        boolean hasUninterpretedFunctions = pcHasUninterpretedFunctions || aHasUninterpretedFunctions || bHasUninterpretedFunctions;
+
         // @TODO: Check if the path condition is satisfiable.
 
         String z3Query = "";
@@ -136,8 +142,13 @@ public class DifferencingListener extends PropertyListenerAdapter {
                 throw new RuntimeException("z3 Error: " + z3Answer);
             }
 
-            // @TODO: Differentiate "sat" (NEQ) vs "unknown" (might be EQ/NEQ).
             areEquivalent = z3Answer.equals("unsat");
+
+            if (areEquivalent || !hasUninterpretedFunctions) {
+                Files.write(z3AnswerPath, z3Answer.getBytes());
+            } else { // if (!areEquivalent && hasUninterpretedFunctions) {
+                Files.write(z3AnswerPath, "unknown".getBytes());
+            }
 
             // A model (i.e., counterexample) only exists if the two programs are NOT equivalent.
             if (!areEquivalent) {
