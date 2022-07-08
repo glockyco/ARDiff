@@ -1,10 +1,11 @@
 package equiv.checking;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class DifferencingParameters {
+public class DifferencingParameters implements Serializable {
     private final String directory;
     private final String z3Declarations;
     private final MethodDescription oldMethodDescription;

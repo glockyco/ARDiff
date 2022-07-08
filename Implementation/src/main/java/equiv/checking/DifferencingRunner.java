@@ -2,6 +2,7 @@ package equiv.checking;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
@@ -11,6 +12,7 @@ import javax.tools.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +21,13 @@ import java.util.Map;
 public class DifferencingRunner {
     private final DifferencingParameters parameters;
     private final Configuration freeMarkerConfiguration;
+
+    public static void main(String[] args) throws IOException, TemplateException, ClassNotFoundException {
+        Path filepath = java.nio.file.Paths.get(args[0]);
+        DifferencingParameterFactory factory = new DifferencingParameterFactory();
+        DifferencingParameters parameters = factory.load(filepath.toFile());
+        new DifferencingRunner(parameters).runDifferencing();
+    }
 
     public DifferencingRunner(DifferencingParameters parameters) throws IOException {
         this.parameters = parameters;
@@ -35,7 +44,7 @@ public class DifferencingRunner {
         this.freeMarkerConfiguration.setFallbackOnNullLoopVariable(false);
     }
 
-    public void runDifferencing() throws Exception {
+    public void runDifferencing() throws TemplateException, IOException {
         File javaFile = this.createDifferencingDriverClass();
         this.compile(ProjectPaths.classpath, javaFile);
         File configFile = this.createDifferencingJpfConfiguration();
@@ -46,7 +55,7 @@ public class DifferencingRunner {
         jpf.run();
     }
 
-    public File createDifferencingDriverClass() throws Exception {
+    public File createDifferencingDriverClass() throws IOException, TemplateException {
         /* Create a data-model */
         Map<String, Object> root = new HashMap<>();
         root.put("parameters", this.parameters);
@@ -65,7 +74,7 @@ public class DifferencingRunner {
         return file;
     }
 
-    public File createDifferencingJpfConfiguration() throws Exception {
+    public File createDifferencingJpfConfiguration() throws IOException, TemplateException {
         /* Create a data-model */
         Map<String, Object> root = new HashMap<>();
         root.put("parameters", this.parameters);

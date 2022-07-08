@@ -1,8 +1,9 @@
 package equiv.checking;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class MethodResultDescription {
+public class MethodResultDescription implements Serializable {
     private final String dataType;
 
     public MethodResultDescription(String dataType) {

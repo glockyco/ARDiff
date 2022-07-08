@@ -1,9 +1,10 @@
 package equiv.checking;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class MethodDescription {
+public class MethodDescription implements Serializable {
     private final String namespace;
     private final String className;
     private final String methodName;

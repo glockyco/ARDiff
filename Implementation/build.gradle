@@ -21,6 +21,7 @@ dependencies {
     implementation libs
 
     implementation group: 'org.freemarker', name: 'freemarker', version: '2.3.31'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
 }
 
 compileJava {

@@ -25,6 +25,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
 
 import static equiv.checking.Utils.DEBUG;
@@ -310,7 +311,9 @@ public class DSE {
                 summary.declarations
             );
 
-            new DifferencingRunner(parameters).runDifferencing();
+            String filename = "IDiff" + this.toolName + "-Parameters.txt";
+            Path filepath = java.nio.file.Paths.get(parameters.getTargetDirectory(), filename);
+            factory.persist(filepath.toFile(), parameters);
 
             return summary;
     }
