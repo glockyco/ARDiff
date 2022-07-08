@@ -1,28 +1,5 @@
 <#-- @ftlvariable name="parameters" type="equiv.checking.DifferencingParameters" -->
 
-<#function getDefaultValue type>
-    <#switch type>
-        <#case "int">
-            <#return "0">
-        <#case "long">
-            <#return "0">
-        <#case "short">
-            <#return "0">
-        <#case "byte">
-            <#return "0">
-        <#case "float">
-            <#return "0">
-        <#case "double">
-            <#return "0">
-        <#case "char">
-            <#return "0">
-        <#case "boolean">
-            <#return "true">
-        <#default>
-            <#return "null">
-    </#switch>
-</#function>
-
 <#function isSymbolic type variable>
     <#switch type>
         <#case "int">
@@ -110,8 +87,8 @@ public class ${parameters.targetClassName} {
     public static boolean areEquivalent(Object a, Object b) { return false; }
 
     public static ${parameters.oldReturnType} run(${parameters.inputParameters}) {
-        ${parameters.oldReturnType} result_old = ${getDefaultValue(parameters.oldReturnType)};
-        ${parameters.newReturnType} result_new = ${getDefaultValue(parameters.newReturnType)};
+        ${parameters.oldReturnType} result_old = ${parameters.oldResultDefaultValue};
+        ${parameters.newReturnType} result_new = ${parameters.newResultDefaultValue};
 
         Throwable error_old = null;
         Throwable error_new = null;

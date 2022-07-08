@@ -1,161 +1,121 @@
 package equiv.checking;
 
+import java.util.Collections;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 public class DifferencingParameters {
-
-    private String targetDirectory;
-    private String targetNamespace;
-    private String targetClassName;
-
-    private String symbolicParameters;
-    private String inputParameters;
-    private String inputVariables;
-    private String inputValues;
-
-    private String oldNamespace;
-    private String oldClassName;
-    private String oldReturnType;
-
-    private String newNamespace;
-    private String newClassName;
-    private String newReturnType;
+    private final String directory;
+    private final String z3Declarations;
+    private final MethodDescription oldMethodDescription;
+    private final MethodDescription newMethodDescription;
+    private final MethodDescription diffMethodDescription;
 
     public DifferencingParameters(
-        String targetDirectory,
-        String targetNamespace,
-        String targetClassName,
-
-        String symbolicParameters,
-        String inputParameters,
-        String inputVariables,
-        String inputValues,
-
-        String oldNamespace,
-        String oldClassName,
-        String oldReturnType,
-
-        String newNamespace,
-        String newClassName,
-        String newReturnType
+        String directory,
+        String z3Declarations,
+        MethodDescription oldMethodDescription,
+        MethodDescription newMethodDescription,
+        MethodDescription diffMethodDescription
     ) {
-        this.targetDirectory = targetDirectory;
-        this.targetNamespace = targetNamespace;
-        this.targetClassName = targetClassName;
-
-        this.symbolicParameters = symbolicParameters;
-        this.inputParameters = inputParameters;
-        this.inputVariables = inputVariables;
-        this.inputValues = inputValues;
-
-        this.oldNamespace = oldNamespace;
-        this.oldClassName = oldClassName;
-        this.oldReturnType = oldReturnType;
-
-        this.newNamespace = newNamespace;
-        this.newClassName = newClassName;
-        this.newReturnType = newReturnType;
+        this.directory = directory;
+        this.z3Declarations = z3Declarations.trim();
+        this.oldMethodDescription = oldMethodDescription;
+        this.newMethodDescription = newMethodDescription;
+        this.diffMethodDescription = diffMethodDescription;
     }
+
+    public String getZ3Declarations() { return this.z3Declarations; }
 
     public String getTargetDirectory() {
-        return targetDirectory;
-    }
-
-    public void setTargetDirectory(String targetDirectory) {
-        this.targetDirectory = targetDirectory;
+        return directory;
     }
 
     public String getTargetNamespace() {
-        return targetNamespace;
-    }
-
-    public void setTargetNamespace(String targetNamespace) {
-        this.targetNamespace = targetNamespace;
+        return this.diffMethodDescription.getNamespace();
     }
 
     public String getTargetClassName() {
-        return targetClassName;
-    }
-
-    public void setTargetClassName(String targetClassName) {
-        this.targetClassName = targetClassName;
+        return this.diffMethodDescription.getClassName();
     }
 
     public String getSymbolicParameters() {
-        return symbolicParameters;
-    }
-
-    public void setSymbolicParameters(String symbolicParameters) {
-        this.symbolicParameters = symbolicParameters;
+        int parameterCount = this.diffMethodDescription.getParameters().size();
+        return String.join("#", Collections.nCopies(parameterCount, "sym"));
     }
 
     public String getInputParameters() {
-        return inputParameters;
-    }
-
-    public void setInputParameters(String inputParameters) {
-        this.inputParameters = inputParameters;
+        return this.diffMethodDescription.getParameters().stream()
+            .map(parameter -> parameter.getDataType() + " " + parameter.getName())
+            .collect(Collectors.joining(", "));
     }
 
     public String getInputVariables() {
-        return inputVariables;
-    }
-
-    public void setInputVariables(String inputVariables) {
-        this.inputVariables = inputVariables;
+        return this.diffMethodDescription.getParameters().stream()
+            .map(MethodParameterDescription::getName)
+            .collect(Collectors.joining(", "));
     }
 
     public String getInputValues() {
-        return inputValues;
-    }
-
-    public void setInputValues(String inputValues) {
-        this.inputValues = inputValues;
+        return this.diffMethodDescription.getParameters().stream()
+            .map(MethodParameterDescription::getPlaceholderValue)
+            .collect(Collectors.joining(", "));
     }
 
     public String getOldNamespace() {
-        return oldNamespace;
-    }
-
-    public void setOldNamespace(String oldNamespace) {
-        this.oldNamespace = oldNamespace;
+        return this.oldMethodDescription.getNamespace();
     }
 
     public String getOldClassName() {
-        return oldClassName;
-    }
-
-    public void setOldClassName(String oldClassName) {
-        this.oldClassName = oldClassName;
+        return this.oldMethodDescription.getClassName();
     }
 
     public String getOldReturnType() {
-        return oldReturnType;
+        return this.oldMethodDescription.getResult().getDataType();
     }
 
-    public void setOldReturnType(String oldReturnType) {
-        this.oldReturnType = oldReturnType;
+    public String getOldResultDefaultValue() {
+        return this.oldMethodDescription.getResult().getPlaceholderValue();
     }
 
     public String getNewNamespace() {
-        return newNamespace;
-    }
-
-    public void setNewNamespace(String newNamespace) {
-        this.newNamespace = newNamespace;
+        return this.newMethodDescription.getNamespace();
     }
 
     public String getNewClassName() {
-        return newClassName;
-    }
-
-    public void setNewClassName(String newClassName) {
-        this.newClassName = newClassName;
+        return this.newMethodDescription.getClassName();
     }
 
     public String getNewReturnType() {
-        return newReturnType;
+        return this.newMethodDescription.getResult().getDataType();
     }
 
-    public void setNewReturnType(String newReturnType) {
-        this.newReturnType = newReturnType;
+    public String getNewResultDefaultValue() {
+        return this.newMethodDescription.getResult().getPlaceholderValue();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DifferencingParameters that = (DifferencingParameters) o;
+        return Objects.equals(directory, that.directory)
+            && Objects.equals(z3Declarations, that.z3Declarations)
+            && Objects.equals(oldMethodDescription, that.oldMethodDescription)
+            && Objects.equals(newMethodDescription, that.newMethodDescription)
+            && Objects.equals(diffMethodDescription, that.diffMethodDescription);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+            directory,
+            z3Declarations,
+            oldMethodDescription,
+            newMethodDescription,
+            diffMethodDescription
+        );
     }
 }
+
+

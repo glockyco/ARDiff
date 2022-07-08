@@ -1,11 +1,8 @@
 <#-- @ftlvariable name="parameters" type="equiv.checking.DifferencingParameters" -->
 
 target = ${parameters.targetNamespace}.${parameters.targetClassName}
-# @TODO: Generate correct number of symbolic parameters.
 symbolic.method = ${parameters.targetNamespace}.${parameters.targetClassName}.run(${parameters.symbolicParameters})
-# @TODO: Add missing classpath directories / JARs.
 classpath=target/classes
-# @TODO: Read symbolic execution settings parameters.
 symbolic.min_int=-100
 symbolic.max_int=100
 symbolic.min_long=-100

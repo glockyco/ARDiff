@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,15 +21,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DifferencingListener extends PropertyListenerAdapter {
-    final DifferencingParameters parameters;
-    final String declarations;
-    final ArrayList<MethodSpec> areEquivalentMethods = new ArrayList<>();
+    protected final DifferencingParameters parameters;
+    protected final List<MethodSpec> areEquivalentMethods = new ArrayList<>();
 
-    public int count =  0;
+    protected int count =  0;
 
-    public DifferencingListener(DifferencingParameters parameters, String declarations) {
+    public DifferencingListener(DifferencingParameters parameters) {
         this.parameters = parameters;
-        this.declarations = declarations;
 
         // @TODO: Check if we can make do with fewer method specs.
         this.areEquivalentMethods.add(MethodSpec.createMethodSpec("*.areEquivalent(int,int)"));
@@ -184,7 +183,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
         String realDeclarations = this.getRealDeclarations(pcString);
         String powDeclaration = "(define-fun pow ((a Real) (b Real)) Real (^ a b))";
 
-        return Stream.of(this.declarations.trim(), intDeclarations, realDeclarations, powDeclaration)
+        return Stream.of(this.parameters.getZ3Declarations(), intDeclarations, realDeclarations, powDeclaration)
             .filter(s -> s != null && !s.isEmpty())
             .collect(Collectors.joining("\n"));
     }
@@ -200,7 +199,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
         return matches.stream()
             .map(match -> "(declare-fun " + match + " () Int)")
-            .filter(declaration -> !this.declarations.contains(declaration))
+            .filter(declaration -> !this.parameters.getZ3Declarations().contains(declaration))
             .collect(Collectors.joining("\n"));
     }
 
@@ -215,7 +214,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
         return matches.stream()
             .map(match -> "(declare-fun " + match + " () Real)")
-            .filter(declaration -> !this.declarations.contains(declaration))
+            .filter(declaration -> !this.parameters.getZ3Declarations().contains(declaration))
             .collect(Collectors.joining("\n"));
     }
 }

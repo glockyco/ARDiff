@@ -296,18 +296,22 @@ public class DSE {
             String outputs = path.split("instrumented")[0];
 
             /**********************Running the differencing ******************/
-            new DifferencingRunner(
+
+            DifferencingParameterFactory factory = new DifferencingParameterFactory();
+
+            DifferencingParameters parameters = factory.create(
+                this.toolName,
+                this.path,
+                instrument.packageName(),
+                v1ClassName,
+                v2ClassName,
+                method1.desc,
                 methodParams,
                 variablesNamesTypesMapping1,
-                summary.declarations,
-                this.path,
-                v1ClassName,
-                method1.desc,
-                v2ClassName,
-                method2.desc,
-                this.toolName,
-                instrument
-            ).runDifferencing();
+                summary.declarations
+            );
+
+            new DifferencingRunner(parameters).runDifferencing();
 
             return summary;
     }
