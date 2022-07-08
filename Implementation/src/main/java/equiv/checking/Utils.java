@@ -56,7 +56,7 @@ public interface Utils {
 
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnosticCollector, null, null);
         String dir = classpath;
-        List<String> classpathParts = Arrays.asList(classpath, Paths.jpf_core_jar, Paths.jpf_symbc_jar);
+        List<String> classpathParts = Arrays.asList(classpath, ProjectPaths.jpf_core_jar, ProjectPaths.jpf_symbc_jar);
         classpath = String.join(SystemUtils.IS_OS_WINDOWS ? ";" : ":", classpathParts);
         List<String> options = Arrays.asList("-g", "-cp", classpath, "-d", dir);
         Iterable<? extends JavaFileObject> cpu =

@@ -37,7 +37,7 @@ public class DifferencingRunner {
 
     public void runDifferencing() throws Exception {
         File javaFile = this.createDifferencingDriverClass();
-        this.compile(Paths.classpath, javaFile);
+        this.compile(ProjectPaths.classpath, javaFile);
         File configFile = this.createDifferencingJpfConfiguration();
 
         Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
@@ -96,7 +96,7 @@ public class DifferencingRunner {
 
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnosticCollector, null, null);
         String dir = classpath;
-        List<String> classpathParts = Arrays.asList(classpath, Paths.jpf_core_jar, Paths.jpf_symbc_jar);
+        List<String> classpathParts = Arrays.asList(classpath, ProjectPaths.jpf_core_jar, ProjectPaths.jpf_symbc_jar);
         classpath = String.join(SystemUtils.IS_OS_WINDOWS ? ";" : ":", classpathParts);
         List<String> options = Arrays.asList("-g", "-cp", classpath, "-d", dir);
         Iterable<? extends JavaFileObject> cpu =

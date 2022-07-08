@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -117,10 +118,10 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
         try {
             String z3QueryFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-ToSolve.txt";
-            Path z3QueryPath  = java.nio.file.Paths.get(this.parameters.getTargetDirectory(), z3QueryFilename).toAbsolutePath();
+            Path z3QueryPath  = Paths.get(this.parameters.getTargetDirectory(), z3QueryFilename).toAbsolutePath();
             Files.write(z3QueryPath, z3Query.getBytes());
 
-            String mainCommand = Paths.z3 +" -smt2 " + z3QueryPath + " -T:1";
+            String mainCommand = ProjectPaths.z3 +" -smt2 " + z3QueryPath + " -T:1";
 
             Process z3Process = Runtime.getRuntime().exec(mainCommand);
             BufferedReader in = new BufferedReader(new InputStreamReader(z3Process.getInputStream()));
@@ -140,7 +141,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
             }
 
             String z3AnswerFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Answer.txt";
-            Path z3AnswerPath  = java.nio.file.Paths.get(this.parameters.getTargetDirectory(), z3AnswerFilename).toAbsolutePath();
+            Path z3AnswerPath  = Paths.get(this.parameters.getTargetDirectory(), z3AnswerFilename).toAbsolutePath();
             Files.write(z3AnswerPath, z3Answer.getBytes());
 
             if (z3Answer.startsWith("(error")) {
@@ -158,13 +159,13 @@ public class DifferencingListener extends PropertyListenerAdapter {
             // A model (i.e., counterexample) only exists if the two programs are NOT equivalent.
             if (!areEquivalent) {
                 String z3ModelFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Model.txt";
-                Path z3ModelPath  = java.nio.file.Paths.get(this.parameters.getTargetDirectory(), z3ModelFilename).toAbsolutePath();
+                Path z3ModelPath  = Paths.get(this.parameters.getTargetDirectory(), z3ModelFilename).toAbsolutePath();
                 Files.write(z3ModelPath, z3Model.getBytes());
             }
 
             if (!z3Errors.isEmpty()) {
                 String z3ErrorsFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Errors.txt";
-                Path z3ErrorsPath  = java.nio.file.Paths.get(this.parameters.getTargetDirectory(), z3ErrorsFilename).toAbsolutePath();
+                Path z3ErrorsPath  = Paths.get(this.parameters.getTargetDirectory(), z3ErrorsFilename).toAbsolutePath();
                 Files.write(z3ErrorsPath, z3Errors.getBytes());
             }
         } catch (IOException e) {

@@ -14,13 +14,13 @@ import DSE.DSE;
 import GradDiff.GradDiff;
 import IMPs.ImpactedS;
 import com.microsoft.z3.Context;
+import equiv.checking.ProjectPaths;
 import equiv.checking.Utils;
 import org.apache.commons.lang3.SystemUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
-import static equiv.checking.Paths.z3;
 import static equiv.checking.Utils.*;
 
 public class Runner{
@@ -45,7 +45,7 @@ public class Runner{
             MethodPath2 = path2;
         }
         if(SystemUtils.IS_OS_LINUX) {
-            File file = new File(z3);
+            File file = new File(ProjectPaths.z3);
             if(!file.canExecute()){
                 boolean success = file.setExecutable(true);
                 if(!success){
@@ -53,7 +53,7 @@ public class Runner{
                     System.exit(1);
                 }
             }
-            z3 = "./z3";
+            ProjectPaths.z3 = "./z3";
         }
     }
 
@@ -66,7 +66,7 @@ public class Runner{
         MethodPath1 = path1;
         MethodPath2 = path2;
         if(SystemUtils.IS_OS_LINUX) {
-            File file = new File(z3);
+            File file = new File(ProjectPaths.z3);
             if(!file.canExecute()){
                 boolean success = file.setExecutable(true);
                 if(!success){
@@ -74,7 +74,7 @@ public class Runner{
                     System.exit(1);
                 }
             }
-            z3 = "./z3";
+            ProjectPaths.z3 = "./z3";
         }
     }
 

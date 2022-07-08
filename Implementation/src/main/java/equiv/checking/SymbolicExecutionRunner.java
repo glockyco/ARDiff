@@ -20,7 +20,6 @@ import javafx.util.Pair;
 import java.io.*;
 import java.util.*;
 
-import static equiv.checking.Paths.*;
 import static equiv.checking.Utils.DEBUG;
 
 public class SymbolicExecutionRunner {
@@ -242,7 +241,7 @@ public class SymbolicExecutionRunner {
 					+secondSummary+"))))\n(check-sat-using (then smt (par-or simplify aig solve-eqs qfnra-nlsat)))\n(get-info:reason-unknown)\n(get-model)";
 			bw2.write(toSolve);
 			bw2.close();
-			String mainCommand = z3+" -smt2 " + path+newFileName+"ToSolve.txt -T:"+timeout/1000;
+			String mainCommand = ProjectPaths.z3+" -smt2 " + path+newFileName+"ToSolve.txt -T:"+timeout/1000;
 			if (DEBUG) System.out.println(mainCommand);
 			long start = System.nanoTime();
 			Process p1 = Runtime.getRuntime().exec(mainCommand);
@@ -303,7 +302,7 @@ public class SymbolicExecutionRunner {
 	public void creatingJpfFiles() throws IOException{
 		String JPFMethodInputs=createSymbolicInputParametersForInstrumentedJPF();
 		String fixed=
-        "classpath="+classpath.replace("\\", "\\\\")+" \n"+
+        "classpath="+ProjectPaths.classpath.replace("\\", "\\\\")+" \n"+
 		"symbolic.min_int="+this.minInt+"\n"+
         "symbolic.max_int="+this.maxInt+"\n"+
         "symbolic.min_long="+this.minLong+"\n"+
@@ -384,8 +383,9 @@ public class SymbolicExecutionRunner {
 	 */
 	public void runningOnProgram(String fileName) throws IOException {
 
-		String mainCommand = "java -jar -Djava.library.path="+ dp +" "+jpf_core+"/build/RunJPF.jar "
-				+ path+fileName+".jpf";
+		String mainCommand = "java -jar -Djava.library.path=" + ProjectPaths.dp + " "
+			+ ProjectPaths.jpf_core + "/build/RunJPF.jar "
+			+ path + fileName +".jpf";
 
 		if(DEBUG) System.out.println(mainCommand);
 		Process p = Runtime.getRuntime().exec(mainCommand);

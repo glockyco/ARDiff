@@ -16,6 +16,7 @@ import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import com.microsoft.z3.*;
 import equiv.checking.ChangeExtractor;
+import equiv.checking.ProjectPaths;
 import equiv.checking.SymbolicExecutionRunner.SMTSummary;
 import javafx.util.Pair;
 
@@ -23,7 +24,6 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static equiv.checking.Paths.z3;
 import static equiv.checking.Utils.DEBUG;
 
 public class GradDiff extends DSE {
@@ -418,7 +418,7 @@ public class GradDiff extends DSE {
             bw.write("(check-sat)");
             bw.close();
             fw.close();
-            String mainCommand = z3+" -smt2 " + this.path + "/H1Checking.smt2 -T:"+timeout/1000;
+            String mainCommand = ProjectPaths.z3+" -smt2 " + this.path + "/H1Checking.smt2 -T:"+timeout/1000;
             //if (debug) System.out.println(mainCommand);
             Process p = Runtime.getRuntime().exec(mainCommand);
             BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));

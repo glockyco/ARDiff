@@ -17,8 +17,6 @@ import java.util.*;
 import javafx.util.Pair;
 import org.objectweb.asm.tree.MethodNode;
 
-import static equiv.checking.Paths.classpath;
-
 public class Instrumentation implements Utils{
 
 	/** This class is in charge of creating the uninterpreted functions and JPF input **/
@@ -308,6 +306,6 @@ public class Instrumentation implements Utils{
 		FileWriter writer = new FileWriter(newFile);
 		writer.write(newProgram);
 		writer.close();
-		compile(classpath,newFile);
+		compile(ProjectPaths.classpath,newFile);
 	}
 }

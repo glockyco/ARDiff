@@ -24,8 +24,6 @@ import equiv.checking.custom.CustomSerializer;
 import java.io.*;
 import java.util.*;
 
-import static equiv.checking.Paths.classpath;
-
 /**
  * This class extracts the changes between the two programs in the form of an ArrayList containing the lines numbers
  */
@@ -291,8 +289,8 @@ public class ChangeExtractor implements Utils{
 		writer = new FileWriter(file2);
 		writer.write(prog2);
 		writer.close();
-		compile(Paths.classpath,file1);
-		compile(Paths.classpath,file2);
+		compile(ProjectPaths.classpath,file1);
+		compile(ProjectPaths.classpath,file2);
 	}
 
 	/**

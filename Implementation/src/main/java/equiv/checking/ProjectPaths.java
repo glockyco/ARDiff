@@ -11,13 +11,15 @@
 //WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 package equiv.checking;
 
-public final class Paths {
-    public static String classpath = java.nio.file.Paths.get("target", "classes").toAbsolutePath().toString();
-    public static String sourcepath = java.nio.file.Paths.get("src", "examples", "demo", "instrumented").toAbsolutePath().toString();
-    public static final String jpf_symbc = java.nio.file.Paths.get("jpf-git", "jpf-symbc").toAbsolutePath().toString();
-    public static final String jpf_symbc_jar = java.nio.file.Paths.get(jpf_symbc, "build", "jpf-symbc.jar").toAbsolutePath().toString();
-    public static final String jpf_core = java.nio.file.Paths.get("jpf-git", "jpf-core").toAbsolutePath().toString();
-    public static final String jpf_core_jar = java.nio.file.Paths.get(jpf_core, "build", "jpf.jar").toAbsolutePath().toString();
+import java.nio.file.Paths;
+
+public final class ProjectPaths {
+    public static String classpath = Paths.get("target", "classes").toAbsolutePath().toString();
+    public static String sourcepath = Paths.get("src", "examples", "demo", "instrumented").toAbsolutePath().toString();
+    public static final String jpf_symbc = Paths.get("jpf-git", "jpf-symbc").toAbsolutePath().toString();
+    public static final String jpf_symbc_jar = Paths.get(jpf_symbc, "build", "jpf-symbc.jar").toAbsolutePath().toString();
+    public static final String jpf_core = Paths.get("jpf-git", "jpf-core").toAbsolutePath().toString();
+    public static final String jpf_core_jar = Paths.get(jpf_core, "build", "jpf.jar").toAbsolutePath().toString();
     public static String z3 = "z3";
-    public static String dp = java.nio.file.Paths.get( "jpf-git", "jpf-symbc", "lib").toAbsolutePath().toString();
+    public static String dp = Paths.get( "jpf-git", "jpf-symbc", "lib").toAbsolutePath().toString();
 }

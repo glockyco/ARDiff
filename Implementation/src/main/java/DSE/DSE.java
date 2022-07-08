@@ -27,7 +27,6 @@ import org.objectweb.asm.tree.MethodNode;
 import java.io.*;
 import java.util.*;
 
-import static equiv.checking.Paths.z3;
 import static equiv.checking.Utils.DEBUG;
 
 
@@ -425,7 +424,7 @@ public class DSE {
         BufferedWriter bw2 = new BufferedWriter(new FileWriter(tmp));
         bw2.write(toSolve);
         bw2.close();
-        String mainCommand = z3+" -smt2 " + tmp.getAbsolutePath()+" -t:"+timeout;
+        String mainCommand = ProjectPaths.z3+" -smt2 " + tmp.getAbsolutePath()+" -t:"+timeout;
         if (DEBUG) System.out.println(mainCommand);
         Process p1 = Runtime.getRuntime().exec(mainCommand);
         BufferedReader in = new BufferedReader(new InputStreamReader(p1.getInputStream()));
