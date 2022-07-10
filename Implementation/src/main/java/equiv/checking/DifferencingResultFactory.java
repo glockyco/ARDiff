@@ -49,7 +49,7 @@ public class DifferencingResultFactory {
         int neqCount = 0;
         int unknownCount = 0;
 
-        for (String answerFile : parameters.getAnswerFiles()) {
+        for (String answerFile : parameters.getZ3AnswerFiles()) {
             Path answerPath = Paths.get(answerFile);
             String answer = new String(Files.readAllBytes(answerPath));
 

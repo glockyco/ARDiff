@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DifferencingParameters implements Serializable {
@@ -50,6 +47,14 @@ public class DifferencingParameters implements Serializable {
         return Paths.get(this.directory, "IDiff" + this.toolName + "-Parameters.txt").toString();
     }
 
+    public String getJavaFile() {
+        return Paths.get(this.directory, "IDiff" + this.toolName + ".java").toString();
+    }
+
+    public String getJpfFile() {
+        return Paths.get(this.directory, "IDiff" + this.toolName + ".jpf").toString();
+    }
+
     public String getOutputFile() {
         return Paths.get(this.directory, "IDiff" + this.toolName + "-Output.txt").toString();
     }
@@ -62,10 +67,21 @@ public class DifferencingParameters implements Serializable {
         return Paths.get(this.directory, "IDiff" + this.toolName + "-Result.txt").toString();
     }
 
-    public String[] getAnswerFiles() throws IOException {
+    public String[] getZ3QueryFiles() throws IOException {
+        return this.getFiles("glob:**/IDiff" + this.toolName + "-P*-ToSolve.txt");
+    }
+
+    public String[] getZ3AnswerFiles() throws IOException {
+        return this.getFiles("glob:**/IDiff" + this.toolName + "-P*-Answer.txt");
+    }
+
+    public String[] getZ3ModelFiles() throws IOException {
+        return this.getFiles("glob:**/IDiff" + this.toolName + "-P*-Model.txt");
+    }
+
+    private String[] getFiles(String glob) throws IOException {
         List<String> answerFiles = new ArrayList<>();
 
-        String glob = "glob:**/IDiff" + this.toolName + "-P*-Answer.txt";
         PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(glob);
         Files.walkFileTree(Paths.get(this.getTargetDirectory()), new SimpleFileVisitor<Path>() {
             @Override
@@ -78,6 +94,22 @@ public class DifferencingParameters implements Serializable {
         });
 
         return answerFiles.toArray(new String[0]);
+    }
+
+
+    public String[] getGeneratedFiles() throws IOException {
+        List<String> generatedFiles = new ArrayList<>();
+
+        generatedFiles.add(this.getJavaFile());
+        generatedFiles.add(this.getJpfFile());
+        generatedFiles.addAll(Arrays.asList(this.getZ3QueryFiles()));
+        generatedFiles.addAll(Arrays.asList(this.getZ3AnswerFiles()));
+        generatedFiles.addAll(Arrays.asList(this.getZ3ModelFiles()));
+        generatedFiles.add(this.getOutputFile());
+        generatedFiles.add(this.getErrorFile());
+        generatedFiles.add(this.getResultFile());
+
+        return generatedFiles.toArray(new String[0]);
     }
 
     public String getTargetNamespace() {

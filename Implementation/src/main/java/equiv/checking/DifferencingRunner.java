@@ -24,10 +24,15 @@ public class DifferencingRunner {
     private final Configuration freeMarkerConfiguration;
 
     public static void main(String[] args) throws IOException, TemplateException {
+        // Read the differencing configuration:
         Path parameterFilePath = Paths.get(args[0]);
         DifferencingParameterFactory parameterFactory = new DifferencingParameterFactory();
         DifferencingParameters parameters = parameterFactory.load(parameterFilePath.toFile());
 
+        // Delete generated files from previous run(s):
+        Arrays.stream(parameters.getGeneratedFiles()).forEach(file -> new File(file).delete());
+
+        // Run the differencing:
         int timeout = Integer.parseInt(args[1]);
         TimeUnit timeUnit = TimeUnit.SECONDS;
 
@@ -59,6 +64,7 @@ public class DifferencingRunner {
             e.printStackTrace(errorStream);
         }
 
+        // Write the differencing results to disk:
         DifferencingResultFactory resultFactory = new DifferencingResultFactory();
         DifferencingResult result = resultFactory.create(parameters);
         Path resultFilePath = Paths.get(parameters.getResultFile());
