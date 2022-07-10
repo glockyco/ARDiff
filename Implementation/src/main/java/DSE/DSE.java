@@ -26,6 +26,7 @@ import org.objectweb.asm.tree.MethodNode;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static equiv.checking.Utils.DEBUG;
@@ -311,8 +312,7 @@ public class DSE {
                 summary.declarations
             );
 
-            String filename = "IDiff" + this.toolName + "-Parameters.txt";
-            Path filepath = java.nio.file.Paths.get(parameters.getTargetDirectory(), filename);
+            Path filepath = Paths.get(parameters.getParameterFile());
             factory.persist(filepath.toFile(), parameters);
 
             return summary;

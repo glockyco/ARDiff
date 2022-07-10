@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -22,11 +23,16 @@ public class DifferencingRunner {
     private final DifferencingParameters parameters;
     private final Configuration freeMarkerConfiguration;
 
-    public static void main(String[] args) throws IOException, TemplateException, ClassNotFoundException {
-        Path filepath = java.nio.file.Paths.get(args[0]);
-        DifferencingParameterFactory factory = new DifferencingParameterFactory();
-        DifferencingParameters parameters = factory.load(filepath.toFile());
+    public static void main(String[] args) throws IOException, TemplateException {
+        Path parameterFilePath = Paths.get(args[0]);
+        DifferencingParameterFactory parameterFactory = new DifferencingParameterFactory();
+        DifferencingParameters parameters = parameterFactory.load(parameterFilePath.toFile());
         new DifferencingRunner(parameters).runDifferencing();
+
+        DifferencingResultFactory resultFactory = new DifferencingResultFactory();
+        DifferencingResult result = resultFactory.create(parameters);
+        Path resultFilePath = Paths.get(parameters.getResultFile());
+        resultFactory.persist(resultFilePath.toFile(), result);
     }
 
     public DifferencingRunner(DifferencingParameters parameters) throws IOException {

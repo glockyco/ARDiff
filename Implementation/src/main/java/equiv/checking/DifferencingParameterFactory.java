@@ -73,6 +73,7 @@ public class DifferencingParameterFactory {
 
         return new DifferencingParameters(
             directory,
+            toolName,
             z3Declarations,
             oldMethodDescription,
             newMethodDescription,

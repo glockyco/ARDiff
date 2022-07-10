@@ -1,12 +1,18 @@
 package equiv.checking;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class DifferencingParameters implements Serializable {
     private final String directory;
+    private final String toolName;
     private final String z3Declarations;
     private final MethodDescription oldMethodDescription;
     private final MethodDescription newMethodDescription;
@@ -14,22 +20,64 @@ public class DifferencingParameters implements Serializable {
 
     public DifferencingParameters(
         String directory,
+        String toolName,
         String z3Declarations,
         MethodDescription oldMethodDescription,
         MethodDescription newMethodDescription,
         MethodDescription diffMethodDescription
     ) {
         this.directory = directory;
+        this.toolName = toolName;
         this.z3Declarations = z3Declarations.trim();
         this.oldMethodDescription = oldMethodDescription;
         this.newMethodDescription = newMethodDescription;
         this.diffMethodDescription = diffMethodDescription;
     }
 
-    public String getZ3Declarations() { return this.z3Declarations; }
+    public String getToolName() {
+        return this.toolName;
+    }
+
+    public String getZ3Declarations() {
+        return this.z3Declarations;
+    }
 
     public String getTargetDirectory() {
-        return directory;
+        return this.directory;
+    }
+
+    public String getParameterFile() {
+        return Paths.get(this.directory, "IDiff" + this.toolName + "-Parameters.txt").toString();
+    }
+
+    public String getOutputFile() {
+        return Paths.get(this.directory, "IDiff" + this.toolName + "-Output.txt").toString();
+    }
+
+    public String getErrorFile() {
+        return Paths.get(this.directory, "IDiff" + this.toolName + "-Error.txt").toString();
+    }
+
+    public String getResultFile() {
+        return Paths.get(this.directory, "IDiff" + this.toolName + "-Result.txt").toString();
+    }
+
+    public String[] getAnswerFiles() throws IOException {
+        List<String> answerFiles = new ArrayList<>();
+
+        String glob = "glob:**/IDiff" + this.toolName + "-P*-Answer.txt";
+        PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(glob);
+        Files.walkFileTree(Paths.get(this.getTargetDirectory()), new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+                if (pathMatcher.matches(path)) {
+                    answerFiles.add(path.toString());
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        return answerFiles.toArray(new String[0]);
     }
 
     public String getTargetNamespace() {
