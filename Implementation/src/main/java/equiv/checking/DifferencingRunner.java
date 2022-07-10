@@ -9,15 +9,15 @@ import gov.nasa.jpf.JPF;
 import org.apache.commons.lang.SystemUtils;
 
 import javax.tools.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class DifferencingRunner {
     private final DifferencingParameters parameters;
@@ -27,7 +27,37 @@ public class DifferencingRunner {
         Path parameterFilePath = Paths.get(args[0]);
         DifferencingParameterFactory parameterFactory = new DifferencingParameterFactory();
         DifferencingParameters parameters = parameterFactory.load(parameterFilePath.toFile());
-        new DifferencingRunner(parameters).runDifferencing();
+
+        int timeout = Integer.parseInt(args[1]);
+        TimeUnit timeUnit = TimeUnit.SECONDS;
+
+        PrintStream errorStream = new PrintStream(parameters.getErrorFile());
+
+        try {
+            TimeLimitedCodeBlock.runWithTimeout(() -> {
+                try {
+                    new DifferencingRunner(parameters).runDifferencing();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }, timeout, timeUnit);
+        } catch (TimeoutException e) {
+            String errorMessage = "Differencing failed due to timeout (" + timeout + " " + timeUnit + ").\n";
+
+            System.out.println(errorMessage);
+            e.printStackTrace();
+
+            errorStream.println(errorMessage);
+            e.printStackTrace(errorStream);
+        } catch (Exception e) {
+            String errorMessage = "Differencing failed due to error.\n";
+
+            System.out.println(errorMessage);
+            e.printStackTrace();
+
+            errorStream.println(errorMessage);
+            e.printStackTrace(errorStream);
+        }
 
         DifferencingResultFactory resultFactory = new DifferencingResultFactory();
         DifferencingResult result = resultFactory.create(parameters);
