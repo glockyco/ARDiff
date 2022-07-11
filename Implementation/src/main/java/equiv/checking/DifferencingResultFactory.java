@@ -83,7 +83,7 @@ public class DifferencingResultFactory {
         }
 
         String error = new String(Files.readAllBytes(errorFilePath));
-        return error.toLowerCase().contains("timeout");
+        return error.contains("java.util.concurrent.TimeoutException");
     }
 
     public boolean createErrorResult(DifferencingParameters parameters) throws IOException {
@@ -98,6 +98,6 @@ public class DifferencingResultFactory {
             return false;
         }
 
-        return !error.toLowerCase().contains("timeout");
+        return !error.contains("java.util.concurrent.TimeoutException");
     }
 }

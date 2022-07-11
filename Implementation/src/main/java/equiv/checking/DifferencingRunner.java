@@ -21,11 +21,13 @@ import java.util.concurrent.TimeoutException;
 
 public class DifferencingRunner {
     private final DifferencingParameters parameters;
+    private final int timeout;
     private final Configuration freeMarkerConfiguration;
 
     public static void main(String[] args) throws IOException, TemplateException {
         // Read the differencing configuration:
         Path parameterFilePath = Paths.get(args[0]);
+        int timeout = Integer.parseInt(args[1]);
         DifferencingParameterFactory parameterFactory = new DifferencingParameterFactory();
         DifferencingParameters parameters = parameterFactory.load(parameterFilePath.toFile());
 
@@ -33,35 +35,73 @@ public class DifferencingRunner {
         Arrays.stream(parameters.getGeneratedFiles()).forEach(file -> new File(file).delete());
 
         // Run the differencing:
-        int timeout = Integer.parseInt(args[1]);
-        TimeUnit timeUnit = TimeUnit.SECONDS;
+        PrintStream systemOutput = System.out;
+        PrintStream systemError = System.err;
 
-        PrintStream errorStream = new PrintStream(parameters.getErrorFile());
+        ByteArrayOutputStream driverOutputBuffer = new ByteArrayOutputStream();
+        PrintStream driverOutput = new PrintStream(driverOutputBuffer);
+        ByteArrayOutputStream driverErrorBuffer = new ByteArrayOutputStream();
+        PrintStream driverError = new PrintStream(driverErrorBuffer);
 
-        try {
-            TimeLimitedCodeBlock.runWithTimeout(() -> {
-                try {
-                    new DifferencingRunner(parameters).runDifferencing();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+        String outputPath = parameters.getOutputFile();
+        String errorPath = parameters.getErrorFile();
+
+        boolean hasSucceeded = false;
+        boolean hasTimedOut = false;
+
+        try (PrintWriter outputWriter = new PrintWriter(outputPath, "UTF-8")) {
+            Thread shutdownHook = new Thread(() -> {
+                outputWriter.println(driverOutputBuffer);
+                outputWriter.println("Program quit unexpectedly.");
+                outputWriter.flush();
+            });
+
+            try {
+                System.setOut(driverOutput);
+                System.setErr(driverError);
+
+                Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+                new DifferencingRunner(parameters, timeout).runDifferencing();
+
+                hasSucceeded = true;
+            } catch (TimeoutException e) {
+                try (PrintWriter errorWriter = new PrintWriter(errorPath, "UTF-8")) {
+                    e.printStackTrace(driverError);
+
+                    errorWriter.println("Differencing failed due to timeout (" + timeout + "s).\n");
+                    errorWriter.println(driverErrorBuffer);
+                    errorWriter.flush();
                 }
-            }, timeout, timeUnit);
-        } catch (TimeoutException e) {
-            String errorMessage = "Differencing failed due to timeout (" + timeout + " " + timeUnit + ").\n";
 
-            System.out.println(errorMessage);
-            e.printStackTrace();
+                hasTimedOut = true;
+            } catch (Exception e) {
+                try (PrintWriter errorWriter = new PrintWriter(errorPath, "UTF-8")) {
+                    e.printStackTrace(driverError);
 
-            errorStream.println(errorMessage);
-            e.printStackTrace(errorStream);
-        } catch (Exception e) {
-            String errorMessage = "Differencing failed due to error.\n";
+                    errorWriter.println("Differencing failed due to error.\n");
+                    errorWriter.println(driverErrorBuffer);
+                    errorWriter.flush();
+                }
+            } finally {
+                outputWriter.println(driverOutputBuffer);
+                outputWriter.flush();
 
-            System.out.println(errorMessage);
-            e.printStackTrace();
+                Runtime.getRuntime().removeShutdownHook(shutdownHook);
+            }
+        }
 
-            errorStream.println(errorMessage);
-            e.printStackTrace(errorStream);
+        String status = "SUCCESS";
+        if (hasTimedOut) {
+            status = "TIMEOUT";
+        } else if (!hasSucceeded) {
+            status = "FAILURE";
+        }
+
+        systemOutput.println(status + ": " + parameters.getTargetDirectory());
+
+        if (!hasSucceeded && !hasTimedOut) {
+            systemOutput.println(driverErrorBuffer);
         }
 
         // Write the differencing results to disk:
@@ -71,8 +111,9 @@ public class DifferencingRunner {
         resultFactory.persist(resultFilePath.toFile(), result);
     }
 
-    public DifferencingRunner(DifferencingParameters parameters) throws IOException {
+    public DifferencingRunner(DifferencingParameters parameters, int timeout) throws IOException {
         this.parameters = parameters;
+        this.timeout = timeout;
 
         // @TODO: Inject FreeMarker configuration into this file (?).
         /* Create and adjust the FreeMarker configuration singleton */
@@ -86,15 +127,23 @@ public class DifferencingRunner {
         this.freeMarkerConfiguration.setFallbackOnNullLoopVariable(false);
     }
 
-    public void runDifferencing() throws TemplateException, IOException {
-        File javaFile = this.createDifferencingDriverClass();
-        this.compile(ProjectPaths.classpath, javaFile);
-        File configFile = this.createDifferencingJpfConfiguration();
+    public void runDifferencing() throws Exception {
+        Runnable differencing = () -> {
+            try {
+                File javaFile = this.createDifferencingDriverClass();
+                this.compile(ProjectPaths.classpath, javaFile);
+                File configFile = this.createDifferencingJpfConfiguration();
 
-        Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
-        JPF jpf = new JPF(config);
-        jpf.addListener(new DifferencingListener(this.parameters));
-        jpf.run();
+                Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
+                JPF jpf = new JPF(config);
+                jpf.addListener(new DifferencingListener(this.parameters));
+                jpf.run();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        TimeLimitedCodeBlock.runWithTimeout(differencing, this.timeout, TimeUnit.SECONDS);
     }
 
     public File createDifferencingDriverClass() throws IOException, TemplateException {
