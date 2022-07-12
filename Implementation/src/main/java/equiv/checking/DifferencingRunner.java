@@ -28,6 +28,12 @@ public class DifferencingRunner {
         // Read the differencing configuration:
         Path parameterFilePath = Paths.get(args[0]);
         int timeout = Integer.parseInt(args[1]);
+
+        if (!parameterFilePath.toFile().exists()) {
+            System.out.println("Error: '" + parameterFilePath + "' does not exist.");
+            return;
+        }
+
         DifferencingParameterFactory parameterFactory = new DifferencingParameterFactory();
         DifferencingParameters parameters = parameterFactory.load(parameterFilePath.toFile());
 
