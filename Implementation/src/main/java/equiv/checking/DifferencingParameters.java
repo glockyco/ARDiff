@@ -67,6 +67,10 @@ public class DifferencingParameters implements Serializable {
         return Paths.get(this.directory, "IDiff" + this.toolName + "-Result.txt").toString();
     }
 
+    public String getBaseToolOutputFile() {
+        return Paths.get(this.directory, "..", "outputs", this.toolName + ".txt").toString();
+    }
+
     public String[] getZ3QueryFiles() throws IOException {
         return this.getFiles("glob:**/IDiff" + this.toolName + "-P*-ToSolve.txt");
     }

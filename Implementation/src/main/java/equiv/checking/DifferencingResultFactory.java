@@ -44,7 +44,7 @@ public class DifferencingResultFactory {
         return new DifferencingResult(
             benchmarkDirectory,
             this.createExpectedClassification(benchmarkDirectory),
-            "UNKNOWN",
+            "BASE_TOOL_TIMEOUT",
             true,
             true
         );

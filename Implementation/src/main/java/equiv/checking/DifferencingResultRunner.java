@@ -16,10 +16,12 @@ public class DifferencingResultRunner {
 
         if (parameterFilePath.toFile().exists()) {
             DifferencingParameters parameters = parameterFactory.load(parameterFilePath.toFile());
-            result = resultFactory.create(parameters);
+            Path baseToolOutputPath = Paths.get(parameters.getBaseToolOutputFile());
+            result = baseToolOutputPath.toFile().exists()
+                ? resultFactory.create(parameters)
+                : resultFactory.create(parameterFilePath.getParent().toString());
             resultFilePath = Paths.get(parameters.getResultFile());
         } else {
-            System.out.println("Error: '" + parameterFilePath + "' does not exist.");
             result = resultFactory.create(parameterFilePath.getParent().toString());
             resultFilePath = Paths.get(parameterFilePath.toString().replace("-Parameters.txt", "-Result.txt"));
         }
