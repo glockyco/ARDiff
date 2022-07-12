@@ -74,13 +74,6 @@ public class GradDiff extends DSE {
             else changes = changeExtractor.obtainChanges(MethodPath1, MethodPath2, ranByUser, path);
             setPathToDummy(changeExtractor.getClasspath());
             gumTreePassed = true;
-            String outputs = path.split("instrumented")[0];
-            File newFile = new File(outputs+"outputs/ARDiff"+this.strategy+".txt");
-            newFile.getParentFile().mkdir();
-            if(!newFile.exists())
-                newFile.createNewFile();
-            FileWriter fwNew=new FileWriter(newFile);
-            BufferedWriter writer=new BufferedWriter(fwNew);
             SMTSummary summary = null;
             String result = "";
             int index =0;
@@ -94,6 +87,13 @@ public class GradDiff extends DSE {
 
             }
             System.out.println(updateUserOutput(finalRes));
+            String outputs = path.split("instrumented")[0];
+            File newFile = new File(outputs+"outputs/" + this.toolName + ".txt");
+            newFile.getParentFile().mkdir();
+            if(!newFile.exists())
+                newFile.createNewFile();
+            FileWriter fwNew=new FileWriter(newFile);
+            BufferedWriter writer=new BufferedWriter(fwNew);
             writer.write(result);
             writer.close();
             fwNew.close();
