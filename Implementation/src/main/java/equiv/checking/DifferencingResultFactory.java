@@ -33,15 +33,25 @@ public class DifferencingResultFactory {
     public DifferencingResult create(DifferencingParameters parameters) throws IOException {
         return new DifferencingResult(
             parameters.getTargetDirectory(),
-            this.createExpectedClassification(parameters),
+            this.createExpectedClassification(parameters.getTargetDirectory()),
             this.createActualClassification(parameters),
             this.createTimeOutResult(parameters),
             this.createErrorResult(parameters)
         );
     }
 
-    public String createExpectedClassification(DifferencingParameters parameters) {
-        return parameters.getTargetDirectory().contains("/Eq/") ? "EQ" : "NEQ";
+    public DifferencingResult create(String benchmarkDirectory) {
+        return new DifferencingResult(
+            benchmarkDirectory,
+            this.createExpectedClassification(benchmarkDirectory),
+            "UNKNOWN",
+            true,
+            true
+        );
+    }
+
+    public String createExpectedClassification(String benchmarkDirectory) {
+        return benchmarkDirectory.contains("/Eq/") ? "EQ" : "NEQ";
     }
 
     public String createActualClassification(DifferencingParameters parameters) throws IOException {
@@ -57,7 +67,10 @@ public class DifferencingResultFactory {
                 eqCount++;
             } else if (answer.equals("sat")) {
                 neqCount++;
-            } else if (answer.equals("unknown")) {
+            } else if (answer.equals("unknown") // z3 query has no definite answer.
+                || answer.startsWith("(error") // z3 query is invalid.
+                || answer.equals("") // z3 was interrupted by timeout.
+            ) {
                 unknownCount++;
             } else {
                 throw new RuntimeException("Unknown z3 answer '" + answer + "' in '" + answerFile + "'.");

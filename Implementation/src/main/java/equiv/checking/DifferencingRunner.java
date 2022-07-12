@@ -103,12 +103,6 @@ public class DifferencingRunner {
         if (!hasSucceeded && !hasTimedOut) {
             systemOutput.println(driverErrorBuffer);
         }
-
-        // Write the differencing results to disk:
-        DifferencingResultFactory resultFactory = new DifferencingResultFactory();
-        DifferencingResult result = resultFactory.create(parameters);
-        Path resultFilePath = Paths.get(parameters.getResultFile());
-        resultFactory.persist(resultFilePath.toFile(), result);
     }
 
     public DifferencingRunner(DifferencingParameters parameters, int timeout) throws IOException {
