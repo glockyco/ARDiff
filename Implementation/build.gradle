@@ -30,17 +30,19 @@ compileJava {
 }
 
 application {
-    mainClass = 'Runner.Runner'
+    mainClass = project.hasProperty("mainClass") ? project.getProperty("mainClass") : "Runner.Runner"
 }
 
 jar {
     destinationDirectory = file("target/artifacts/Implementation_jar")
     archiveFileName = "Implementation.jar"
 
+    def mainClass = project.hasProperty("mainClass") ? project.getProperty("mainClass") : "Runner.Runner"
+
     manifest {
         attributes(
                 'Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join(' '),
-                'Main-Class': 'Runner.Runner'
+                'Main-Class': mainClass
         )
     }
 }
