@@ -321,9 +321,8 @@ public class SymParserSMTLib extends AbstractSymParser{
     }
 
     public Pair<String,String> parseCast(String string){
-        String[] name = string.split("_");
-        if(name[0].contains("REAL")){
-            String var = "REAL_"+name[1].substring(0,1);
+        String var = string.split("\\[")[0];
+        if(var.contains("REAL")){
             //To be checked
             if (!variables.containsKey(var)) {
                 declarations += "(declare-fun " + var + " () Real)\n";
@@ -333,7 +332,6 @@ public class SymParserSMTLib extends AbstractSymParser{
             }
             return new Pair("Real",var);
         }
-        String var = "INT_"+name[1].substring(0,1);
         if (!variables.containsKey(var)) {
             declarations += "(declare-fun " + var + " () Int)\n";
             Expr e = context.mkIntConst(var);
