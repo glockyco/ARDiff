@@ -1,1988 +1,236 @@
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Airy/MAX/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/MAX/Eq/oldV.java --path2 ../benchmarks/Airy/MAX/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/MAX/Eq/oldV.java --path2 ../benchmarks/Airy/MAX/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/MAX/Eq/oldV.java --path2 ../benchmarks/Airy/MAX/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/MAX/Eq/oldV.java --path2 ../benchmarks/Airy/MAX/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/MAX/Eq/oldV.java --path2 ../benchmarks/Airy/MAX/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Airy/MAX/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/MAX/NEq/oldV.java --path2 ../benchmarks/Airy/MAX/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/MAX/NEq/oldV.java --path2 ../benchmarks/Airy/MAX/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/MAX/NEq/oldV.java --path2 ../benchmarks/Airy/MAX/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/MAX/NEq/oldV.java --path2 ../benchmarks/Airy/MAX/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/MAX/NEq/oldV.java --path2 ../benchmarks/Airy/MAX/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Airy/Sign/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/Sign/Eq/oldV.java --path2 ../benchmarks/Airy/Sign/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/Sign/Eq/oldV.java --path2 ../benchmarks/Airy/Sign/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/Sign/Eq/oldV.java --path2 ../benchmarks/Airy/Sign/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/Sign/Eq/oldV.java --path2 ../benchmarks/Airy/Sign/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/Sign/Eq/oldV.java --path2 ../benchmarks/Airy/Sign/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Airy/Sign/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/Sign/NEq/oldV.java --path2 ../benchmarks/Airy/Sign/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/Sign/NEq/oldV.java --path2 ../benchmarks/Airy/Sign/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/Sign/NEq/oldV.java --path2 ../benchmarks/Airy/Sign/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/Sign/NEq/oldV.java --path2 ../benchmarks/Airy/Sign/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Airy/Sign/NEq/oldV.java --path2 ../benchmarks/Airy/Sign/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessi/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi/Eq/oldV.java --path2 ../benchmarks/Bess/bessi/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi/Eq/oldV.java --path2 ../benchmarks/Bess/bessi/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi/Eq/oldV.java --path2 ../benchmarks/Bess/bessi/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi/Eq/oldV.java --path2 ../benchmarks/Bess/bessi/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi/Eq/oldV.java --path2 ../benchmarks/Bess/bessi/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessi/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi/NEq/oldV.java --path2 ../benchmarks/Bess/bessi/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi/NEq/oldV.java --path2 ../benchmarks/Bess/bessi/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi/NEq/oldV.java --path2 ../benchmarks/Bess/bessi/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi/NEq/oldV.java --path2 ../benchmarks/Bess/bessi/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi/NEq/oldV.java --path2 ../benchmarks/Bess/bessi/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessi0/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi0/Eq/oldV.java --path2 ../benchmarks/Bess/bessi0/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi0/Eq/oldV.java --path2 ../benchmarks/Bess/bessi0/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi0/Eq/oldV.java --path2 ../benchmarks/Bess/bessi0/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi0/Eq/oldV.java --path2 ../benchmarks/Bess/bessi0/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi0/Eq/oldV.java --path2 ../benchmarks/Bess/bessi0/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessi0/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi0/NEq/oldV.java --path2 ../benchmarks/Bess/bessi0/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi0/NEq/oldV.java --path2 ../benchmarks/Bess/bessi0/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi0/NEq/oldV.java --path2 ../benchmarks/Bess/bessi0/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi0/NEq/oldV.java --path2 ../benchmarks/Bess/bessi0/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi0/NEq/oldV.java --path2 ../benchmarks/Bess/bessi0/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessi1/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi1/Eq/oldV.java --path2 ../benchmarks/Bess/bessi1/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi1/Eq/oldV.java --path2 ../benchmarks/Bess/bessi1/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi1/Eq/oldV.java --path2 ../benchmarks/Bess/bessi1/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi1/Eq/oldV.java --path2 ../benchmarks/Bess/bessi1/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi1/Eq/oldV.java --path2 ../benchmarks/Bess/bessi1/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessi1/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi1/NEq/oldV.java --path2 ../benchmarks/Bess/bessi1/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi1/NEq/oldV.java --path2 ../benchmarks/Bess/bessi1/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi1/NEq/oldV.java --path2 ../benchmarks/Bess/bessi1/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi1/NEq/oldV.java --path2 ../benchmarks/Bess/bessi1/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessi1/NEq/oldV.java --path2 ../benchmarks/Bess/bessi1/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessj/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj/Eq/oldV.java --path2 ../benchmarks/Bess/bessj/Eq/newV.java --tool D --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj/Eq/oldV.java --path2 ../benchmarks/Bess/bessj/Eq/newV.java --tool I --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj/Eq/oldV.java --path2 ../benchmarks/Bess/bessj/Eq/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj/Eq/oldV.java --path2 ../benchmarks/Bess/bessj/Eq/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj/Eq/oldV.java --path2 ../benchmarks/Bess/bessj/Eq/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessj/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj/NEq/oldV.java --path2 ../benchmarks/Bess/bessj/NEq/newV.java --tool D --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj/NEq/oldV.java --path2 ../benchmarks/Bess/bessj/NEq/newV.java --tool I --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj/NEq/oldV.java --path2 ../benchmarks/Bess/bessj/NEq/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj/NEq/oldV.java --path2 ../benchmarks/Bess/bessj/NEq/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj/NEq/oldV.java --path2 ../benchmarks/Bess/bessj/NEq/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessj0/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj0/Eq/oldV.java --path2 ../benchmarks/Bess/bessj0/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj0/Eq/oldV.java --path2 ../benchmarks/Bess/bessj0/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj0/Eq/oldV.java --path2 ../benchmarks/Bess/bessj0/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj0/Eq/oldV.java --path2 ../benchmarks/Bess/bessj0/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj0/Eq/oldV.java --path2 ../benchmarks/Bess/bessj0/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessj0/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj0/NEq/oldV.java --path2 ../benchmarks/Bess/bessj0/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj0/NEq/oldV.java --path2 ../benchmarks/Bess/bessj0/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj0/NEq/oldV.java --path2 ../benchmarks/Bess/bessj0/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj0/NEq/oldV.java --path2 ../benchmarks/Bess/bessj0/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj0/NEq/oldV.java --path2 ../benchmarks/Bess/bessj0/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessj1/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj1/Eq/oldV.java --path2 ../benchmarks/Bess/bessj1/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj1/Eq/oldV.java --path2 ../benchmarks/Bess/bessj1/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj1/Eq/oldV.java --path2 ../benchmarks/Bess/bessj1/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj1/Eq/oldV.java --path2 ../benchmarks/Bess/bessj1/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj1/Eq/oldV.java --path2 ../benchmarks/Bess/bessj1/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessj1/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj1/NEq/oldV.java --path2 ../benchmarks/Bess/bessj1/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj1/NEq/oldV.java --path2 ../benchmarks/Bess/bessj1/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj1/NEq/oldV.java --path2 ../benchmarks/Bess/bessj1/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj1/NEq/oldV.java --path2 ../benchmarks/Bess/bessj1/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessj1/NEq/oldV.java --path2 ../benchmarks/Bess/bessj1/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessk/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk/Eq/oldV.java --path2 ../benchmarks/Bess/bessk/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk/Eq/oldV.java --path2 ../benchmarks/Bess/bessk/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk/Eq/oldV.java --path2 ../benchmarks/Bess/bessk/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk/Eq/oldV.java --path2 ../benchmarks/Bess/bessk/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk/Eq/oldV.java --path2 ../benchmarks/Bess/bessk/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessk/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk/NEq/oldV.java --path2 ../benchmarks/Bess/bessk/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk/NEq/oldV.java --path2 ../benchmarks/Bess/bessk/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk/NEq/oldV.java --path2 ../benchmarks/Bess/bessk/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk/NEq/oldV.java --path2 ../benchmarks/Bess/bessk/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk/NEq/oldV.java --path2 ../benchmarks/Bess/bessk/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessk0/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk0/Eq/oldV.java --path2 ../benchmarks/Bess/bessk0/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk0/Eq/oldV.java --path2 ../benchmarks/Bess/bessk0/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk0/Eq/oldV.java --path2 ../benchmarks/Bess/bessk0/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk0/Eq/oldV.java --path2 ../benchmarks/Bess/bessk0/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk0/Eq/oldV.java --path2 ../benchmarks/Bess/bessk0/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessk0/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk0/NEq/oldV.java --path2 ../benchmarks/Bess/bessk0/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk0/NEq/oldV.java --path2 ../benchmarks/Bess/bessk0/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk0/NEq/oldV.java --path2 ../benchmarks/Bess/bessk0/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk0/NEq/oldV.java --path2 ../benchmarks/Bess/bessk0/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk0/NEq/oldV.java --path2 ../benchmarks/Bess/bessk0/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessk1/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk1/Eq/oldV.java --path2 ../benchmarks/Bess/bessk1/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk1/Eq/oldV.java --path2 ../benchmarks/Bess/bessk1/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk1/Eq/oldV.java --path2 ../benchmarks/Bess/bessk1/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk1/Eq/oldV.java --path2 ../benchmarks/Bess/bessk1/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk1/Eq/oldV.java --path2 ../benchmarks/Bess/bessk1/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessk1/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk1/NEq/oldV.java --path2 ../benchmarks/Bess/bessk1/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk1/NEq/oldV.java --path2 ../benchmarks/Bess/bessk1/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk1/NEq/oldV.java --path2 ../benchmarks/Bess/bessk1/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk1/NEq/oldV.java --path2 ../benchmarks/Bess/bessk1/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessk1/NEq/oldV.java --path2 ../benchmarks/Bess/bessk1/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessy/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy/Eq/oldV.java --path2 ../benchmarks/Bess/bessy/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy/Eq/oldV.java --path2 ../benchmarks/Bess/bessy/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy/Eq/oldV.java --path2 ../benchmarks/Bess/bessy/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy/Eq/oldV.java --path2 ../benchmarks/Bess/bessy/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy/Eq/oldV.java --path2 ../benchmarks/Bess/bessy/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessy/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy/NEq/oldV.java --path2 ../benchmarks/Bess/bessy/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy/NEq/oldV.java --path2 ../benchmarks/Bess/bessy/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy/NEq/oldV.java --path2 ../benchmarks/Bess/bessy/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy/NEq/oldV.java --path2 ../benchmarks/Bess/bessy/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy/NEq/oldV.java --path2 ../benchmarks/Bess/bessy/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessy0/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy0/Eq/oldV.java --path2 ../benchmarks/Bess/bessy0/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy0/Eq/oldV.java --path2 ../benchmarks/Bess/bessy0/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy0/Eq/oldV.java --path2 ../benchmarks/Bess/bessy0/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy0/Eq/oldV.java --path2 ../benchmarks/Bess/bessy0/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy0/Eq/oldV.java --path2 ../benchmarks/Bess/bessy0/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessy0/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy0/NEq/oldV.java --path2 ../benchmarks/Bess/bessy0/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy0/NEq/oldV.java --path2 ../benchmarks/Bess/bessy0/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy0/NEq/oldV.java --path2 ../benchmarks/Bess/bessy0/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy0/NEq/oldV.java --path2 ../benchmarks/Bess/bessy0/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy0/NEq/oldV.java --path2 ../benchmarks/Bess/bessy0/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessy1/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy1/Eq/oldV.java --path2 ../benchmarks/Bess/bessy1/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy1/Eq/oldV.java --path2 ../benchmarks/Bess/bessy1/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy1/Eq/oldV.java --path2 ../benchmarks/Bess/bessy1/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy1/Eq/oldV.java --path2 ../benchmarks/Bess/bessy1/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy1/Eq/oldV.java --path2 ../benchmarks/Bess/bessy1/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/bessy1/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy1/NEq/oldV.java --path2 ../benchmarks/Bess/bessy1/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy1/NEq/oldV.java --path2 ../benchmarks/Bess/bessy1/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy1/NEq/oldV.java --path2 ../benchmarks/Bess/bessy1/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy1/NEq/oldV.java --path2 ../benchmarks/Bess/bessy1/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/bessy1/NEq/oldV.java --path2 ../benchmarks/Bess/bessy1/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/dawson/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/dawson/Eq/oldV.java --path2 ../benchmarks/Bess/dawson/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/dawson/Eq/oldV.java --path2 ../benchmarks/Bess/dawson/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/dawson/Eq/oldV.java --path2 ../benchmarks/Bess/dawson/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/dawson/Eq/oldV.java --path2 ../benchmarks/Bess/dawson/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/dawson/Eq/oldV.java --path2 ../benchmarks/Bess/dawson/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/dawson/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/dawson/NEq/oldV.java --path2 ../benchmarks/Bess/dawson/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/dawson/NEq/oldV.java --path2 ../benchmarks/Bess/dawson/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/dawson/NEq/oldV.java --path2 ../benchmarks/Bess/dawson/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/dawson/NEq/oldV.java --path2 ../benchmarks/Bess/dawson/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/dawson/NEq/oldV.java --path2 ../benchmarks/Bess/dawson/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/probks/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/probks/Eq/oldV.java --path2 ../benchmarks/Bess/probks/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/probks/Eq/oldV.java --path2 ../benchmarks/Bess/probks/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/probks/Eq/oldV.java --path2 ../benchmarks/Bess/probks/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/probks/Eq/oldV.java --path2 ../benchmarks/Bess/probks/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/probks/Eq/oldV.java --path2 ../benchmarks/Bess/probks/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/probks/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/probks/NEq/oldV.java --path2 ../benchmarks/Bess/probks/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/probks/NEq/oldV.java --path2 ../benchmarks/Bess/probks/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/probks/NEq/oldV.java --path2 ../benchmarks/Bess/probks/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/probks/NEq/oldV.java --path2 ../benchmarks/Bess/probks/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/probks/NEq/oldV.java --path2 ../benchmarks/Bess/probks/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/pythag/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/pythag/Eq/oldV.java --path2 ../benchmarks/Bess/pythag/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/pythag/Eq/oldV.java --path2 ../benchmarks/Bess/pythag/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/pythag/Eq/oldV.java --path2 ../benchmarks/Bess/pythag/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/pythag/Eq/oldV.java --path2 ../benchmarks/Bess/pythag/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/pythag/Eq/oldV.java --path2 ../benchmarks/Bess/pythag/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/pythag/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/pythag/NEq/oldV.java --path2 ../benchmarks/Bess/pythag/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/pythag/NEq/oldV.java --path2 ../benchmarks/Bess/pythag/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/pythag/NEq/oldV.java --path2 ../benchmarks/Bess/pythag/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/pythag/NEq/oldV.java --path2 ../benchmarks/Bess/pythag/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/pythag/NEq/oldV.java --path2 ../benchmarks/Bess/pythag/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/SIGN/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SIGN/Eq/oldV.java --path2 ../benchmarks/Bess/SIGN/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SIGN/Eq/oldV.java --path2 ../benchmarks/Bess/SIGN/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SIGN/Eq/oldV.java --path2 ../benchmarks/Bess/SIGN/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SIGN/Eq/oldV.java --path2 ../benchmarks/Bess/SIGN/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SIGN/Eq/oldV.java --path2 ../benchmarks/Bess/SIGN/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/SIGN/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SIGN/NEq/oldV.java --path2 ../benchmarks/Bess/SIGN/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SIGN/NEq/oldV.java --path2 ../benchmarks/Bess/SIGN/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SIGN/NEq/oldV.java --path2 ../benchmarks/Bess/SIGN/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SIGN/NEq/oldV.java --path2 ../benchmarks/Bess/SIGN/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SIGN/NEq/oldV.java --path2 ../benchmarks/Bess/SIGN/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/SQR/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SQR/Eq/oldV.java --path2 ../benchmarks/Bess/SQR/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SQR/Eq/oldV.java --path2 ../benchmarks/Bess/SQR/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SQR/Eq/oldV.java --path2 ../benchmarks/Bess/SQR/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SQR/Eq/oldV.java --path2 ../benchmarks/Bess/SQR/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SQR/Eq/oldV.java --path2 ../benchmarks/Bess/SQR/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Bess/SQR/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SQR/NEq/oldV.java --path2 ../benchmarks/Bess/SQR/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SQR/NEq/oldV.java --path2 ../benchmarks/Bess/SQR/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SQR/NEq/oldV.java --path2 ../benchmarks/Bess/SQR/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SQR/NEq/oldV.java --path2 ../benchmarks/Bess/SQR/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Bess/SQR/NEq/oldV.java --path2 ../benchmarks/Bess/SQR/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/caldat/badluk/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/badluk/Eq/oldV.java --path2 ../benchmarks/caldat/badluk/Eq/newV.java --tool D --s coral --b 13
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/badluk/Eq/oldV.java --path2 ../benchmarks/caldat/badluk/Eq/newV.java --tool I --s coral --b 13
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/badluk/Eq/oldV.java --path2 ../benchmarks/caldat/badluk/Eq/newV.java --tool A --s coral --b 13 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/badluk/Eq/oldV.java --path2 ../benchmarks/caldat/badluk/Eq/newV.java --tool A --s coral --b 13 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/badluk/Eq/oldV.java --path2 ../benchmarks/caldat/badluk/Eq/newV.java --tool A --s coral --b 13 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/caldat/badluk/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/badluk/NEq/oldV.java --path2 ../benchmarks/caldat/badluk/NEq/newV.java --tool D --s coral --b 13
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/badluk/NEq/oldV.java --path2 ../benchmarks/caldat/badluk/NEq/newV.java --tool I --s coral --b 13
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/badluk/NEq/oldV.java --path2 ../benchmarks/caldat/badluk/NEq/newV.java --tool A --s coral --b 13 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/badluk/NEq/oldV.java --path2 ../benchmarks/caldat/badluk/NEq/newV.java --tool A --s coral --b 13 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/badluk/NEq/oldV.java --path2 ../benchmarks/caldat/badluk/NEq/newV.java --tool A --s coral --b 13 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/caldat/julday/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/julday/Eq/oldV.java --path2 ../benchmarks/caldat/julday/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/julday/Eq/oldV.java --path2 ../benchmarks/caldat/julday/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/julday/Eq/oldV.java --path2 ../benchmarks/caldat/julday/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/julday/Eq/oldV.java --path2 ../benchmarks/caldat/julday/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/julday/Eq/oldV.java --path2 ../benchmarks/caldat/julday/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/caldat/julday/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/julday/NEq/oldV.java --path2 ../benchmarks/caldat/julday/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/julday/NEq/oldV.java --path2 ../benchmarks/caldat/julday/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/julday/NEq/oldV.java --path2 ../benchmarks/caldat/julday/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/julday/NEq/oldV.java --path2 ../benchmarks/caldat/julday/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/caldat/julday/NEq/oldV.java --path2 ../benchmarks/caldat/julday/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/dart/test/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/dart/test/Eq/oldV.java --path2 ../benchmarks/dart/test/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/dart/test/Eq/oldV.java --path2 ../benchmarks/dart/test/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/dart/test/Eq/oldV.java --path2 ../benchmarks/dart/test/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/dart/test/Eq/oldV.java --path2 ../benchmarks/dart/test/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/dart/test/Eq/oldV.java --path2 ../benchmarks/dart/test/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/dart/test/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/dart/test/NEq/oldV.java --path2 ../benchmarks/dart/test/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/dart/test/NEq/oldV.java --path2 ../benchmarks/dart/test/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/dart/test/NEq/oldV.java --path2 ../benchmarks/dart/test/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/dart/test/NEq/oldV.java --path2 ../benchmarks/dart/test/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/dart/test/NEq/oldV.java --path2 ../benchmarks/dart/test/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/brent/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/brent/Eq/oldV.java --path2 ../benchmarks/Ell/brent/Eq/newV.java --tool D --s coral --b 5 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/brent/Eq/oldV.java --path2 ../benchmarks/Ell/brent/Eq/newV.java --tool I --s coral --b 5
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/brent/Eq/oldV.java --path2 ../benchmarks/Ell/brent/Eq/newV.java --tool A --s coral --b 5 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/brent/Eq/oldV.java --path2 ../benchmarks/Ell/brent/Eq/newV.java --tool A --s coral --b 5 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/brent/Eq/oldV.java --path2 ../benchmarks/Ell/brent/Eq/newV.java --tool A --s coral --b 5 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/brent/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/brent/NEq/oldV.java --path2 ../benchmarks/Ell/brent/NEq/newV.java --tool D --s coral --b 5
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/brent/NEq/oldV.java --path2 ../benchmarks/Ell/brent/NEq/newV.java --tool I --s coral --b 5 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/brent/NEq/oldV.java --path2 ../benchmarks/Ell/brent/NEq/newV.java --tool A --s coral --b 5 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/brent/NEq/oldV.java --path2 ../benchmarks/Ell/brent/NEq/newV.java --tool A --s coral --b 5 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/brent/NEq/oldV.java --path2 ../benchmarks/Ell/brent/NEq/newV.java --tool A --s coral --b 5 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/dbrent/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/dbrent/Eq/oldV.java --path2 ../benchmarks/Ell/dbrent/Eq/newV.java --tool D --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/dbrent/Eq/oldV.java --path2 ../benchmarks/Ell/dbrent/Eq/newV.java --tool I --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/dbrent/Eq/oldV.java --path2 ../benchmarks/Ell/dbrent/Eq/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/dbrent/Eq/oldV.java --path2 ../benchmarks/Ell/dbrent/Eq/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/dbrent/Eq/oldV.java --path2 ../benchmarks/Ell/dbrent/Eq/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/dbrent/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/dbrent/NEq/oldV.java --path2 ../benchmarks/Ell/dbrent/NEq/newV.java --tool D --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/dbrent/NEq/oldV.java --path2 ../benchmarks/Ell/dbrent/NEq/newV.java --tool I --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/dbrent/NEq/oldV.java --path2 ../benchmarks/Ell/dbrent/NEq/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/dbrent/NEq/oldV.java --path2 ../benchmarks/Ell/dbrent/NEq/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/dbrent/NEq/oldV.java --path2 ../benchmarks/Ell/dbrent/NEq/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/ell/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ell/Eq/oldV.java --path2 ../benchmarks/Ell/ell/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ell/Eq/oldV.java --path2 ../benchmarks/Ell/ell/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ell/Eq/oldV.java --path2 ../benchmarks/Ell/ell/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ell/Eq/oldV.java --path2 ../benchmarks/Ell/ell/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ell/Eq/oldV.java --path2 ../benchmarks/Ell/ell/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/ell/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ell/NEq/oldV.java --path2 ../benchmarks/Ell/ell/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ell/NEq/oldV.java --path2 ../benchmarks/Ell/ell/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ell/NEq/oldV.java --path2 ../benchmarks/Ell/ell/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ell/NEq/oldV.java --path2 ../benchmarks/Ell/ell/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ell/NEq/oldV.java --path2 ../benchmarks/Ell/ell/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/ellpi/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ellpi/Eq/oldV.java --path2 ../benchmarks/Ell/ellpi/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ellpi/Eq/oldV.java --path2 ../benchmarks/Ell/ellpi/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ellpi/Eq/oldV.java --path2 ../benchmarks/Ell/ellpi/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ellpi/Eq/oldV.java --path2 ../benchmarks/Ell/ellpi/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ellpi/Eq/oldV.java --path2 ../benchmarks/Ell/ellpi/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/ellpi/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ellpi/NEq/oldV.java --path2 ../benchmarks/Ell/ellpi/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ellpi/NEq/oldV.java --path2 ../benchmarks/Ell/ellpi/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ellpi/NEq/oldV.java --path2 ../benchmarks/Ell/ellpi/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ellpi/NEq/oldV.java --path2 ../benchmarks/Ell/ellpi/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/ellpi/NEq/oldV.java --path2 ../benchmarks/Ell/ellpi/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/plgndr/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/plgndr/Eq/oldV.java --path2 ../benchmarks/Ell/plgndr/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/plgndr/Eq/oldV.java --path2 ../benchmarks/Ell/plgndr/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/plgndr/Eq/oldV.java --path2 ../benchmarks/Ell/plgndr/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/plgndr/Eq/oldV.java --path2 ../benchmarks/Ell/plgndr/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/plgndr/Eq/oldV.java --path2 ../benchmarks/Ell/plgndr/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/plgndr/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/plgndr/NEq/oldV.java --path2 ../benchmarks/Ell/plgndr/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/plgndr/NEq/oldV.java --path2 ../benchmarks/Ell/plgndr/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/plgndr/NEq/oldV.java --path2 ../benchmarks/Ell/plgndr/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/plgndr/NEq/oldV.java --path2 ../benchmarks/Ell/plgndr/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/plgndr/NEq/oldV.java --path2 ../benchmarks/Ell/plgndr/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/rc/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rc/Eq/oldV.java --path2 ../benchmarks/Ell/rc/Eq/newV.java --tool D --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rc/Eq/oldV.java --path2 ../benchmarks/Ell/rc/Eq/newV.java --tool I --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rc/Eq/oldV.java --path2 ../benchmarks/Ell/rc/Eq/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rc/Eq/oldV.java --path2 ../benchmarks/Ell/rc/Eq/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rc/Eq/oldV.java --path2 ../benchmarks/Ell/rc/Eq/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/rc/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rc/NEq/oldV.java --path2 ../benchmarks/Ell/rc/NEq/newV.java --tool D --s coral --b 5 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rc/NEq/oldV.java --path2 ../benchmarks/Ell/rc/NEq/newV.java --tool I --s coral --b 5 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rc/NEq/oldV.java --path2 ../benchmarks/Ell/rc/NEq/newV.java --tool A --s coral --b 5 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rc/NEq/oldV.java --path2 ../benchmarks/Ell/rc/NEq/newV.java --tool A --s coral --b 5 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rc/NEq/oldV.java --path2 ../benchmarks/Ell/rc/NEq/newV.java --tool A --s coral --b 5 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/rd/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rd/Eq/oldV.java --path2 ../benchmarks/Ell/rd/Eq/newV.java --tool D --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rd/Eq/oldV.java --path2 ../benchmarks/Ell/rd/Eq/newV.java --tool I --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rd/Eq/oldV.java --path2 ../benchmarks/Ell/rd/Eq/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rd/Eq/oldV.java --path2 ../benchmarks/Ell/rd/Eq/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rd/Eq/oldV.java --path2 ../benchmarks/Ell/rd/Eq/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/rd/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rd/NEq/oldV.java --path2 ../benchmarks/Ell/rd/NEq/newV.java --tool D --s coral --b 5
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rd/NEq/oldV.java --path2 ../benchmarks/Ell/rd/NEq/newV.java --tool I --s coral --b 5
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rd/NEq/oldV.java --path2 ../benchmarks/Ell/rd/NEq/newV.java --tool A --s coral --b 5 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rd/NEq/oldV.java --path2 ../benchmarks/Ell/rd/NEq/newV.java --tool A --s coral --b 5 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rd/NEq/oldV.java --path2 ../benchmarks/Ell/rd/NEq/newV.java --tool A --s coral --b 5 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/rf/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rf/Eq/oldV.java --path2 ../benchmarks/Ell/rf/Eq/newV.java --tool D --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rf/Eq/oldV.java --path2 ../benchmarks/Ell/rf/Eq/newV.java --tool I --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rf/Eq/oldV.java --path2 ../benchmarks/Ell/rf/Eq/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rf/Eq/oldV.java --path2 ../benchmarks/Ell/rf/Eq/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rf/Eq/oldV.java --path2 ../benchmarks/Ell/rf/Eq/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/rf/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rf/NEq/oldV.java --path2 ../benchmarks/Ell/rf/NEq/newV.java --tool D --s coral --b 5 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rf/NEq/oldV.java --path2 ../benchmarks/Ell/rf/NEq/newV.java --tool I --s coral --b 5 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rf/NEq/oldV.java --path2 ../benchmarks/Ell/rf/NEq/newV.java --tool A --s coral --b 5 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rf/NEq/oldV.java --path2 ../benchmarks/Ell/rf/NEq/newV.java --tool A --s coral --b 5 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rf/NEq/oldV.java --path2 ../benchmarks/Ell/rf/NEq/newV.java --tool A --s coral --b 5 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/rj/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rj/Eq/oldV.java --path2 ../benchmarks/Ell/rj/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rj/Eq/oldV.java --path2 ../benchmarks/Ell/rj/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rj/Eq/oldV.java --path2 ../benchmarks/Ell/rj/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rj/Eq/oldV.java --path2 ../benchmarks/Ell/rj/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rj/Eq/oldV.java --path2 ../benchmarks/Ell/rj/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/rj/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rj/NEq/oldV.java --path2 ../benchmarks/Ell/rj/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rj/NEq/oldV.java --path2 ../benchmarks/Ell/rj/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rj/NEq/oldV.java --path2 ../benchmarks/Ell/rj/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rj/NEq/oldV.java --path2 ../benchmarks/Ell/rj/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/rj/NEq/oldV.java --path2 ../benchmarks/Ell/rj/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/zbrent/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/zbrent/Eq/oldV.java --path2 ../benchmarks/Ell/zbrent/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/zbrent/Eq/oldV.java --path2 ../benchmarks/Ell/zbrent/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/zbrent/Eq/oldV.java --path2 ../benchmarks/Ell/zbrent/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/zbrent/Eq/oldV.java --path2 ../benchmarks/Ell/zbrent/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/zbrent/Eq/oldV.java --path2 ../benchmarks/Ell/zbrent/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ell/zbrent/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/zbrent/NEq/oldV.java --path2 ../benchmarks/Ell/zbrent/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/zbrent/NEq/oldV.java --path2 ../benchmarks/Ell/zbrent/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/zbrent/NEq/oldV.java --path2 ../benchmarks/Ell/zbrent/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/zbrent/NEq/oldV.java --path2 ../benchmarks/Ell/zbrent/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ell/zbrent/NEq/oldV.java --path2 ../benchmarks/Ell/zbrent/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/betacf/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betacf/Eq/oldV.java --path2 ../benchmarks/gam/betacf/Eq/newV.java --tool D --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betacf/Eq/oldV.java --path2 ../benchmarks/gam/betacf/Eq/newV.java --tool I --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betacf/Eq/oldV.java --path2 ../benchmarks/gam/betacf/Eq/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betacf/Eq/oldV.java --path2 ../benchmarks/gam/betacf/Eq/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betacf/Eq/oldV.java --path2 ../benchmarks/gam/betacf/Eq/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/betacf/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betacf/NEq/oldV.java --path2 ../benchmarks/gam/betacf/NEq/newV.java --tool D --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betacf/NEq/oldV.java --path2 ../benchmarks/gam/betacf/NEq/newV.java --tool I --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betacf/NEq/oldV.java --path2 ../benchmarks/gam/betacf/NEq/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betacf/NEq/oldV.java --path2 ../benchmarks/gam/betacf/NEq/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betacf/NEq/oldV.java --path2 ../benchmarks/gam/betacf/NEq/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/betai/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betai/Eq/oldV.java --path2 ../benchmarks/gam/betai/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betai/Eq/oldV.java --path2 ../benchmarks/gam/betai/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betai/Eq/oldV.java --path2 ../benchmarks/gam/betai/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betai/Eq/oldV.java --path2 ../benchmarks/gam/betai/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betai/Eq/oldV.java --path2 ../benchmarks/gam/betai/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/betai/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betai/NEq/oldV.java --path2 ../benchmarks/gam/betai/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betai/NEq/oldV.java --path2 ../benchmarks/gam/betai/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betai/NEq/oldV.java --path2 ../benchmarks/gam/betai/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betai/NEq/oldV.java --path2 ../benchmarks/gam/betai/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/betai/NEq/oldV.java --path2 ../benchmarks/gam/betai/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/ei/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/ei/Eq/oldV.java --path2 ../benchmarks/gam/ei/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/ei/Eq/oldV.java --path2 ../benchmarks/gam/ei/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/ei/Eq/oldV.java --path2 ../benchmarks/gam/ei/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/ei/Eq/oldV.java --path2 ../benchmarks/gam/ei/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/ei/Eq/oldV.java --path2 ../benchmarks/gam/ei/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/ei/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/ei/NEq/oldV.java --path2 ../benchmarks/gam/ei/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/ei/NEq/oldV.java --path2 ../benchmarks/gam/ei/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/ei/NEq/oldV.java --path2 ../benchmarks/gam/ei/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/ei/NEq/oldV.java --path2 ../benchmarks/gam/ei/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/ei/NEq/oldV.java --path2 ../benchmarks/gam/ei/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/erfcc/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/erfcc/Eq/oldV.java --path2 ../benchmarks/gam/erfcc/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/erfcc/Eq/oldV.java --path2 ../benchmarks/gam/erfcc/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/erfcc/Eq/oldV.java --path2 ../benchmarks/gam/erfcc/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/erfcc/Eq/oldV.java --path2 ../benchmarks/gam/erfcc/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/erfcc/Eq/oldV.java --path2 ../benchmarks/gam/erfcc/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/erfcc/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/erfcc/NEq/oldV.java --path2 ../benchmarks/gam/erfcc/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/erfcc/NEq/oldV.java --path2 ../benchmarks/gam/erfcc/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/erfcc/NEq/oldV.java --path2 ../benchmarks/gam/erfcc/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/erfcc/NEq/oldV.java --path2 ../benchmarks/gam/erfcc/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/erfcc/NEq/oldV.java --path2 ../benchmarks/gam/erfcc/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/expint/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/expint/Eq/oldV.java --path2 ../benchmarks/gam/expint/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/expint/Eq/oldV.java --path2 ../benchmarks/gam/expint/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/expint/Eq/oldV.java --path2 ../benchmarks/gam/expint/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/expint/Eq/oldV.java --path2 ../benchmarks/gam/expint/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/expint/Eq/oldV.java --path2 ../benchmarks/gam/expint/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/expint/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/expint/NEq/oldV.java --path2 ../benchmarks/gam/expint/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/expint/NEq/oldV.java --path2 ../benchmarks/gam/expint/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/expint/NEq/oldV.java --path2 ../benchmarks/gam/expint/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/expint/NEq/oldV.java --path2 ../benchmarks/gam/expint/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/expint/NEq/oldV.java --path2 ../benchmarks/gam/expint/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/gammp/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammp/Eq/oldV.java --path2 ../benchmarks/gam/gammp/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammp/Eq/oldV.java --path2 ../benchmarks/gam/gammp/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammp/Eq/oldV.java --path2 ../benchmarks/gam/gammp/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammp/Eq/oldV.java --path2 ../benchmarks/gam/gammp/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammp/Eq/oldV.java --path2 ../benchmarks/gam/gammp/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/gammp/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammp/NEq/oldV.java --path2 ../benchmarks/gam/gammp/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammp/NEq/oldV.java --path2 ../benchmarks/gam/gammp/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammp/NEq/oldV.java --path2 ../benchmarks/gam/gammp/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammp/NEq/oldV.java --path2 ../benchmarks/gam/gammp/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammp/NEq/oldV.java --path2 ../benchmarks/gam/gammp/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/gammq/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammq/Eq/oldV.java --path2 ../benchmarks/gam/gammq/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammq/Eq/oldV.java --path2 ../benchmarks/gam/gammq/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammq/Eq/oldV.java --path2 ../benchmarks/gam/gammq/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammq/Eq/oldV.java --path2 ../benchmarks/gam/gammq/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammq/Eq/oldV.java --path2 ../benchmarks/gam/gammq/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/gammq/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammq/NEq/oldV.java --path2 ../benchmarks/gam/gammq/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammq/NEq/oldV.java --path2 ../benchmarks/gam/gammq/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammq/NEq/oldV.java --path2 ../benchmarks/gam/gammq/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammq/NEq/oldV.java --path2 ../benchmarks/gam/gammq/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gammq/NEq/oldV.java --path2 ../benchmarks/gam/gammq/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/gcf/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gcf/Eq/oldV.java --path2 ../benchmarks/gam/gcf/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gcf/Eq/oldV.java --path2 ../benchmarks/gam/gcf/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gcf/Eq/oldV.java --path2 ../benchmarks/gam/gcf/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gcf/Eq/oldV.java --path2 ../benchmarks/gam/gcf/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gcf/Eq/oldV.java --path2 ../benchmarks/gam/gcf/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/gcf/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gcf/NEq/oldV.java --path2 ../benchmarks/gam/gcf/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gcf/NEq/oldV.java --path2 ../benchmarks/gam/gcf/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gcf/NEq/oldV.java --path2 ../benchmarks/gam/gcf/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gcf/NEq/oldV.java --path2 ../benchmarks/gam/gcf/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gcf/NEq/oldV.java --path2 ../benchmarks/gam/gcf/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/gser/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gser/Eq/oldV.java --path2 ../benchmarks/gam/gser/Eq/newV.java --tool D --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gser/Eq/oldV.java --path2 ../benchmarks/gam/gser/Eq/newV.java --tool I --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gser/Eq/oldV.java --path2 ../benchmarks/gam/gser/Eq/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gser/Eq/oldV.java --path2 ../benchmarks/gam/gser/Eq/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gser/Eq/oldV.java --path2 ../benchmarks/gam/gser/Eq/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/gam/gser/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gser/NEq/oldV.java --path2 ../benchmarks/gam/gser/NEq/newV.java --tool D --s coral --b 5
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gser/NEq/oldV.java --path2 ../benchmarks/gam/gser/NEq/newV.java --tool I --s coral --b 5
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gser/NEq/oldV.java --path2 ../benchmarks/gam/gser/NEq/newV.java --tool A --s coral --b 5 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gser/NEq/oldV.java --path2 ../benchmarks/gam/gser/NEq/newV.java --tool A --s coral --b 5 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/gam/gser/NEq/oldV.java --path2 ../benchmarks/gam/gser/NEq/newV.java --tool A --s coral --b 5 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/Add     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Add/oldV.java --path2 ../benchmarks/ModDiff/Eq/Add/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Add/oldV.java --path2 ../benchmarks/ModDiff/Eq/Add/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Add/oldV.java --path2 ../benchmarks/ModDiff/Eq/Add/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Add/oldV.java --path2 ../benchmarks/ModDiff/Eq/Add/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Add/oldV.java --path2 ../benchmarks/ModDiff/Eq/Add/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/Comp     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Comp/oldV.java --path2 ../benchmarks/ModDiff/Eq/Comp/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Comp/oldV.java --path2 ../benchmarks/ModDiff/Eq/Comp/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Comp/oldV.java --path2 ../benchmarks/ModDiff/Eq/Comp/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Comp/oldV.java --path2 ../benchmarks/ModDiff/Eq/Comp/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Comp/oldV.java --path2 ../benchmarks/ModDiff/Eq/Comp/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/Const     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Const/oldV.java --path2 ../benchmarks/ModDiff/Eq/Const/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Const/oldV.java --path2 ../benchmarks/ModDiff/Eq/Const/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Const/oldV.java --path2 ../benchmarks/ModDiff/Eq/Const/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Const/oldV.java --path2 ../benchmarks/ModDiff/Eq/Const/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Const/oldV.java --path2 ../benchmarks/ModDiff/Eq/Const/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/LoopMult10     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult10/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult10/newV.java --tool D --s coral --b 15 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult10/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult10/newV.java --tool I --s coral --b 15 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult10/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult10/newV.java --tool A --s coral --b 15 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult10/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult10/newV.java --tool A --s coral --b 15 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult10/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult10/newV.java --tool A --s coral --b 15 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/LoopMult15     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult15/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult15/newV.java --tool D --s coral --b 20
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult15/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult15/newV.java --tool I --s coral --b 20 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult15/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult15/newV.java --tool A --s coral --b 20 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult15/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult15/newV.java --tool A --s coral --b 20 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult15/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult15/newV.java --tool A --s coral --b 20 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/LoopMult2     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult2/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult2/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult2/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult2/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult2/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult2/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult2/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult2/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult2/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult2/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/LoopMult20     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult20/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult20/newV.java --tool D --s coral --b 25
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult20/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult20/newV.java --tool I --s coral --b 25
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult20/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult20/newV.java --tool A --s coral --b 25 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult20/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult20/newV.java --tool A --s coral --b 25 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult20/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult20/newV.java --tool A --s coral --b 25 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/LoopMult5     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult5/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult5/newV.java --tool D --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult5/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult5/newV.java --tool I --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult5/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult5/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult5/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult5/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopMult5/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopMult5/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/LoopSub     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopSub/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopSub/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopSub/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopSub/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopSub/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopSub/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopSub/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopSub/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopSub/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopSub/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/LoopUnreach10     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach10/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach10/newV.java --tool D --s coral --b 15
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach10/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach10/newV.java --tool I --s coral --b 15
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach10/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach10/newV.java --tool A --s coral --b 15 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach10/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach10/newV.java --tool A --s coral --b 15 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach10/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach10/newV.java --tool A --s coral --b 15 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/LoopUnreach15     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach15/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach15/newV.java --tool D --s coral --b 20
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach15/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach15/newV.java --tool I --s coral --b 20
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach15/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach15/newV.java --tool A --s coral --b 20 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach15/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach15/newV.java --tool A --s coral --b 20 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach15/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach15/newV.java --tool A --s coral --b 20 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/LoopUnreach2     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach2/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach2/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach2/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach2/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach2/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach2/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach2/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach2/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach2/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach2/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/LoopUnreach20     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach20/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach20/newV.java --tool D --s coral --b 25
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach20/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach20/newV.java --tool I --s coral --b 25
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach20/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach20/newV.java --tool A --s coral --b 25 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach20/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach20/newV.java --tool A --s coral --b 25 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach20/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach20/newV.java --tool A --s coral --b 25 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/LoopUnreach5     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach5/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach5/newV.java --tool D --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach5/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach5/newV.java --tool I --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach5/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach5/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach5/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach5/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/LoopUnreach5/oldV.java --path2 ../benchmarks/ModDiff/Eq/LoopUnreach5/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/Sub     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Sub/oldV.java --path2 ../benchmarks/ModDiff/Eq/Sub/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Sub/oldV.java --path2 ../benchmarks/ModDiff/Eq/Sub/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Sub/oldV.java --path2 ../benchmarks/ModDiff/Eq/Sub/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Sub/oldV.java --path2 ../benchmarks/ModDiff/Eq/Sub/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/Sub/oldV.java --path2 ../benchmarks/ModDiff/Eq/Sub/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/Eq/UnchLoop     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/UnchLoop/oldV.java --path2 ../benchmarks/ModDiff/Eq/UnchLoop/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/UnchLoop/oldV.java --path2 ../benchmarks/ModDiff/Eq/UnchLoop/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/UnchLoop/oldV.java --path2 ../benchmarks/ModDiff/Eq/UnchLoop/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/UnchLoop/oldV.java --path2 ../benchmarks/ModDiff/Eq/UnchLoop/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/Eq/UnchLoop/oldV.java --path2 ../benchmarks/ModDiff/Eq/UnchLoop/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/NEq/LoopMult10     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult10/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult10/newV.java --tool D --s coral --b 15
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult10/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult10/newV.java --tool I --s coral --b 15
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult10/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult10/newV.java --tool A --s coral --b 15 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult10/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult10/newV.java --tool A --s coral --b 15 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult10/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult10/newV.java --tool A --s coral --b 15 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/NEq/LoopMult15     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult15/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult15/newV.java --tool D --s coral --b 20
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult15/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult15/newV.java --tool I --s coral --b 20
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult15/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult15/newV.java --tool A --s coral --b 20 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult15/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult15/newV.java --tool A --s coral --b 20 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult15/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult15/newV.java --tool A --s coral --b 20 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/NEq/LoopMult2     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult2/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult2/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult2/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult2/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult2/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult2/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult2/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult2/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult2/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult2/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/NEq/LoopMult20     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult20/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult20/newV.java --tool D --s coral --b 25
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult20/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult20/newV.java --tool I --s coral --b 25
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult20/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult20/newV.java --tool A --s coral --b 25 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult20/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult20/newV.java --tool A --s coral --b 25 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult20/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult20/newV.java --tool A --s coral --b 25 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/NEq/LoopMult5     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult5/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult5/newV.java --tool D --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult5/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult5/newV.java --tool I --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult5/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult5/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult5/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult5/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopMult5/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopMult5/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/NEq/LoopSub     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopSub/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopSub/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopSub/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopSub/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopSub/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopSub/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopSub/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopSub/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopSub/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopSub/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/NEq/LoopUnreach10     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach10/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach10/newV.java --tool D --s coral --b 15
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach10/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach10/newV.java --tool I --s coral --b 15
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach10/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach10/newV.java --tool A --s coral --b 15 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach10/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach10/newV.java --tool A --s coral --b 15 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach10/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach10/newV.java --tool A --s coral --b 15 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/NEq/LoopUnreach15     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach15/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach15/newV.java --tool D --s coral --b 20
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach15/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach15/newV.java --tool I --s coral --b 20
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach15/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach15/newV.java --tool A --s coral --b 20 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach15/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach15/newV.java --tool A --s coral --b 20 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach15/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach15/newV.java --tool A --s coral --b 20 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/NEq/LoopUnreach2     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach2/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach2/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach2/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach2/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach2/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach2/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach2/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach2/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach2/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach2/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/NEq/LoopUnreach20     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach20/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach20/newV.java --tool D --s coral --b 25
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach20/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach20/newV.java --tool I --s coral --b 25
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach20/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach20/newV.java --tool A --s coral --b 25 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach20/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach20/newV.java --tool A --s coral --b 25 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach20/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach20/newV.java --tool A --s coral --b 25 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/NEq/LoopUnreach5     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach5/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach5/newV.java --tool D --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach5/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach5/newV.java --tool I --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach5/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach5/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach5/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach5/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/LoopUnreach5/oldV.java --path2 ../benchmarks/ModDiff/NEq/LoopUnreach5/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/ModDiff/NEq/UnchLoop     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/UnchLoop/oldV.java --path2 ../benchmarks/ModDiff/NEq/UnchLoop/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/UnchLoop/oldV.java --path2 ../benchmarks/ModDiff/NEq/UnchLoop/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/UnchLoop/oldV.java --path2 ../benchmarks/ModDiff/NEq/UnchLoop/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/UnchLoop/oldV.java --path2 ../benchmarks/ModDiff/NEq/UnchLoop/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/ModDiff/NEq/UnchLoop/oldV.java --path2 ../benchmarks/ModDiff/NEq/UnchLoop/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/power/test/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/power/test/Eq/oldV.java --path2 ../benchmarks/power/test/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/power/test/Eq/oldV.java --path2 ../benchmarks/power/test/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/power/test/Eq/oldV.java --path2 ../benchmarks/power/test/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/power/test/Eq/oldV.java --path2 ../benchmarks/power/test/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/power/test/Eq/oldV.java --path2 ../benchmarks/power/test/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/power/test/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/power/test/NEq/oldV.java --path2 ../benchmarks/power/test/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/power/test/NEq/oldV.java --path2 ../benchmarks/power/test/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/power/test/NEq/oldV.java --path2 ../benchmarks/power/test/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/power/test/NEq/oldV.java --path2 ../benchmarks/power/test/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/power/test/NEq/oldV.java --path2 ../benchmarks/power/test/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/bnldev/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/bnldev/Eq/oldV.java --path2 ../benchmarks/Ran/bnldev/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/bnldev/Eq/oldV.java --path2 ../benchmarks/Ran/bnldev/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/bnldev/Eq/oldV.java --path2 ../benchmarks/Ran/bnldev/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/bnldev/Eq/oldV.java --path2 ../benchmarks/Ran/bnldev/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/bnldev/Eq/oldV.java --path2 ../benchmarks/Ran/bnldev/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/bnldev/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/bnldev/NEq/oldV.java --path2 ../benchmarks/Ran/bnldev/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/bnldev/NEq/oldV.java --path2 ../benchmarks/Ran/bnldev/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/bnldev/NEq/oldV.java --path2 ../benchmarks/Ran/bnldev/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/bnldev/NEq/oldV.java --path2 ../benchmarks/Ran/bnldev/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/bnldev/NEq/oldV.java --path2 ../benchmarks/Ran/bnldev/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/expdev/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/expdev/Eq/oldV.java --path2 ../benchmarks/Ran/expdev/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/expdev/Eq/oldV.java --path2 ../benchmarks/Ran/expdev/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/expdev/Eq/oldV.java --path2 ../benchmarks/Ran/expdev/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/expdev/Eq/oldV.java --path2 ../benchmarks/Ran/expdev/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/expdev/Eq/oldV.java --path2 ../benchmarks/Ran/expdev/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/expdev/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/expdev/NEq/oldV.java --path2 ../benchmarks/Ran/expdev/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/expdev/NEq/oldV.java --path2 ../benchmarks/Ran/expdev/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/expdev/NEq/oldV.java --path2 ../benchmarks/Ran/expdev/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/expdev/NEq/oldV.java --path2 ../benchmarks/Ran/expdev/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/expdev/NEq/oldV.java --path2 ../benchmarks/Ran/expdev/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/gamdev/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gamdev/Eq/oldV.java --path2 ../benchmarks/Ran/gamdev/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gamdev/Eq/oldV.java --path2 ../benchmarks/Ran/gamdev/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gamdev/Eq/oldV.java --path2 ../benchmarks/Ran/gamdev/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gamdev/Eq/oldV.java --path2 ../benchmarks/Ran/gamdev/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gamdev/Eq/oldV.java --path2 ../benchmarks/Ran/gamdev/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/gamdev/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gamdev/NEq/oldV.java --path2 ../benchmarks/Ran/gamdev/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gamdev/NEq/oldV.java --path2 ../benchmarks/Ran/gamdev/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gamdev/NEq/oldV.java --path2 ../benchmarks/Ran/gamdev/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gamdev/NEq/oldV.java --path2 ../benchmarks/Ran/gamdev/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gamdev/NEq/oldV.java --path2 ../benchmarks/Ran/gamdev/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/gammln/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gammln/Eq/oldV.java --path2 ../benchmarks/Ran/gammln/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gammln/Eq/oldV.java --path2 ../benchmarks/Ran/gammln/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gammln/Eq/oldV.java --path2 ../benchmarks/Ran/gammln/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gammln/Eq/oldV.java --path2 ../benchmarks/Ran/gammln/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gammln/Eq/oldV.java --path2 ../benchmarks/Ran/gammln/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/gammln/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gammln/NEq/oldV.java --path2 ../benchmarks/Ran/gammln/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gammln/NEq/oldV.java --path2 ../benchmarks/Ran/gammln/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gammln/NEq/oldV.java --path2 ../benchmarks/Ran/gammln/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gammln/NEq/oldV.java --path2 ../benchmarks/Ran/gammln/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gammln/NEq/oldV.java --path2 ../benchmarks/Ran/gammln/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/gasdev/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gasdev/Eq/oldV.java --path2 ../benchmarks/Ran/gasdev/Eq/newV.java --tool D --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gasdev/Eq/oldV.java --path2 ../benchmarks/Ran/gasdev/Eq/newV.java --tool I --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gasdev/Eq/oldV.java --path2 ../benchmarks/Ran/gasdev/Eq/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gasdev/Eq/oldV.java --path2 ../benchmarks/Ran/gasdev/Eq/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gasdev/Eq/oldV.java --path2 ../benchmarks/Ran/gasdev/Eq/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/gasdev/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gasdev/NEq/oldV.java --path2 ../benchmarks/Ran/gasdev/NEq/newV.java --tool D --s coral --b 10
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gasdev/NEq/oldV.java --path2 ../benchmarks/Ran/gasdev/NEq/newV.java --tool I --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gasdev/NEq/oldV.java --path2 ../benchmarks/Ran/gasdev/NEq/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gasdev/NEq/oldV.java --path2 ../benchmarks/Ran/gasdev/NEq/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/gasdev/NEq/oldV.java --path2 ../benchmarks/Ran/gasdev/NEq/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/poidev/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/poidev/Eq/oldV.java --path2 ../benchmarks/Ran/poidev/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/poidev/Eq/oldV.java --path2 ../benchmarks/Ran/poidev/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/poidev/Eq/oldV.java --path2 ../benchmarks/Ran/poidev/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/poidev/Eq/oldV.java --path2 ../benchmarks/Ran/poidev/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/poidev/Eq/oldV.java --path2 ../benchmarks/Ran/poidev/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/poidev/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/poidev/NEq/oldV.java --path2 ../benchmarks/Ran/poidev/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/poidev/NEq/oldV.java --path2 ../benchmarks/Ran/poidev/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/poidev/NEq/oldV.java --path2 ../benchmarks/Ran/poidev/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/poidev/NEq/oldV.java --path2 ../benchmarks/Ran/poidev/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/poidev/NEq/oldV.java --path2 ../benchmarks/Ran/poidev/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/ran/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ran/Eq/oldV.java --path2 ../benchmarks/Ran/ran/Eq/newV.java --tool D --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ran/Eq/oldV.java --path2 ../benchmarks/Ran/ran/Eq/newV.java --tool I --s coral --b 10 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ran/Eq/oldV.java --path2 ../benchmarks/Ran/ran/Eq/newV.java --tool A --s coral --b 10 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ran/Eq/oldV.java --path2 ../benchmarks/Ran/ran/Eq/newV.java --tool A --s coral --b 10 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ran/Eq/oldV.java --path2 ../benchmarks/Ran/ran/Eq/newV.java --tool A --s coral --b 10 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/ran/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ran/NEq/oldV.java --path2 ../benchmarks/Ran/ran/NEq/newV.java --tool D --s coral --b 5 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ran/NEq/oldV.java --path2 ../benchmarks/Ran/ran/NEq/newV.java --tool I --s coral --b 5 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ran/NEq/oldV.java --path2 ../benchmarks/Ran/ran/NEq/newV.java --tool A --s coral --b 5 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ran/NEq/oldV.java --path2 ../benchmarks/Ran/ran/NEq/newV.java --tool A --s coral --b 5 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ran/NEq/oldV.java --path2 ../benchmarks/Ran/ran/NEq/newV.java --tool A --s coral --b 5 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/ranzero/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ranzero/Eq/oldV.java --path2 ../benchmarks/Ran/ranzero/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ranzero/Eq/oldV.java --path2 ../benchmarks/Ran/ranzero/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ranzero/Eq/oldV.java --path2 ../benchmarks/Ran/ranzero/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ranzero/Eq/oldV.java --path2 ../benchmarks/Ran/ranzero/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ranzero/Eq/oldV.java --path2 ../benchmarks/Ran/ranzero/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/Ran/ranzero/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ranzero/NEq/oldV.java --path2 ../benchmarks/Ran/ranzero/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ranzero/NEq/oldV.java --path2 ../benchmarks/Ran/ranzero/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ranzero/NEq/oldV.java --path2 ../benchmarks/Ran/ranzero/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ranzero/NEq/oldV.java --path2 ../benchmarks/Ran/ranzero/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/Ran/ranzero/NEq/oldV.java --path2 ../benchmarks/Ran/ranzero/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/sine/mysin/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/sine/mysin/Eq/oldV.java --path2 ../benchmarks/sine/mysin/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/sine/mysin/Eq/oldV.java --path2 ../benchmarks/sine/mysin/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/sine/mysin/Eq/oldV.java --path2 ../benchmarks/sine/mysin/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/sine/mysin/Eq/oldV.java --path2 ../benchmarks/sine/mysin/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/sine/mysin/Eq/oldV.java --path2 ../benchmarks/sine/mysin/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/sine/mysin/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/sine/mysin/NEq/oldV.java --path2 ../benchmarks/sine/mysin/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/sine/mysin/NEq/oldV.java --path2 ../benchmarks/sine/mysin/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/sine/mysin/NEq/oldV.java --path2 ../benchmarks/sine/mysin/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/sine/mysin/NEq/oldV.java --path2 ../benchmarks/sine/mysin/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/sine/mysin/NEq/oldV.java --path2 ../benchmarks/sine/mysin/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/tcas/altseptest/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/altseptest/Eq/oldV.java --path2 ../benchmarks/tcas/altseptest/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/altseptest/Eq/oldV.java --path2 ../benchmarks/tcas/altseptest/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/altseptest/Eq/oldV.java --path2 ../benchmarks/tcas/altseptest/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/altseptest/Eq/oldV.java --path2 ../benchmarks/tcas/altseptest/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/altseptest/Eq/oldV.java --path2 ../benchmarks/tcas/altseptest/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/tcas/altseptest/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/altseptest/NEq/oldV.java --path2 ../benchmarks/tcas/altseptest/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/altseptest/NEq/oldV.java --path2 ../benchmarks/tcas/altseptest/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/altseptest/NEq/oldV.java --path2 ../benchmarks/tcas/altseptest/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/altseptest/NEq/oldV.java --path2 ../benchmarks/tcas/altseptest/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/altseptest/NEq/oldV.java --path2 ../benchmarks/tcas/altseptest/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/tcas/NonCrossingBiasedClimb/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedClimb/Eq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedClimb/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedClimb/Eq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedClimb/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedClimb/Eq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedClimb/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedClimb/Eq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedClimb/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedClimb/Eq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedClimb/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/tcas/NonCrossingBiasedClimb/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedClimb/NEq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedClimb/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedClimb/NEq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedClimb/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedClimb/NEq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedClimb/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedClimb/NEq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedClimb/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedClimb/NEq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedClimb/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/tcas/NonCrossingBiasedDescend/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedDescend/Eq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedDescend/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedDescend/Eq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedDescend/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedDescend/Eq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedDescend/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedDescend/Eq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedDescend/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedDescend/Eq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedDescend/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/tcas/NonCrossingBiasedDescend/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedDescend/NEq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedDescend/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedDescend/NEq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedDescend/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedDescend/NEq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedDescend/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedDescend/NEq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedDescend/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tcas/NonCrossingBiasedDescend/NEq/oldV.java --path2 ../benchmarks/tcas/NonCrossingBiasedDescend/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/tsafe/conflict/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/conflict/Eq/oldV.java --path2 ../benchmarks/tsafe/conflict/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/conflict/Eq/oldV.java --path2 ../benchmarks/tsafe/conflict/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/conflict/Eq/oldV.java --path2 ../benchmarks/tsafe/conflict/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/conflict/Eq/oldV.java --path2 ../benchmarks/tsafe/conflict/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/conflict/Eq/oldV.java --path2 ../benchmarks/tsafe/conflict/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/tsafe/conflict/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/conflict/NEq/oldV.java --path2 ../benchmarks/tsafe/conflict/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/conflict/NEq/oldV.java --path2 ../benchmarks/tsafe/conflict/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/conflict/NEq/oldV.java --path2 ../benchmarks/tsafe/conflict/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/conflict/NEq/oldV.java --path2 ../benchmarks/tsafe/conflict/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/conflict/NEq/oldV.java --path2 ../benchmarks/tsafe/conflict/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/tsafe/normAngle/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/normAngle/Eq/oldV.java --path2 ../benchmarks/tsafe/normAngle/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/normAngle/Eq/oldV.java --path2 ../benchmarks/tsafe/normAngle/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/normAngle/Eq/oldV.java --path2 ../benchmarks/tsafe/normAngle/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/normAngle/Eq/oldV.java --path2 ../benchmarks/tsafe/normAngle/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/normAngle/Eq/oldV.java --path2 ../benchmarks/tsafe/normAngle/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/tsafe/normAngle/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/normAngle/NEq/oldV.java --path2 ../benchmarks/tsafe/normAngle/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/normAngle/NEq/oldV.java --path2 ../benchmarks/tsafe/normAngle/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/normAngle/NEq/oldV.java --path2 ../benchmarks/tsafe/normAngle/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/normAngle/NEq/oldV.java --path2 ../benchmarks/tsafe/normAngle/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/normAngle/NEq/oldV.java --path2 ../benchmarks/tsafe/normAngle/NEq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/tsafe/snippet/Eq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/snippet/Eq/oldV.java --path2 ../benchmarks/tsafe/snippet/Eq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/snippet/Eq/oldV.java --path2 ../benchmarks/tsafe/snippet/Eq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/snippet/Eq/oldV.java --path2 ../benchmarks/tsafe/snippet/Eq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/snippet/Eq/oldV.java --path2 ../benchmarks/tsafe/snippet/Eq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/snippet/Eq/oldV.java --path2 ../benchmarks/tsafe/snippet/Eq/newV.java --tool A --s coral --b 3 --H H123
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-echo "###################################    ../benchmarks/tsafe/snippet/NEq     ###################################" 
-echo "###################################################################################################" 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/snippet/NEq/oldV.java --path2 ../benchmarks/tsafe/snippet/NEq/newV.java --tool D --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/snippet/NEq/oldV.java --path2 ../benchmarks/tsafe/snippet/NEq/newV.java --tool I --s coral --b 3 
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/snippet/NEq/oldV.java --path2 ../benchmarks/tsafe/snippet/NEq/newV.java --tool A --s coral --b 3 --H R
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/snippet/NEq/oldV.java --path2 ../benchmarks/tsafe/snippet/NEq/newV.java --tool A --s coral --b 3 --H H3
-echo "###################################################################################################" 
-time gtimeout 300 java -Djava.library.path=jpf-git/jpf-symbc/lib -Xmx20G -Xms16G -jar target/artifacts/Implementation_jar/Implementation.jar --path1 ../benchmarks/tsafe/snippet/NEq/oldV.java --path2 ../benchmarks/tsafe/snippet/NEq/newV.java --tool A --s coral --b 3 --H H123
+#!/bin/bash
+
+dry_run=false
+
+timeout="300" # seconds
+
+clean=true
+print_cleaned=true
+print_skipped=false
+print_commands=true
+
+benchmarks=(
+  "../benchmarks/Airy/MAX/Eq"
+  "../benchmarks/Airy/MAX/NEq"
+  "../benchmarks/Airy/Sign/Eq"
+  "../benchmarks/Airy/Sign/NEq"
+  "../benchmarks/Bess/SIGN/Eq"
+  "../benchmarks/Bess/SIGN/NEq"
+  "../benchmarks/Bess/SQR/Eq"
+  "../benchmarks/Bess/SQR/NEq"
+  "../benchmarks/Bess/bessi/Eq"
+  "../benchmarks/Bess/bessi/NEq"
+  "../benchmarks/Bess/bessi0/Eq"
+  "../benchmarks/Bess/bessi0/NEq"
+  "../benchmarks/Bess/bessi1/Eq"
+  "../benchmarks/Bess/bessi1/NEq"
+  "../benchmarks/Bess/bessj/Eq"
+  "../benchmarks/Bess/bessj/NEq"
+  "../benchmarks/Bess/bessj0/Eq"
+  "../benchmarks/Bess/bessj0/NEq"
+  "../benchmarks/Bess/bessj1/Eq"
+  "../benchmarks/Bess/bessj1/NEq"
+  "../benchmarks/Bess/bessk/Eq"
+  "../benchmarks/Bess/bessk/NEq"
+  "../benchmarks/Bess/bessk0/Eq"
+  "../benchmarks/Bess/bessk0/NEq"
+  "../benchmarks/Bess/bessk1/Eq"
+  "../benchmarks/Bess/bessk1/NEq"
+  "../benchmarks/Bess/bessy/Eq"
+  "../benchmarks/Bess/bessy/NEq"
+  "../benchmarks/Bess/bessy0/Eq"
+  "../benchmarks/Bess/bessy0/NEq"
+  "../benchmarks/Bess/bessy1/Eq"
+  "../benchmarks/Bess/bessy1/NEq"
+  "../benchmarks/Bess/dawson/Eq"
+  "../benchmarks/Bess/dawson/NEq"
+  "../benchmarks/Bess/probks/Eq"
+  "../benchmarks/Bess/probks/NEq"
+  "../benchmarks/Bess/pythag/Eq"
+  "../benchmarks/Bess/pythag/NEq"
+  "../benchmarks/Ell/brent/Eq"
+  "../benchmarks/Ell/brent/NEq"
+  "../benchmarks/Ell/dbrent/Eq"
+  "../benchmarks/Ell/dbrent/NEq"
+  "../benchmarks/Ell/ell/Eq"
+  "../benchmarks/Ell/ell/NEq"
+  "../benchmarks/Ell/ellpi/Eq"
+  "../benchmarks/Ell/ellpi/NEq"
+  "../benchmarks/Ell/plgndr/Eq"
+  "../benchmarks/Ell/plgndr/NEq"
+  "../benchmarks/Ell/rc/Eq"
+  "../benchmarks/Ell/rc/NEq"
+  "../benchmarks/Ell/rd/Eq"
+  "../benchmarks/Ell/rd/NEq"
+  "../benchmarks/Ell/rf/Eq"
+  "../benchmarks/Ell/rf/NEq"
+  "../benchmarks/Ell/rj/Eq"
+  "../benchmarks/Ell/rj/NEq"
+  "../benchmarks/Ell/zbrent/Eq"
+  "../benchmarks/Ell/zbrent/NEq"
+  "../benchmarks/ModDiff/Eq/Add"
+  "../benchmarks/ModDiff/Eq/Comp"
+  "../benchmarks/ModDiff/Eq/Const"
+  "../benchmarks/ModDiff/Eq/LoopMult10"
+  "../benchmarks/ModDiff/Eq/LoopMult15"
+  "../benchmarks/ModDiff/Eq/LoopMult2"
+  "../benchmarks/ModDiff/Eq/LoopMult20"
+  "../benchmarks/ModDiff/Eq/LoopMult5"
+  "../benchmarks/ModDiff/Eq/LoopSub"
+  "../benchmarks/ModDiff/Eq/LoopUnreach10"
+  "../benchmarks/ModDiff/Eq/LoopUnreach15"
+  "../benchmarks/ModDiff/Eq/LoopUnreach2"
+  "../benchmarks/ModDiff/Eq/LoopUnreach20"
+  "../benchmarks/ModDiff/Eq/LoopUnreach5"
+  "../benchmarks/ModDiff/Eq/Sub"
+  "../benchmarks/ModDiff/Eq/UnchLoop"
+  "../benchmarks/ModDiff/NEq/LoopMult10"
+  "../benchmarks/ModDiff/NEq/LoopMult15"
+  "../benchmarks/ModDiff/NEq/LoopMult2"
+  "../benchmarks/ModDiff/NEq/LoopMult20"
+  "../benchmarks/ModDiff/NEq/LoopMult5"
+  "../benchmarks/ModDiff/NEq/LoopSub"
+  "../benchmarks/ModDiff/NEq/LoopUnreach10"
+  "../benchmarks/ModDiff/NEq/LoopUnreach15"
+  "../benchmarks/ModDiff/NEq/LoopUnreach2"
+  "../benchmarks/ModDiff/NEq/LoopUnreach20"
+  "../benchmarks/ModDiff/NEq/LoopUnreach5"
+  "../benchmarks/ModDiff/NEq/UnchLoop"
+  "../benchmarks/Ran/bnldev/Eq"
+  "../benchmarks/Ran/bnldev/NEq"
+  "../benchmarks/Ran/expdev/Eq"
+  "../benchmarks/Ran/expdev/NEq"
+  "../benchmarks/Ran/gamdev/Eq"
+  "../benchmarks/Ran/gamdev/NEq"
+  "../benchmarks/Ran/gammln/Eq"
+  "../benchmarks/Ran/gammln/NEq"
+  "../benchmarks/Ran/gasdev/Eq"
+  "../benchmarks/Ran/gasdev/NEq"
+  "../benchmarks/Ran/poidev/Eq"
+  "../benchmarks/Ran/poidev/NEq"
+  "../benchmarks/Ran/ran/Eq"
+  "../benchmarks/Ran/ran/NEq"
+  "../benchmarks/Ran/ranzero/Eq"
+  "../benchmarks/Ran/ranzero/NEq"
+  "../benchmarks/caldat/badluk/Eq"
+  "../benchmarks/caldat/badluk/NEq"
+  "../benchmarks/caldat/julday/Eq"
+  "../benchmarks/caldat/julday/NEq"
+  "../benchmarks/custom/loop/Eq"
+  "../benchmarks/custom/unreachable/Eq"
+  "../benchmarks/dart/test/Eq"
+  "../benchmarks/dart/test/NEq"
+  "../benchmarks/gam/betacf/Eq"
+  "../benchmarks/gam/betacf/NEq"
+  "../benchmarks/gam/betai/Eq"
+  "../benchmarks/gam/betai/NEq"
+  "../benchmarks/gam/ei/Eq"
+  "../benchmarks/gam/ei/NEq"
+  "../benchmarks/gam/erfcc/Eq"
+  "../benchmarks/gam/erfcc/NEq"
+  "../benchmarks/gam/expint/Eq"
+  "../benchmarks/gam/expint/NEq"
+  "../benchmarks/gam/gammp/Eq"
+  "../benchmarks/gam/gammp/NEq"
+  "../benchmarks/gam/gammq/Eq"
+  "../benchmarks/gam/gammq/NEq"
+  "../benchmarks/gam/gcf/Eq"
+  "../benchmarks/gam/gcf/NEq"
+  "../benchmarks/gam/gser/Eq"
+  "../benchmarks/gam/gser/NEq"
+  "../benchmarks/power/test/Eq"
+  "../benchmarks/power/test/NEq"
+  "../benchmarks/sine/mysin/Eq"
+  "../benchmarks/sine/mysin/NEq"
+  "../benchmarks/tcas/NonCrossingBiasedClimb/Eq"
+  "../benchmarks/tcas/NonCrossingBiasedClimb/NEq"
+  "../benchmarks/tcas/NonCrossingBiasedDescend/Eq"
+  "../benchmarks/tcas/NonCrossingBiasedDescend/NEq"
+  "../benchmarks/tcas/altseptest/Eq"
+  "../benchmarks/tcas/altseptest/NEq"
+  "../benchmarks/tsafe/conflict/Eq"
+  "../benchmarks/tsafe/conflict/NEq"
+  "../benchmarks/tsafe/normAngle/Eq"
+  "../benchmarks/tsafe/normAngle/NEq"
+  "../benchmarks/tsafe/snippet/Eq"
+  "../benchmarks/tsafe/snippet/NEq"
+)
+
+tool_names=(
+  "DSE"
+#  "Imp"
+#  "ARDiffR"
+#  "ARDiffH3"
+  "ARDiff"
+)
+
+configurations=(
+  "--tool D --s coral --b 3"
+#  "--tool I --s coral --b 3"
+#  "--tool A --s coral --b 3 --H R"
+#  "--tool A --s coral --b 3 --H H3"
+  "--tool A --s coral --b 3 --H H123"
+)
+
+if [ "$clean" = true ] ; then
+  for d1 in ../benchmarks/* ; do
+    for d2 in "$d1"/* ; do
+      for d3 in "$d2"/* ; do
+        if [[ ! " ${benchmarks[*]} " =~ " ${d3} " ]]; then
+          continue
+        fi
+
+        if [ "$print_cleaned" = true ] ; then
+          printf "Cleaning %s ...\n" "${d3}"
+          echo "rm -rf ${d3}/*/"
+        fi
+
+        if [ "$dry_run" = false ] ; then
+          rm -rf "${d3:?}"/*/
+        fi
+      done
+    done
+  done
+fi
+
+for d1 in ../benchmarks/* ; do
+  for d2 in "$d1"/* ; do
+    for d3 in "$d2"/* ; do
+      if [[ ! " ${benchmarks[*]} " =~ " ${d3} " ]]; then
+        if [ "$print_skipped" = true ] ; then
+          printf "Skipping %s ...\n" "${d3}"
+        fi
+        continue
+      fi
+
+      printf "Processing %s ..." "${d3}"
+
+      oldV="${d3}/oldV.java"
+      newV="${d3}/newV.java"
+
+      for i in "${!configurations[@]}" ; do
+        diffParameters="${d3}/instrumented/IDiff${tool_names[$i]}-Parameters.txt"
+
+        command_1="gtimeout --verbose --foreground ${timeout}s gradle -PmainClass=Runner.Runner run --args='--path1 ${oldV} --path2 ${newV} ${configurations[$i]}'"
+        command_2="gradle -PmainClass=equiv.checking.DifferencingRunner run --args='${diffParameters} ${timeout}'"
+        command_3="gradle -PmainClass=equiv.checking.DifferencingResultRunner run --args='${diffParameters}'"
+
+        if [ "$print_commands" = true ] ; then
+          printf "\n%s" "${command_1}"
+          printf "\n%s" "${command_2}"
+          printf "\n%s" "${command_3}"
+        fi
+
+        if [ "$dry_run" = false ] ; then
+          mkdir -p "${d3}/instrumented/"
+
+          eval "${command_1}"
+          eval "${command_2}"
+          eval "${command_3}"
+        fi
+      done
+
+      printf "\n"
+    done
+  done
+done
