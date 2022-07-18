@@ -142,19 +142,16 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
             String z3AnswerFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Answer.txt";
             Path z3AnswerPath  = Paths.get(this.parameters.getTargetDirectory(), z3AnswerFilename).toAbsolutePath();
-            Files.write(z3AnswerPath, z3Answer.getBytes());
 
             if (z3Answer.startsWith("(error")) {
-                throw new RuntimeException("z3 Error: " + z3Answer);
-            }
-
-            areEquivalent = z3Answer.equals("unsat");
-
-            if (areEquivalent || !hasUninterpretedFunctions) {
                 Files.write(z3AnswerPath, z3Answer.getBytes());
-            } else { // if (!areEquivalent && hasUninterpretedFunctions) {
-                Files.write(z3AnswerPath, "unknown".getBytes());
+                throw new RuntimeException("z3 Error: " + z3Answer);
+            } else {
+                z3Answer += hasUninterpretedFunctions ? " (has UIF)" : " (has no UIF)";
+                Files.write(z3AnswerPath, z3Answer.getBytes());
             }
+
+            areEquivalent = z3Answer.startsWith("unsat");
 
             // A model (i.e., counterexample) only exists if the two programs are NOT equivalent.
             if (!areEquivalent) {
