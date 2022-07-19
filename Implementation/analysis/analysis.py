@@ -491,45 +491,57 @@ class DifferencingData(BenchmarkData):
         }
 
 
-def run_main() -> None:
-    base_data: List[Dict[str, Any]] = []
-    diff_data: List[Dict[str, Any]] = []
+def run_main(use_cache: bool = True) -> None:
+    base_df: Optional[pd.DataFrame] = None
+    diff_df: Optional[pd.DataFrame] = None
 
-    for directory in glob.glob(os.path.join(BENCHMARKS_DIR, "*", "*", "*")):
-        for tool_name in ["ARDiff"]:
-            benchmark_path = Path(directory)
+    base_results_file = RESULTS_DIR / "base_results.csv"
+    diff_results_file = RESULTS_DIR / "diff_results.csv"
 
-            new_base_data = BaseToolData(benchmark_path, tool_name)
-            new_diff_data = DifferencingData(benchmark_path, tool_name)
+    is_cache_available: bool = False
 
-            if new_diff_data.has_failed():
-                print()
-                print("--------------------------------------------------")
-                print()
-                print(new_diff_data)
-                print()
-                print(new_diff_data.errors())
+    # --------------------------------------------------------------------------
 
-            base_data.append(new_base_data.to_dict())
-            diff_data.append(new_diff_data.to_dict())
+    if use_cache:
+        if base_results_file.exists():
+            base_df = pd.read_csv(base_results_file)
 
-    base_df = pd.DataFrame(base_data)
-    diff_df = pd.DataFrame(diff_data)
-    diff_df.insert(4, "actual-base", base_df["actual"])
+        if diff_results_file.exists():
+            diff_df = pd.read_csv(diff_results_file)
 
-    pd.set_option("display.max_columns", None)
-    pd.set_option("display.max_colwidth", None)
-    pd.set_option("display.max_rows", None)
-    pd.set_option("display.width", None)
+        is_cache_available = base_df is not None and diff_df is not None
 
-    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    if not is_cache_available:
+        base_data: List[Dict[str, Any]] = []
+        diff_data: List[Dict[str, Any]] = []
 
-    base_results_file = RESULTS_DIR / "base_results.md"
-    base_results_file.write_text(base_df.to_markdown())
+        for directory in glob.glob(os.path.join(BENCHMARKS_DIR, "*", "*", "*")):
+            for tool_name in ["DSE", "ARDiff"]:
+                benchmark_path = Path(directory)
 
-    diff_results_file = RESULTS_DIR / "diff_results.md"
-    diff_results_file.write_text(diff_df.to_markdown())
+                new_base_data = BaseToolData(benchmark_path, tool_name)
+                new_diff_data = DifferencingData(benchmark_path, tool_name)
+
+                if new_diff_data.is_error():
+                    print()
+                    print("--------------------------------------------------")
+                    print()
+                    print(new_diff_data)
+                    print()
+                    print(new_diff_data.errors())
+
+                base_data.append(new_base_data.to_dict())
+                diff_data.append(new_diff_data.to_dict())
+
+        base_df = pd.DataFrame(base_data)
+        diff_df = pd.DataFrame(diff_data)
+        diff_df.insert(4, "actual-base", base_df["actual"])
+
+        RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+
+        base_df.to_csv(base_results_file)
+        diff_df.to_csv(diff_results_file)
 
 
 if __name__ == "__main__":
-    run_main()
+    run_main(use_cache=True)
