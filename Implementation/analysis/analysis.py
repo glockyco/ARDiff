@@ -23,17 +23,15 @@ class Classification(Enum):
     TIMEOUT = 3
 
     UNKNOWN = 4
-    NEQ_UIF = 5
+    MAYBE_NEQ = 5
     NEQ = 6
-    EQ_UIF = 7
-    EQ = 8
+    EQ = 7
 
     def is_success(self):
         return self in [
             Classification.EQ,
             Classification.NEQ,
-            Classification.EQ_UIF,
-            Classification.NEQ_UIF,
+            Classification.MAYBE_NEQ,
             Classification.UNKNOWN,
         ]
 
@@ -72,10 +70,8 @@ class BenchmarkData(ABC):
             self._result = Classification.TIMEOUT
         elif self.is_unknown():
             self._result = Classification.UNKNOWN
-        elif self.is_neq_uif():
-            self._result = Classification.NEQ_UIF
-        elif self.is_eq_uif():
-            self._result = Classification.EQ_UIF
+        elif self.is_maybe_neq():
+            self._result = Classification.MAYBE_NEQ
         elif self.is_neq():
             self._result = Classification.NEQ
         elif self.is_eq():
@@ -108,7 +104,7 @@ class BenchmarkData(ABC):
         if self.has_failed():
             return False
 
-        if self.is_unknown() or self.is_neq_uif():
+        if self.is_unknown() or self.is_maybe_neq():
             return False
 
         if self.is_neq():
@@ -136,7 +132,7 @@ class BenchmarkData(ABC):
         pass
 
     @abstractmethod
-    def is_eq(self) -> bool:
+    def is_maybe_neq(self) -> bool:
         pass
 
     @abstractmethod
@@ -144,11 +140,7 @@ class BenchmarkData(ABC):
         pass
 
     @abstractmethod
-    def is_eq_uif(self) -> bool:
-        pass
-
-    @abstractmethod
-    def is_neq_uif(self) -> bool:
+    def is_eq(self) -> bool:
         pass
 
     @abstractmethod
@@ -191,20 +183,17 @@ class VersionData(BenchmarkData):
     # Cannot make a specific classification on the VersionData level,
     # so we classify every successful result as UNKNOWN.
 
-    def is_eq(self) -> bool:
+    def is_unknown(self) -> bool:
+        return self.has_succeeded()
+
+    def is_maybe_neq(self) -> bool:
         return False
 
     def is_neq(self) -> bool:
         return False
 
-    def is_eq_uif(self) -> bool:
+    def is_eq(self) -> bool:
         return False
-
-    def is_neq_uif(self) -> bool:
-        return False
-
-    def is_unknown(self) -> bool:
-        return self.has_succeeded()
 
     def errors(self) -> str:
         return self._errors
@@ -270,11 +259,14 @@ class BaseToolData(BenchmarkData):
     # Base tools don't provide UIF information,
     # so we can only classify EQ / NEQ / UNKNOWN.
 
-    def is_eq(self) -> bool:
+    def is_unknown(self) -> bool:
         if self._output_classification is None:
             return False
 
-        return self._output_classification == Classification.EQ
+        return self._output_classification == Classification.UNKNOWN
+
+    def is_maybe_neq(self) -> bool:
+        return False
 
     def is_neq(self) -> bool:
         if self._output_classification is None:
@@ -282,17 +274,11 @@ class BaseToolData(BenchmarkData):
 
         return self._output_classification == Classification.NEQ
 
-    def is_eq_uif(self) -> bool:
-        return False
-
-    def is_neq_uif(self) -> bool:
-        return False
-
-    def is_unknown(self) -> bool:
+    def is_eq(self) -> bool:
         if self._output_classification is None:
             return False
 
-        return self._output_classification == Classification.UNKNOWN
+        return self._output_classification == Classification.EQ
 
     def errors(self) -> str:
         return self._old_version.errors() + self._new_version.errors()
@@ -337,22 +323,19 @@ class PartitionData(BenchmarkData):
         return self._answer is not None and self._answer.startswith("(error")
 
     def is_timeout(self) -> bool:
-        return not self._answer_file.exists() or self._answer == "timeout"
+        return self._answer is None or self._answer.startswith("timeout")
 
-    def is_eq(self) -> bool:
-        return self._answer == "unsat (has no UIF)" or self._answer == "unsat"
+    def is_unknown(self) -> bool:
+        return self._answer is not None and self._answer.startswith("unknown")
+
+    def is_maybe_neq(self) -> bool:
+        return self._answer == "sat (has UIF)"
 
     def is_neq(self) -> bool:
         return self._answer == "sat (has no UIF)" or self._answer == "sat"
 
-    def is_eq_uif(self) -> bool:
-        return self._answer == "unsat (has UIF)"
-
-    def is_neq_uif(self) -> bool:
-        return self._answer == "sat (has UIF)"
-
-    def is_unknown(self) -> bool:
-        return self._answer == "unknown"
+    def is_eq(self) -> bool:
+        return self._answer is not None and self._answer.startswith("unsat")
 
     def errors(self) -> str:
         if self.has_succeeded():
@@ -433,12 +416,10 @@ class DifferencingData(BenchmarkData):
             self._result = Classification.TIMEOUT
         elif self._result_counts[Classification.UNKNOWN] > 0:
             self._result = Classification.UNKNOWN
-        elif self._result_counts[Classification.NEQ_UIF] > 0:
-            self._result = Classification.NEQ_UIF
+        elif self._result_counts[Classification.MAYBE_NEQ] > 0:
+            self._result = Classification.MAYBE_NEQ
         elif self._result_counts[Classification.NEQ] > 0:
             self._result = Classification.NEQ
-        elif self._result_counts[Classification.EQ_UIF] > 0:
-            self._result = Classification.EQ_UIF
         elif self._result_counts[Classification.EQ] > 0:
             self._result = Classification.EQ
 
@@ -459,14 +440,11 @@ class DifferencingData(BenchmarkData):
     def is_unknown(self) -> bool:
         return self.result() == Classification.UNKNOWN
 
-    def is_neq_uif(self) -> bool:
-        return self.result() == Classification.NEQ_UIF
+    def is_maybe_neq(self) -> bool:
+        return self.result() == Classification.MAYBE_NEQ
 
     def is_neq(self) -> bool:
         return self.result() == Classification.NEQ
-
-    def is_eq_uif(self) -> bool:
-        return self.result() == Classification.EQ_UIF
 
     def is_eq(self) -> bool:
         return self.result() == Classification.EQ
@@ -506,9 +484,8 @@ class DifferencingData(BenchmarkData):
             "#error": self._result_counts[Classification.ERROR],
             "#timeout": self._result_counts[Classification.TIMEOUT],
             "#unknown": self._result_counts[Classification.UNKNOWN],
-            "#neq_uif": self._result_counts[Classification.NEQ_UIF],
+            "#maybe_neq": self._result_counts[Classification.MAYBE_NEQ],
             "#neq": self._result_counts[Classification.NEQ],
-            "#eq_uif": self._result_counts[Classification.EQ_UIF],
             "#eq": self._result_counts[Classification.EQ],
             "error": self.errors(),
         }
