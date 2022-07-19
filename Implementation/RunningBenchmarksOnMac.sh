@@ -209,11 +209,9 @@ for d1 in ../benchmarks/* ; do
       newV="${d3}/newV.java"
 
       for i in "${!configurations[@]}" ; do
-        diffParameters="${d3}/instrumented/IDiff${tool_names[$i]}-Parameters.txt"
-
         command_1="gtimeout --verbose --foreground ${timeout}s gradle -PmainClass=Runner.Runner run --args='--path1 ${oldV} --path2 ${newV} ${configurations[$i]}'"
-        command_2="gradle -PmainClass=equiv.checking.DifferencingRunner run --args='${diffParameters} ${timeout}'"
-        command_3="gradle -PmainClass=equiv.checking.DifferencingResultRunner run --args='${diffParameters}'"
+        command_2="gradle -PmainClass=equiv.checking.DifferencingRunner run --args='${d3} ${tool_names[$i]} ${timeout}'"
+        command_3="gradle -PmainClass=equiv.checking.DifferencingResultRunner run --args='${d3}/instrumented/IDiff${tool_names[$i]}-Parameters.txt'"
 
         if [ "$print_commands" = true ] ; then
           printf "\n%s" "${command_1}"

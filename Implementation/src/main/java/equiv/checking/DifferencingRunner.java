@@ -26,8 +26,18 @@ public class DifferencingRunner {
 
     public static void main(String[] args) throws IOException, TemplateException {
         // Read the differencing configuration:
-        Path parameterFilePath = Paths.get(args[0]);
-        int timeout = Integer.parseInt(args[1]);
+        String benchmarkDir = args[0];
+        String toolName = args[1];
+
+        int timeout = Integer.parseInt(args[2]);
+
+        Path baseToolOutputFilePath = Paths.get(benchmarkDir, "outputs", toolName + ".txt");
+        Path parameterFilePath = Paths.get(benchmarkDir, "instrumented", "IDiff" + toolName + "-Parameters.txt");
+
+        if(!baseToolOutputFilePath.toFile().exists()) {
+            System.out.println("Error: '" + baseToolOutputFilePath + "' does not exist.");
+            return;
+        }
 
         if (!parameterFilePath.toFile().exists()) {
             System.out.println("Error: '" + parameterFilePath + "' does not exist.");
