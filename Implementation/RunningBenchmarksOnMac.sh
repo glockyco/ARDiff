@@ -211,12 +211,10 @@ for d1 in ../benchmarks/* ; do
       for i in "${!configurations[@]}" ; do
         command_1="gtimeout --verbose --foreground ${timeout}s gradle -PmainClass=Runner.Runner run --args='--path1 ${oldV} --path2 ${newV} ${configurations[$i]}'"
         command_2="gradle -PmainClass=equiv.checking.DifferencingRunner run --args='${d3} ${tool_names[$i]} ${timeout}'"
-        command_3="gradle -PmainClass=equiv.checking.DifferencingResultRunner run --args='${d3}/instrumented/IDiff${tool_names[$i]}-Parameters.txt'"
 
         if [ "$print_commands" = true ] ; then
           printf "\n%s" "${command_1}"
           printf "\n%s" "${command_2}"
-          printf "\n%s" "${command_3}"
         fi
 
         if [ "$dry_run" = false ] ; then
@@ -224,7 +222,6 @@ for d1 in ../benchmarks/* ; do
 
           eval "${command_1}"
           eval "${command_2}"
-          eval "${command_3}"
         fi
       done
 

@@ -61,3 +61,5 @@ pom.xml
 
 .version
 build.properties
+
+analysis/results
