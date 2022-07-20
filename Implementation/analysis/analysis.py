@@ -589,6 +589,53 @@ def run_main(use_cache: bool = True) -> None:
         base_df.to_csv(base_results_file)
         diff_df.to_csv(diff_results_file)
 
+    assert base_df is not None
+    assert diff_df is not None
+
+    # --------------------------------------------------------------------------
+
+    pd.set_option("display.max_columns", None)
+    pd.set_option("display.max_colwidth", None)
+    pd.set_option("display.max_rows", None)
+    pd.set_option("display.width", None)
+
+    dse_base_df = base_df.loc[base_df["tool"] == "DSE-base"]
+    dse_diff_df = diff_df.loc[diff_df["tool"] == "DSE-diff"]
+    ard_base_df = base_df.loc[base_df["tool"] == "ARDiff-base"]
+    ard_diff_df = diff_df.loc[diff_df["tool"] == "ARDiff-diff"]
+
+    print()
+
+    column_order = ["EQ", "NEQ", "MAYBE_NEQ", "UNKNOWN", "TIMEOUT", "ERROR", "MISSING", "All"]
+
+    dse_base_ct = pd.crosstab(dse_base_df["expected"], dse_base_df["actual"], margins=True)
+    dse_base_ct = dse_base_ct[[c for c in column_order if c in dse_base_ct.columns]]
+
+    print("DSE-base:")
+    print(dse_base_ct)
+    print()
+
+    dse_diff_ct = pd.crosstab(dse_diff_df["expected"], dse_diff_df["actual"], margins=True)
+    dse_diff_ct = dse_diff_ct[[c for c in column_order if c in dse_diff_ct.columns]]
+
+    print("DSE-diff:")
+    print(dse_diff_ct)
+    print()
+
+    ard_base_ct = pd.crosstab(ard_base_df["expected"], ard_base_df["actual"], margins=True)
+    ard_base_ct = ard_base_ct[[c for c in column_order if c in ard_base_ct.columns]]
+
+    print("ARDiff-base:")
+    print(ard_base_ct)
+    print()
+
+    ard_diff_ct = pd.crosstab(ard_diff_df["expected"], ard_diff_df["actual"], margins=True)
+    ard_diff_ct = ard_diff_ct[[c for c in column_order if c in ard_diff_ct.columns]]
+
+    print("ARDiff-diff:")
+    print(ard_diff_ct)
+    print()
+
 
 if __name__ == "__main__":
     run_main(use_cache=True)
