@@ -60,7 +60,7 @@ public class SymbolicStringFunction  extends StringSymbolic implements SymbolicF
 {
     String class_name;
     String method_name;
-    Class<?>[] argTypes;
+    public Class<?>[] argTypes;
     public Expression [] sym_args;
     static URLClassLoader clsLoader = null;
     ArrayList<PathCondition> conditions;

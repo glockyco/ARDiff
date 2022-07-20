@@ -2,7 +2,9 @@ package equiv.checking;
 
 import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.jvm.bytecode.JVMReturnInstruction;
-import gov.nasa.jpf.symbc.numeric.*;
+import gov.nasa.jpf.symbc.numeric.Constraint;
+import gov.nasa.jpf.symbc.numeric.Expression;
+import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.util.MethodSpec;
 import gov.nasa.jpf.vm.*;
 
@@ -13,13 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class DifferencingListener extends PropertyListenerAdapter {
     protected final DifferencingParameters parameters;
@@ -97,6 +93,8 @@ public class DifferencingListener extends PropertyListenerAdapter {
         String aString = aIsConcrete ? valueA.toString() : expressionA.prefix_notation();
         String bString = bIsConcrete ? valueB.toString() : expressionB.prefix_notation();
 
+        String declarationsString = this.getDeclarations(pcConstraint, expressionA, expressionB);
+
         boolean pcHasUninterpretedFunctions = pcString.contains("UF_");
         boolean aHasUninterpretedFunctions = aString.contains("UF_");
         boolean bHasUninterpretedFunctions = bString.contains("UF_");
@@ -114,7 +112,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
         }
 
         String z3NeqQuery = "";
-        z3NeqQuery += this.getDeclarations(pcString) + "\n\n";
+        z3NeqQuery += declarationsString + "\n\n";
         z3NeqQuery += "; Path Condition:\n";
         z3NeqQuery += "(assert " + pcString + ")\n\n";
         z3NeqQuery += "; Non-Equivalence Check:\n";
@@ -140,7 +138,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
             // non-equivalent.
 
             String z3EqQuery = "";
-            z3EqQuery += this.getDeclarations(pcString) + "\n\n";
+            z3EqQuery += declarationsString + "\n\n";
             z3EqQuery += "; Path Condition:\n";
             z3EqQuery += "(assert " + pcString + ")\n\n";
             z3EqQuery += "; Equivalence Check:\n";
@@ -158,44 +156,22 @@ public class DifferencingListener extends PropertyListenerAdapter {
         stackFrame.setOperand(0, Types.booleanToInt(areEquivalent), false);
     }
 
-    private String getDeclarations(String pcString) {
-        String intDeclarations = this.getIntDeclarations(pcString);
-        String realDeclarations = this.getRealDeclarations(pcString);
-        String powDeclaration = "(define-fun pow ((a Real) (b Real)) Real (^ a b))";
+    private String getDeclarations(Constraint pc, Expression a, Expression b) {
+        CreateDeclarationsVisitor visitor = new CreateDeclarationsVisitor();
 
-        return Stream.of(this.parameters.getZ3Declarations(), intDeclarations, realDeclarations, powDeclaration)
-            .filter(s -> s != null && !s.isEmpty())
-            .collect(Collectors.joining("\n"));
-    }
-
-    private String getIntDeclarations(String pcString) {
-        Pattern pattern = Pattern.compile("(INT\\d+)");
-        Matcher matcher = pattern.matcher(pcString);
-
-        Set<String> matches = new HashSet<>();
-        while (matcher.find()) {
-            matches.add(matcher.group());
+        if (pc != null) {
+            pc.accept(visitor);
         }
 
-        return matches.stream()
-            .map(match -> "(declare-fun " + match + " () Int)")
-            .filter(declaration -> !this.parameters.getZ3Declarations().contains(declaration))
-            .collect(Collectors.joining("\n"));
-    }
-
-    private String getRealDeclarations(String pcString) {
-        Pattern pattern = Pattern.compile("(REAL_\\d+)");
-        Matcher matcher = pattern.matcher(pcString);
-
-        Set<String> matches = new HashSet<>();
-        while (matcher.find()) {
-            matches.add(matcher.group());
+        if (a != null) {
+            a.accept(visitor);
         }
 
-        return matches.stream()
-            .map(match -> "(declare-fun " + match + " () Real)")
-            .filter(declaration -> !this.parameters.getZ3Declarations().contains(declaration))
-            .collect(Collectors.joining("\n"));
+        if (b != null) {
+            b.accept(visitor);
+        }
+
+        return visitor.getDeclarations();
     }
 
     private String runQuery(String z3Query, String name) {

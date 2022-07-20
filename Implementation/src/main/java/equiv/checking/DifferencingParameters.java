@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 public class DifferencingParameters implements Serializable {
     private final String directory;
     private final String toolName;
-    private final String z3Declarations;
     private final MethodDescription oldMethodDescription;
     private final MethodDescription newMethodDescription;
     private final MethodDescription diffMethodDescription;
@@ -18,14 +17,12 @@ public class DifferencingParameters implements Serializable {
     public DifferencingParameters(
         String directory,
         String toolName,
-        String z3Declarations,
         MethodDescription oldMethodDescription,
         MethodDescription newMethodDescription,
         MethodDescription diffMethodDescription
     ) {
         this.directory = directory;
         this.toolName = toolName;
-        this.z3Declarations = z3Declarations.trim();
         this.oldMethodDescription = oldMethodDescription;
         this.newMethodDescription = newMethodDescription;
         this.diffMethodDescription = diffMethodDescription;
@@ -33,10 +30,6 @@ public class DifferencingParameters implements Serializable {
 
     public String getToolName() {
         return this.toolName;
-    }
-
-    public String getZ3Declarations() {
-        return this.z3Declarations;
     }
 
     public String getTargetDirectory() {
@@ -189,7 +182,6 @@ public class DifferencingParameters implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         DifferencingParameters that = (DifferencingParameters) o;
         return Objects.equals(directory, that.directory)
-            && Objects.equals(z3Declarations, that.z3Declarations)
             && Objects.equals(oldMethodDescription, that.oldMethodDescription)
             && Objects.equals(newMethodDescription, that.newMethodDescription)
             && Objects.equals(diffMethodDescription, that.diffMethodDescription);
@@ -199,7 +191,6 @@ public class DifferencingParameters implements Serializable {
     public int hashCode() {
         return Objects.hash(
             directory,
-            z3Declarations,
             oldMethodDescription,
             newMethodDescription,
             diffMethodDescription

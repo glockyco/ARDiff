@@ -308,8 +308,7 @@ public class DSE {
                 v2ClassName,
                 method1.desc,
                 methodParams,
-                variablesNamesTypesMapping1,
-                summary.declarations
+                variablesNamesTypesMapping1
             );
 
             Path filepath = Paths.get(parameters.getParameterFile());

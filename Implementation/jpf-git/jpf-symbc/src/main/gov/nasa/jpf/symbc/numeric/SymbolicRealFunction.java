@@ -61,7 +61,7 @@ public class SymbolicRealFunction extends SymbolicReal implements SymbolicFuncti
 { //Maybe the solution should be changed, right now it looks concolic
     String class_name;
     String method_name;
-    Class<?>[] argTypes;
+    public Class<?>[] argTypes;
     public Expression [] sym_args;
     static URLClassLoader clsLoader = null;
     ArrayList<PathCondition> conditions;
@@ -173,6 +173,10 @@ public class SymbolicRealFunction extends SymbolicReal implements SymbolicFuncti
         return "(" + class_name +"." + method_name + "(" + result + ")";
     }*/
 
+    public String getName() {
+        return method_name.startsWith("UF_") ?  method_name : "AF_" + method_name;
+    }
+
     public String stringPC () {
         String result="";
         if (sym_args!=null)
@@ -201,17 +205,15 @@ public class SymbolicRealFunction extends SymbolicReal implements SymbolicFuncti
 
     public String prefix_notation()
     {
-        String name = method_name.startsWith("UF_") ?  method_name : "AF_" + method_name;
-
         if (sym_args.length <= 0) {
-            return name;
+            return this.getName();
         }
 
         String args = Arrays.stream(sym_args)
             .map(Expression::prefix_notation)
             .collect(Collectors.joining(" "));
 
-        return "(" + name + " " + args + ")";
+        return "(" + this.getName() + " " + args + ")";
     }
 
     @Override

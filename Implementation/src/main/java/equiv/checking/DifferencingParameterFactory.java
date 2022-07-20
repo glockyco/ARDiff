@@ -41,8 +41,7 @@ public class DifferencingParameterFactory {
         String newClassName,
         String methodSignature,
         String[] methodParameters,
-        Map<String, String> parameterTypes,
-        String z3Declarations
+        Map<String, String> parameterTypes
     ) {
         List<MethodParameterDescription> parameterDescriptions = this.createParameterDescriptions(methodParameters, parameterTypes);
         MethodResultDescription resultDescription = this.createMethodResult(methodSignature);
@@ -74,7 +73,6 @@ public class DifferencingParameterFactory {
         return new DifferencingParameters(
             directory,
             toolName,
-            z3Declarations,
             oldMethodDescription,
             newMethodDescription,
             diffMethodDescription
