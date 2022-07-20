@@ -504,7 +504,12 @@ class DifferencingData(BenchmarkData):
             if partition_errors is not None and partition_errors != "":
                 errors.append(partition_errors)
 
-        return "\n".join(errors)
+        if len(errors) <= 0:
+            return ""
+
+        error_msg: str = f"Error while executing benchmark {self.full_path()}.\n\n"
+
+        return error_msg + "\n".join(errors)
 
     def partitions(self) -> List[PartitionData]:
         return self._partitions
