@@ -21,12 +21,7 @@ package gov.nasa.jpf.symbc.numeric;
 
 import gov.nasa.jpf.symbc.mixednumstrg.SpecialIntegerExpression;
 import gov.nasa.jpf.symbc.mixednumstrg.SpecialRealExpression;
-import gov.nasa.jpf.symbc.string.DerivedStringExpression;
-import gov.nasa.jpf.symbc.string.StringConstant;
-import gov.nasa.jpf.symbc.string.StringConstraint;
-import gov.nasa.jpf.symbc.string.StringExpression;
-import gov.nasa.jpf.symbc.string.StringSymbolic;
-import gov.nasa.jpf.symbc.string.SymbolicStringBuilder;
+import gov.nasa.jpf.symbc.string.*;
 
 /**
  * A visitor for both constraints and expressions. Ideally, constraints should
@@ -129,6 +124,9 @@ public abstract class ConstraintExpressionVisitor {
 	public void preVisit(SymbolicInteger expr) {
 	}
 
+	public void preVisit(SymbolicIntFunction expr) {
+	}
+
 	public void preVisit(NonLinearIntegerExpression expr) {
 	}
 
@@ -156,6 +154,9 @@ public abstract class ConstraintExpressionVisitor {
 	public void preVisit(SymbolicReal expr) {
 	}
 
+	public void preVisit(SymbolicRealFunction expr) {
+	}
+
 	public void preVisit(StringExpression expr) {
 	}
 
@@ -166,6 +167,9 @@ public abstract class ConstraintExpressionVisitor {
 	}
 
 	public void preVisit(StringSymbolic expr) {
+	}
+
+	public void preVisit(SymbolicStringFunction expr) {
 	}
 
 	public void preVisit(SymbolicStringBuilder expr) {
@@ -187,6 +191,9 @@ public abstract class ConstraintExpressionVisitor {
 	}
 
 	public void postVisit(SymbolicInteger expr) {
+	}
+
+	public void postVisit(SymbolicIntFunction expr) {
 	}
 
 	public void postVisit(NonLinearIntegerExpression expr) {
@@ -216,6 +223,9 @@ public abstract class ConstraintExpressionVisitor {
 	public void postVisit(SymbolicReal expr) {
 	}
 
+	public void postVisit(SymbolicRealFunction expr) {
+	}
+
 	public void postVisit(StringExpression expr) {
 	}
 
@@ -226,6 +236,9 @@ public abstract class ConstraintExpressionVisitor {
 	}
 
 	public void postVisit(StringSymbolic expr) {
+	}
+
+	public void postVisit(SymbolicStringFunction expr) {
 	}
 
 	public void postVisit(SymbolicStringBuilder expr) {
