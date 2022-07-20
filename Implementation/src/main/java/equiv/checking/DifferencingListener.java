@@ -90,8 +90,6 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
         this.count++;
 
-        boolean areEquivalent;
-
         boolean aIsConcrete = expressionA == null;
         boolean bIsConcrete = expressionB == null;
 
@@ -107,66 +105,50 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
         // @TODO: Check if the path condition is satisfiable.
 
-        String z3Query = "";
-        z3Query += this.getDeclarations(pcString) + "\n\n";
-        z3Query += "; Path Condition:\n";
-        z3Query += "(assert " + pcString + ")\n\n";
-        z3Query += "; Equivalence Check:\n";
-        z3Query += "(assert (not (= " + aString + " " + bString + ")))\n\n";
-        z3Query += "(check-sat)\n";
-        z3Query += "(get-model)\n";
-
         try {
-            String z3QueryFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-ToSolve.txt";
-            Path z3QueryPath  = Paths.get(this.parameters.getTargetDirectory(), z3QueryFilename).toAbsolutePath();
-            Files.write(z3QueryPath, z3Query.getBytes());
-
-            String mainCommand = ProjectPaths.z3 +" -smt2 " + z3QueryPath + " -T:1";
-
-            Process z3Process = Runtime.getRuntime().exec(mainCommand);
-            BufferedReader in = new BufferedReader(new InputStreamReader(z3Process.getInputStream()));
-            BufferedReader err = new BufferedReader(new InputStreamReader(z3Process.getErrorStream()));
-            String z3Answer = in.readLine();
-
-            String line = "";
-
-            String z3Model = "";
-            while ((line = in.readLine()) != null) {
-                z3Model += line + "\n";
-            }
-
-            String z3Errors = "";
-            while ((line = err.readLine()) != null) {
-                z3Errors += line + "\n";
-            }
-
-            String z3AnswerFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Answer.txt";
-            Path z3AnswerPath  = Paths.get(this.parameters.getTargetDirectory(), z3AnswerFilename).toAbsolutePath();
-
-            if (z3Answer.startsWith("(error")) {
-                Files.write(z3AnswerPath, z3Answer.getBytes());
-                throw new RuntimeException("z3 Error: " + z3Answer);
-            } else {
-                z3Answer += hasUninterpretedFunctions ? " (has UIF)" : " (has no UIF)";
-                Files.write(z3AnswerPath, z3Answer.getBytes());
-            }
-
-            areEquivalent = z3Answer.startsWith("unsat");
-
-            // A model (i.e., counterexample) only exists if the two programs are NOT equivalent.
-            if (!areEquivalent) {
-                String z3ModelFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Model.txt";
-                Path z3ModelPath  = Paths.get(this.parameters.getTargetDirectory(), z3ModelFilename).toAbsolutePath();
-                Files.write(z3ModelPath, z3Model.getBytes());
-            }
-
-            if (!z3Errors.isEmpty()) {
-                String z3ErrorsFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Errors.txt";
-                Path z3ErrorsPath  = Paths.get(this.parameters.getTargetDirectory(), z3ErrorsFilename).toAbsolutePath();
-                Files.write(z3ErrorsPath, z3Errors.getBytes());
-            }
+            String hasUifFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-HasUIF.txt";
+            Path hasUifPath  = Paths.get(this.parameters.getTargetDirectory(), hasUifFilename).toAbsolutePath();
+            Files.write(hasUifPath, String.valueOf(hasUninterpretedFunctions).getBytes());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+
+        String z3NeqQuery = "";
+        z3NeqQuery += this.getDeclarations(pcString) + "\n\n";
+        z3NeqQuery += "; Path Condition:\n";
+        z3NeqQuery += "(assert " + pcString + ")\n\n";
+        z3NeqQuery += "; Non-Equivalence Check:\n";
+        z3NeqQuery += "(assert (not (= " + aString + " " + bString + ")))\n\n";
+        z3NeqQuery += "(check-sat)\n";
+        z3NeqQuery += "(get-model)\n";
+
+        String z3NeqAnswer = this.runQuery(z3NeqQuery, "NEQ");
+
+        boolean areEquivalent = z3NeqAnswer.equals("unsat");
+
+        if (z3NeqAnswer.equals("sat") && hasUninterpretedFunctions) {
+            // If we've found the two results to be non-equivalent,
+            // but there were uninterpreted functions in the solver query,
+            // provide further information, so we might be able to tell
+            // whether the non-equivalence is due to the introduction
+            // of the uninterpreted functions or not.
+
+            // Note that this additional query has no effect on how we'll
+            // continue with the symbolic execution. This is because we can
+            // only become more certain that the results are not equivalent,
+            // but cannot find them to be actually equivalent rather than
+            // non-equivalent.
+
+            String z3EqQuery = "";
+            z3EqQuery += this.getDeclarations(pcString) + "\n\n";
+            z3EqQuery += "; Path Condition:\n";
+            z3EqQuery += "(assert " + pcString + ")\n\n";
+            z3EqQuery += "; Equivalence Check:\n";
+            z3EqQuery += "(assert (= " + aString + " " + bString + "))\n\n";
+            z3EqQuery += "(check-sat)\n";
+            z3EqQuery += "(get-model)\n";
+
+            this.runQuery(z3EqQuery, "EQ");
         }
 
         // -------------------------------------------------------
@@ -214,5 +196,59 @@ public class DifferencingListener extends PropertyListenerAdapter {
             .map(match -> "(declare-fun " + match + " () Real)")
             .filter(declaration -> !this.parameters.getZ3Declarations().contains(declaration))
             .collect(Collectors.joining("\n"));
+    }
+
+    private String runQuery(String z3Query, String name) {
+        try {
+            String z3QueryFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-ToSolve-" + name + ".txt";
+            Path z3QueryPath  = Paths.get(this.parameters.getTargetDirectory(), z3QueryFilename).toAbsolutePath();
+            Files.write(z3QueryPath, z3Query.getBytes());
+
+            String mainCommand = ProjectPaths.z3 +" -smt2 " + z3QueryPath + " -T:1";
+
+            Process z3Process = Runtime.getRuntime().exec(mainCommand);
+            BufferedReader in = new BufferedReader(new InputStreamReader(z3Process.getInputStream()));
+            BufferedReader err = new BufferedReader(new InputStreamReader(z3Process.getErrorStream()));
+            String z3Answer = in.readLine();
+
+            String line = "";
+
+            String z3Model = "";
+            while ((line = in.readLine()) != null) {
+                z3Model += line + "\n";
+            }
+
+            String z3Errors = "";
+            while ((line = err.readLine()) != null) {
+                z3Errors += line + "\n";
+            }
+
+            String z3AnswerFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Answer-" + name + ".txt";
+            Path z3AnswerPath  = Paths.get(this.parameters.getTargetDirectory(), z3AnswerFilename).toAbsolutePath();
+
+            if (z3Answer.startsWith("(error")) {
+                Files.write(z3AnswerPath, z3Answer.getBytes());
+                throw new RuntimeException("z3 Error: " + z3Answer);
+            } else {
+                Files.write(z3AnswerPath, z3Answer.getBytes());
+            }
+
+            if (z3Answer.equals("sat")) {
+                // If the query is satisfiable, the solver provides the corresponding model.
+                String z3ModelFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Model-" + name + ".txt";
+                Path z3ModelPath  = Paths.get(this.parameters.getTargetDirectory(), z3ModelFilename).toAbsolutePath();
+                Files.write(z3ModelPath, z3Model.getBytes());
+            }
+
+            if (!z3Errors.isEmpty()) {
+                String z3ErrorsFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Errors-" + name + ".txt";
+                Path z3ErrorsPath  = Paths.get(this.parameters.getTargetDirectory(), z3ErrorsFilename).toAbsolutePath();
+                Files.write(z3ErrorsPath, z3Errors.getBytes());
+            }
+
+            return z3Answer;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

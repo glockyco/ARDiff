@@ -305,37 +305,79 @@ class PartitionData(BenchmarkData):
 
         name_prefix: str = f"IDiff{tool_name}-P{partition_id}"
 
-        self._query_file: Path = self._instrumented_dir / f"{name_prefix}-ToSolve.txt"
-        self._answer_file: Path = self._instrumented_dir / f"{name_prefix}-Answer.txt"
-        self._model_file: Path = self._instrumented_dir / f"{name_prefix}-Model.txt"
+        neq_query_file_name: str = f"{name_prefix}-ToSolve-NEQ.txt"
+        neq_answer_file_name: str = f"{name_prefix}-Answer-NEQ.txt"
+        eq_query_file_name: str = f"{name_prefix}-ToSolve-EQ.txt"
+        eq_answer_file_name: str = f"{name_prefix}-Answer-EQ.txt"
+        has_uif_file_name: str = f"{name_prefix}-HasUIF.txt"
 
-        self._answer: Optional[str] = None
-        if self._answer_file.exists():
-            self._answer = self._answer_file.read_text()
+        self._neq_query_file: Path = self._instrumented_dir / neq_query_file_name
+        self._neq_answer_file: Path = self._instrumented_dir / neq_answer_file_name
+        self._eq_query_file: Path = self._instrumented_dir / eq_query_file_name
+        self._eq_answer_file: Path = self._instrumented_dir / eq_answer_file_name
+        self._has_uif_file: Path = self._instrumented_dir / has_uif_file_name
+
+        self._neq_answer: str = ""
+        if self._neq_answer_file.exists():
+            self._neq_answer = self._neq_answer_file.read_text()
+
+        self._eq_answer: str = ""
+        if self._eq_answer_file.exists():
+            self._eq_answer = self._eq_answer_file.read_text()
+
+        self._has_uif: bool = False
+        if self._has_uif_file.exists():
+            self._has_uif = self._has_uif_file.read_text() == "true"
 
     def name(self) -> str:
         return f"P{self._partition_id}"
 
     def is_missing(self) -> bool:
-        return not self._query_file.exists()
+        # NEQ query files determine whether a partition is missing because
+        # they are the first files that should be created for a partition.
+        return not self._neq_query_file.exists()
 
     def is_error(self) -> bool:
-        return self._answer is not None and self._answer.startswith("(error")
+        has_neq_error = self._neq_answer.startswith("(error")
+        has_eq_error = self._eq_answer.startswith("(error")
+
+        return has_neq_error or has_eq_error
 
     def is_timeout(self) -> bool:
-        return self._answer is None or self._answer.startswith("timeout")
+        is_uif_missing = not self._has_uif_file.exists()
+        is_neq_timeout = self._neq_answer == "" or self._neq_answer == "timeout"
+
+        if is_uif_missing or is_neq_timeout:
+            return True
+
+        if self._has_uif and self._neq_answer == "sat":
+            return self._eq_answer == "" or self._eq_answer == "timeout"
+
+        return False
 
     def is_unknown(self) -> bool:
-        return self._answer is not None and self._answer.startswith("unknown")
+        return self._neq_answer == "unknown" or self._eq_answer == "unknown"
 
     def is_maybe_neq(self) -> bool:
-        return self._answer == "sat (has UIF)"
+        if not self._neq_answer == "sat":
+            return False
+
+        if not self._has_uif:
+            return False
+
+        return self._eq_answer == "sat"
 
     def is_neq(self) -> bool:
-        return self._answer == "sat (has no UIF)" or self._answer == "sat"
+        if not self._neq_answer == "sat":
+            return False
+
+        if not self._has_uif:
+            return True
+
+        return self._eq_answer == "unsat"
 
     def is_eq(self) -> bool:
-        return self._answer is not None and self._answer.startswith("unsat")
+        return self._neq_answer == "unsat"
 
     def errors(self) -> str:
         if self.has_succeeded():
@@ -344,10 +386,12 @@ class PartitionData(BenchmarkData):
         if self.result() == Classification.TIMEOUT:
             return f"Timeout while solving partition {self._partition_id}."
 
-        assert self._answer is not None
         assert self.result() == Classification.ERROR
 
-        return f"Error while solving partition {self._partition_id}.\n\n{self._answer}"
+        return f"Error while solving partition {self._partition_id}.\n\n{self._neq_answer}"
+
+    def has_uif(self) -> bool:
+        return self._has_uif
 
 
 class DifferencingData(BenchmarkData):
@@ -379,9 +423,9 @@ class DifferencingData(BenchmarkData):
     def _init_partitions(self) -> List[PartitionData]:
         partitions: List[PartitionData] = []
 
-        z3_query_pattern = f"IDiff{self._tool_name}-P*-ToSolve.txt"
+        z3_query_pattern = f"IDiff{self._tool_name}-P*-ToSolve-NEQ.txt"
         for query_file in self._instrumented_dir.glob(z3_query_pattern):
-            partition_id_pattern = f"IDiff{self._tool_name}-P(\\d+)-ToSolve.txt"
+            partition_id_pattern = f"IDiff{self._tool_name}-P(\\d+)-ToSolve-NEQ.txt"
             m = re.search(partition_id_pattern, query_file.name)
             if m:
                 partition_id = int(m.group(1))
@@ -480,6 +524,9 @@ class DifferencingData(BenchmarkData):
             "has_succeeded": self.has_succeeded(),
             "is_correct": self.is_correct(),
             "partitions": len(self._partitions),
+            "has_uif": len(list(filter(lambda p: p.has_uif(), self._partitions))) > 0,
+            "#uif": len(list(filter(lambda p: p.has_uif(), self._partitions))),
+            "#~uif": len(list(filter(lambda p: not p.has_uif(), self._partitions))),
             "#missing": self._result_counts[Classification.MISSING],
             "#error": self._result_counts[Classification.ERROR],
             "#timeout": self._result_counts[Classification.TIMEOUT],
