@@ -668,42 +668,72 @@ def run_main(use_cache: bool = True) -> None:
     pd.set_option("display.max_rows", None)
     pd.set_option("display.width", None)
 
-    dse_base_df = base_df.loc[base_df["tool"] == "DSE-base"]
-    dse_diff_df = diff_df.loc[diff_df["tool"] == "DSE-diff"]
-    ard_base_df = base_df.loc[base_df["tool"] == "ARDiff-base"]
-    ard_diff_df = diff_df.loc[diff_df["tool"] == "ARDiff-diff"]
+    # --------------------------------------------------------------------------
 
-    print()
+    strict_base_df = base_df.copy()
+    strict_base_df.loc[base_df["actual"] == "MAYBE_EQ", "actual"] = "UNKNOWN"
+    strict_base_df.loc[base_df["actual"] == "MAYBE_NEQ", "actual"] = "UNKNOWN"
 
+    strict_diff_df = diff_df.copy()
+    strict_diff_df.loc[diff_df["actual"] == "MAYBE_EQ", "actual"] = "UNKNOWN"
+    strict_diff_df.loc[diff_df["actual"] == "MAYBE_NEQ", "actual"] = "UNKNOWN"
+    strict_diff_df.loc[diff_df["actual-base"] == "MAYBE_EQ", "actual-base"] = "UNKNOWN"
+    strict_diff_df.loc[diff_df["actual-base"] == "MAYBE_NEQ", "actual-base"] = "UNKNOWN"
+
+    # --------------------------------------------------------------------------
+
+    lenient_base_df = base_df.copy()
+    lenient_base_df.loc[base_df["actual"] == "MAYBE_EQ", "actual"] = "EQ"
+    lenient_base_df.loc[base_df["actual"] == "MAYBE_NEQ", "actual"] = "NEQ"
+
+    lenient_diff_df = diff_df.copy()
+    lenient_diff_df.loc[diff_df["actual"] == "MAYBE_EQ", "actual"] = "EQ"
+    lenient_diff_df.loc[diff_df["actual"] == "MAYBE_NEQ", "actual"] = "NEQ"
+    lenient_diff_df.loc[diff_df["actual-base"] == "MAYBE_EQ", "actual-base"] = "EQ"
+    lenient_diff_df.loc[diff_df["actual-base"] == "MAYBE_NEQ", "actual-base"] = "NEQ"
+
+    # --------------------------------------------------------------------------
+
+    print("\n---------- LENIENT RESULTS ----------")
+
+    print_results({
+        "DSE-base": lenient_base_df.loc[base_df["tool"] == "DSE-base"],
+        "DSE-diff": lenient_diff_df.loc[diff_df["tool"] == "DSE-diff"],
+        "ARDiff-base": lenient_base_df.loc[base_df["tool"] == "ARDiff-base"],
+        "ARDiff-diff": lenient_diff_df.loc[diff_df["tool"] == "ARDiff-diff"],
+    })
+
+    print("\n---------- STRICT RESULTS ----------")
+
+    print_results({
+        "DSE-base": strict_base_df.loc[base_df["tool"] == "DSE-base"],
+        "DSE-diff": strict_diff_df.loc[diff_df["tool"] == "DSE-diff"],
+        "ARDiff-base": strict_base_df.loc[base_df["tool"] == "ARDiff-base"],
+        "ARDiff-diff": strict_diff_df.loc[diff_df["tool"] == "ARDiff-diff"],
+    })
+
+    print("\n---------- TRUE RESULTS ----------")
+
+    print_results({
+        "DSE-base": base_df.loc[base_df["tool"] == "DSE-base"],
+        "DSE-diff": diff_df.loc[diff_df["tool"] == "DSE-diff"],
+        "ARDiff-base": base_df.loc[base_df["tool"] == "ARDiff-base"],
+        "ARDiff-diff": diff_df.loc[diff_df["tool"] == "ARDiff-diff"],
+    })
+
+
+def print_results(results: Dict[str, pd.DataFrame]):
     column_order = ["EQ", "MAYBE_EQ", "NEQ", "MAYBE_NEQ", "UNKNOWN", "TIMEOUT", "ERROR", "MISSING", "All"]
 
-    dse_base_ct = pd.crosstab(dse_base_df["expected"], dse_base_df["actual"], margins=True)
-    dse_base_ct = dse_base_ct[[c for c in column_order if c in dse_base_ct.columns]]
-
-    print("DSE-base:")
-    print(dse_base_ct)
     print()
 
-    dse_diff_ct = pd.crosstab(dse_diff_df["expected"], dse_diff_df["actual"], margins=True)
-    dse_diff_ct = dse_diff_ct[[c for c in column_order if c in dse_diff_ct.columns]]
+    for title, result_df in results.items():
+        result_ct = pd.crosstab(result_df["expected"], result_df["actual"], margins=True)
+        result_ct = result_ct[[c for c in column_order if c in result_ct.columns]]
 
-    print("DSE-diff:")
-    print(dse_diff_ct)
-    print()
-
-    ard_base_ct = pd.crosstab(ard_base_df["expected"], ard_base_df["actual"], margins=True)
-    ard_base_ct = ard_base_ct[[c for c in column_order if c in ard_base_ct.columns]]
-
-    print("ARDiff-base:")
-    print(ard_base_ct)
-    print()
-
-    ard_diff_ct = pd.crosstab(ard_diff_df["expected"], ard_diff_df["actual"], margins=True)
-    ard_diff_ct = ard_diff_ct[[c for c in column_order if c in ard_diff_ct.columns]]
-
-    print("ARDiff-diff:")
-    print(ard_diff_ct)
-    print()
+        print(f"{title}:")
+        print(result_ct)
+        print()
 
 
 if __name__ == "__main__":
