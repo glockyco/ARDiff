@@ -24,13 +24,15 @@ class Classification(Enum):
 
     UNKNOWN = 4
     MAYBE_NEQ = 5
-    NEQ = 6
-    EQ = 7
+    MAYBE_EQ = 6
+    NEQ = 7
+    EQ = 8
 
     def is_success(self):
         return self in [
             Classification.EQ,
             Classification.NEQ,
+            Classification.MAYBE_EQ,
             Classification.MAYBE_NEQ,
             Classification.UNKNOWN,
         ]
@@ -72,6 +74,8 @@ class BenchmarkData(ABC):
             self._result = Classification.UNKNOWN
         elif self.is_maybe_neq():
             self._result = Classification.MAYBE_NEQ
+        elif self.is_maybe_eq():
+            self._result = Classification.MAYBE_EQ
         elif self.is_neq():
             self._result = Classification.NEQ
         elif self.is_eq():
@@ -104,13 +108,13 @@ class BenchmarkData(ABC):
         if self.has_failed():
             return False
 
-        if self.is_unknown() or self.is_maybe_neq():
+        if self.is_unknown() or self.is_maybe_neq() or self.is_maybe_eq():
             return False
 
         if self.is_neq():
             return should_be_neq
 
-        if self.is_eq() or self.is_eq_uif():
+        if self.is_eq():
             return should_be_eq
 
         raise Exception(f"Unable to infer whether {self.full_path()} is correct.")
@@ -133,6 +137,10 @@ class BenchmarkData(ABC):
 
     @abstractmethod
     def is_maybe_neq(self) -> bool:
+        pass
+
+    @abstractmethod
+    def is_maybe_eq(self) -> bool:
         pass
 
     @abstractmethod
@@ -187,6 +195,9 @@ class VersionData(BenchmarkData):
         return self.has_succeeded()
 
     def is_maybe_neq(self) -> bool:
+        return False
+
+    def is_maybe_eq(self) -> bool:
         return False
 
     def is_neq(self) -> bool:
@@ -266,6 +277,9 @@ class BaseToolData(BenchmarkData):
         return self._output_classification == Classification.UNKNOWN
 
     def is_maybe_neq(self) -> bool:
+        return False
+
+    def is_maybe_eq(self) -> bool:
         return False
 
     def is_neq(self) -> bool:
@@ -367,6 +381,9 @@ class PartitionData(BenchmarkData):
 
         return self._eq_answer == "sat"
 
+    def is_maybe_eq(self) -> bool:
+        return False
+
     def is_neq(self) -> bool:
         if not self._neq_answer == "sat":
             return False
@@ -405,13 +422,15 @@ class DifferencingData(BenchmarkData):
         self._output_file: Path = self._instrumented_dir / f"{name_prefix}-Output.txt"
         self._error_file: Path = self._instrumented_dir / f"{name_prefix}-Error.txt"
 
-        self._output: Optional[str] = None
+        self._output: str = ""
         if self._output_file.exists():
             self._output = self._output_file.read_text()
 
-        self._errors: Optional[str] = None
+        self._errors: str = ""
         if self._error_file.exists():
             self._errors = self._error_file.read_text()
+
+        self._is_depth_limited = "depth limit reached" in self._output
 
         self._partitions: List[PartitionData] = self._init_partitions()
 
@@ -446,11 +465,8 @@ class DifferencingData(BenchmarkData):
         if self._result is not None:
             return self._result
 
-        has_error: bool = False
-        has_timeout: bool = False
-        if self._errors is not None:
-            has_error = "Differencing failed due to error" in self._errors
-            has_timeout = "Differencing failed due to timeout" in self._errors
+        has_error: bool = "Differencing failed due to error" in self._errors
+        has_timeout: bool = "Differencing failed due to timeout" in self._errors
 
         if len(self._partitions) < 1:
             self._result = Classification.MISSING
@@ -462,6 +478,8 @@ class DifferencingData(BenchmarkData):
             self._result = Classification.UNKNOWN
         elif self._result_counts[Classification.MAYBE_NEQ] > 0:
             self._result = Classification.MAYBE_NEQ
+        elif self._result_counts[Classification.EQ] > 0 and self._is_depth_limited:
+            self._result = Classification.MAYBE_EQ
         elif self._result_counts[Classification.NEQ] > 0:
             self._result = Classification.NEQ
         elif self._result_counts[Classification.EQ] > 0:
@@ -487,6 +505,9 @@ class DifferencingData(BenchmarkData):
     def is_maybe_neq(self) -> bool:
         return self.result() == Classification.MAYBE_NEQ
 
+    def is_maybe_eq(self) -> bool:
+        return self.result() == Classification.MAYBE_EQ
+
     def is_neq(self) -> bool:
         return self.result() == Classification.NEQ
 
@@ -511,6 +532,9 @@ class DifferencingData(BenchmarkData):
 
         return error_msg + "\n".join(errors)
 
+    def is_depth_limited(self) -> bool:
+        return self._is_depth_limited
+
     def partitions(self) -> List[PartitionData]:
         return self._partitions
 
@@ -528,6 +552,7 @@ class DifferencingData(BenchmarkData):
             "actual": self.result().name,
             "has_succeeded": self.has_succeeded(),
             "is_correct": self.is_correct(),
+            "is_depth_limited": self.is_depth_limited(),
             "partitions": len(self._partitions),
             "has_uif": len(list(filter(lambda p: p.has_uif(), self._partitions))) > 0,
             "#uif": len(list(filter(lambda p: p.has_uif(), self._partitions))),
@@ -611,7 +636,7 @@ def run_main(use_cache: bool = True) -> None:
 
     print()
 
-    column_order = ["EQ", "NEQ", "MAYBE_NEQ", "UNKNOWN", "TIMEOUT", "ERROR", "MISSING", "All"]
+    column_order = ["EQ", "MAYBE_EQ", "NEQ", "MAYBE_NEQ", "UNKNOWN", "TIMEOUT", "ERROR", "MISSING", "All"]
 
     dse_base_ct = pd.crosstab(dse_base_df["expected"], dse_base_df["actual"], margins=True)
     dse_base_ct = dse_base_ct[[c for c in column_order if c in dse_base_ct.columns]]
