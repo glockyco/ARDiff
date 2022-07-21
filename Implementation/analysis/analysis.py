@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from enum import Enum
 from pathlib import Path
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional, Any, Set
 
 import pandas as pd
 
@@ -727,8 +727,17 @@ def print_results(results: Dict[str, pd.DataFrame]):
 
     print()
 
+    used_classes: Set[str] = set()
+    for result_df in results.values():
+        used_classes = used_classes | set(result_df["actual"].unique())
+
     for title, result_df in results.items():
         result_ct = pd.crosstab(result_df["expected"], result_df["actual"], margins=True)
+
+        missing_classes = [c for c in used_classes if c not in result_ct.columns]
+        for missing_class in missing_classes:
+            result_ct[missing_class] = 0
+
         result_ct = result_ct[[c for c in column_order if c in result_ct.columns]]
 
         print(f"{title}:")
