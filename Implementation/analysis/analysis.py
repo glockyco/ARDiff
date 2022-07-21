@@ -254,7 +254,7 @@ class BaseToolData(BenchmarkData):
         self._new_version: VersionData = VersionData(root_dir, tool_name, "newV")
 
     @staticmethod
-    def _classify_output(output: str):
+    def _classify_output(output: str) -> Classification:
         # ARDiff outputs contain results of multiple equivalence checking
         # rounds, so we have to identify the result of the last round,
         # i.e., the result that occurs last in the output file.
@@ -272,6 +272,12 @@ class BaseToolData(BenchmarkData):
         elif filtered[0] == neq_index:
             return Classification.NEQ
         elif filtered[0] == unknown_index:
+            has_uif_index: int = output.rfind("too much abstraction")
+            has_uif: bool = has_uif_index != -1
+
+            if has_uif and has_uif_index > unknown_index:
+                return Classification.MAYBE_NEQ
+
             return Classification.UNKNOWN
         else:
             raise Exception(f"Cannot classify output: {output}")
@@ -291,9 +297,6 @@ class BaseToolData(BenchmarkData):
     def is_timeout(self) -> bool:
         return not self.is_error() and not self._output_file.exists()
 
-    # Base tools don't provide UIF information,
-    # so we can only classify EQ / NEQ / UNKNOWN.
-
     def is_unknown(self) -> bool:
         if self._output_classification is None:
             return False
@@ -301,7 +304,10 @@ class BaseToolData(BenchmarkData):
         return self._output_classification == Classification.UNKNOWN
 
     def is_maybe_neq(self) -> bool:
-        return False
+        if self._output_classification is None:
+            return False
+
+        return self._output_classification == Classification.MAYBE_NEQ
 
     def is_maybe_eq(self) -> bool:
         if self._output_classification is None:
