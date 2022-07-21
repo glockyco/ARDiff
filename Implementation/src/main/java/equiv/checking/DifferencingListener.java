@@ -101,12 +101,8 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
         boolean hasUninterpretedFunctions = pcHasUninterpretedFunctions || aHasUninterpretedFunctions || bHasUninterpretedFunctions;
 
-        // @TODO: Check if the path condition is satisfiable.
-
         try {
-            String hasUifFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-HasUIF.txt";
-            Path hasUifPath  = Paths.get(this.parameters.getTargetDirectory(), hasUifFilename).toAbsolutePath();
-            Files.write(hasUifPath, String.valueOf(hasUninterpretedFunctions).getBytes());
+            this.writeHasUIF(hasUninterpretedFunctions);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -176,55 +172,78 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
     private String runQuery(String z3Query, String name) {
         try {
-            String z3QueryFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-ToSolve-" + name + ".txt";
-            Path z3QueryPath  = Paths.get(this.parameters.getTargetDirectory(), z3QueryFilename).toAbsolutePath();
-            Files.write(z3QueryPath, z3Query.getBytes());
+            Path z3QueryPath = this.writeQuery(z3Query, name);
 
             String mainCommand = ProjectPaths.z3 +" -smt2 " + z3QueryPath + " -T:1";
 
             Process z3Process = Runtime.getRuntime().exec(mainCommand);
             BufferedReader in = new BufferedReader(new InputStreamReader(z3Process.getInputStream()));
             BufferedReader err = new BufferedReader(new InputStreamReader(z3Process.getErrorStream()));
+
             String z3Answer = in.readLine();
+            String z3Model = this.readLines(in);
+            String z3Errors = this.readLines(err);
 
-            String line = "";
-
-            String z3Model = "";
-            while ((line = in.readLine()) != null) {
-                z3Model += line + "\n";
-            }
-
-            String z3Errors = "";
-            while ((line = err.readLine()) != null) {
-                z3Errors += line + "\n";
-            }
-
-            String z3AnswerFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Answer-" + name + ".txt";
-            Path z3AnswerPath  = Paths.get(this.parameters.getTargetDirectory(), z3AnswerFilename).toAbsolutePath();
+            this.writeAnswer(z3Answer, name);
 
             if (z3Answer.startsWith("(error")) {
-                Files.write(z3AnswerPath, z3Answer.getBytes());
                 throw new RuntimeException("z3 Error: " + z3Answer);
-            } else {
-                Files.write(z3AnswerPath, z3Answer.getBytes());
             }
 
             if (z3Answer.equals("sat")) {
                 // If the query is satisfiable, the solver provides the corresponding model.
-                String z3ModelFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Model-" + name + ".txt";
-                Path z3ModelPath  = Paths.get(this.parameters.getTargetDirectory(), z3ModelFilename).toAbsolutePath();
-                Files.write(z3ModelPath, z3Model.getBytes());
+                this.writeModel(z3Model, name);
             }
 
             if (!z3Errors.isEmpty()) {
-                String z3ErrorsFilename = this.parameters.getTargetClassName() + "-P" + this.count + "-Errors-" + name + ".txt";
-                Path z3ErrorsPath  = Paths.get(this.parameters.getTargetDirectory(), z3ErrorsFilename).toAbsolutePath();
-                Files.write(z3ErrorsPath, z3Errors.getBytes());
+                this.writeErrors(z3Errors, name);
             }
 
             return z3Answer;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String readLines(BufferedReader reader) throws IOException {
+        StringBuilder lines = new StringBuilder();
+
+        String line = "";
+        while ((line = reader.readLine()) != null) {
+            lines.append(line).append("\n");
+        }
+
+        return lines.toString();
+    }
+
+    private void writeHasUIF(boolean hasUninterpretedFunctions) throws IOException {
+        String filename = this.parameters.getTargetClassName() + "-P" + this.count + "-HasUIF.txt";
+        Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
+        Files.write(path, String.valueOf(hasUninterpretedFunctions).getBytes());
+    }
+
+    private Path writeQuery(String query, String name) throws IOException {
+        String filename = this.parameters.getTargetClassName() + "-P" + this.count + "-ToSolve-" + name + ".txt";
+        Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
+        Files.write(path, query.getBytes());
+        return path;
+    }
+
+    private void writeAnswer(String answer, String name) throws IOException {
+        String filename = this.parameters.getTargetClassName() + "-P" + this.count + "-Answer-" + name + ".txt";
+        Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
+        Files.write(path, answer.getBytes());
+    }
+
+    private void writeModel(String model, String name) throws IOException {
+        String filename = this.parameters.getTargetClassName() + "-P" + this.count + "-Model-" + name + ".txt";
+        Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
+        Files.write(path, model.getBytes());
+    }
+
+    private void writeErrors(String errors, String name) throws IOException {
+        String filename = this.parameters.getTargetClassName() + "-P" + this.count + "-Errors-" + name + ".txt";
+        Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
+        Files.write(path, errors.getBytes());
     }
 }
