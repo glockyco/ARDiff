@@ -116,8 +116,6 @@ benchmarks=(
   "../benchmarks/caldat/badluk/NEq"
   "../benchmarks/caldat/julday/Eq"
   "../benchmarks/caldat/julday/NEq"
-  "../benchmarks/custom/loop/Eq"
-  "../benchmarks/custom/unreachable/Eq"
   "../benchmarks/dart/test/Eq"
   "../benchmarks/dart/test/NEq"
   "../benchmarks/gam/betacf/Eq"
