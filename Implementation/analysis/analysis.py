@@ -23,8 +23,22 @@ class Classification(Enum):
     TIMEOUT = 3
 
     UNKNOWN = 4
+
+    # MAYBE_NEQ:
+    # Equivalence checking found the two programs to be NEQ, but:
+    # (i) there were uninterpreted functions in the solver query AND
+    # (ii) at least one input assignment exists for which the programs are EQ.
+    # Thus, the base programs without uninterpreted functions might actually
+    # be EQ rather than NEQ if the NEQ results only arise due to the
+    # introduction of uninterpreted functions.
     MAYBE_NEQ = 5
+
+    # MAYBE_EQ:
+    # Equivalence checking found the two programs to be EQ, but the symbolic
+    # execution hit the search depth limit. Thus, the programs might be found
+    # to be NEQ rather than EQ when using a sufficiently large search depth.
     MAYBE_EQ = 6
+
     NEQ = 7
     EQ = 8
 
