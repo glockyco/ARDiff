@@ -181,7 +181,14 @@ class VersionData(BenchmarkData):
         name_prefix: str = f"I{version_name}{tool_name}"
 
         self._driver_file: Path = self._instrumented_dir / f"{name_prefix}.java"
+        self._output_file: Path = self._instrumented_dir / f"{name_prefix}JPFOutput.txt"
         self._error_file: Path = self._instrumented_dir / f"{name_prefix}Error.txt"
+
+        self._output: str = ""
+        if self._output_file.exists():
+            self._output = self._output_file.read_text()
+
+        self._is_depth_limited = "depth limit reached" in self._output
 
         self._errors: str = ""
         if self._error_file.exists():
@@ -222,6 +229,9 @@ class VersionData(BenchmarkData):
 
     def errors(self) -> str:
         return self._errors
+
+    def is_depth_limited(self) -> bool:
+        return self._is_depth_limited
 
 
 class BaseToolData(BenchmarkData):
@@ -294,7 +304,16 @@ class BaseToolData(BenchmarkData):
         return False
 
     def is_maybe_eq(self) -> bool:
-        return False
+        if self._output_classification is None:
+            return False
+
+        if not self._output_classification == Classification.EQ:
+            return False
+
+        is_old_depth_limited: bool = self._old_version.is_depth_limited()
+        is_new_depth_limited: bool = self._new_version.is_depth_limited()
+
+        return is_old_depth_limited or is_new_depth_limited
 
     def is_neq(self) -> bool:
         if self._output_classification is None:
@@ -306,7 +325,13 @@ class BaseToolData(BenchmarkData):
         if self._output_classification is None:
             return False
 
-        return self._output_classification == Classification.EQ
+        if not self._output_classification == Classification.EQ:
+            return False
+
+        is_old_depth_limited: bool = self._old_version.is_depth_limited()
+        is_new_depth_limited: bool = self._new_version.is_depth_limited()
+
+        return (not is_old_depth_limited) and (not is_new_depth_limited)
 
     def errors(self) -> str:
         return self._old_version.errors() + self._new_version.errors()
