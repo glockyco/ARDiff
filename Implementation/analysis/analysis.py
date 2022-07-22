@@ -669,6 +669,8 @@ def print_crosstabs(results: Dict[str, pd.DataFrame]):
 def run_main(use_cache: bool = True) -> None:
     tool_names = ["SE", "DSE", "ARDiff"]
 
+    true_base_results: Dict[str, pd.DataFrame] = {}
+    true_diff_results: Dict[str, pd.DataFrame] = {}
     true_results: Dict[str, pd.DataFrame] = {}
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -693,8 +695,19 @@ def run_main(use_cache: bool = True) -> None:
             diff_df.insert(4, "actual-base", base_df["actual"])
             diff_df.to_csv(diff_df_file)
 
+        true_base_results[f"{tool_name}-base"] = base_df
+        true_diff_results[f"{tool_name}-diff"] = diff_df
+
         true_results[f"{tool_name}-base"] = base_df
         true_results[f"{tool_name}-diff"] = diff_df
+
+    # --------------------------------------------------------------------------
+
+    overall_base_df: pd.DataFrame = pd.concat(true_base_results.values())
+    overall_base_df.to_csv(RESULTS_DIR / "overall_base_df.csv")
+
+    overall_diff_df: pd.DataFrame = pd.concat(true_diff_results.values())
+    overall_diff_df.to_csv(RESULTS_DIR / "overall_diff_df.csv")
 
     # --------------------------------------------------------------------------
 
@@ -726,6 +739,22 @@ def run_main(use_cache: bool = True) -> None:
     pd.set_option("display.max_colwidth", None)
     pd.set_option("display.max_rows", None)
     pd.set_option("display.width", None)
+
+    # --------------------------------------------------------------------------
+
+    columns = ["actual", "path", "error"]
+    base_error_mask = overall_base_df["actual"] == "ERROR"
+    diff_error_mask = overall_diff_df["actual"] == "ERROR"
+    base_errors_df: pd.DataFrame = overall_base_df.loc[base_error_mask, columns]
+    diff_errors_df: pd.DataFrame = overall_diff_df.loc[diff_error_mask, columns]
+
+    errors_df = pd.concat([base_errors_df, diff_errors_df])
+
+    with open(RESULTS_DIR / "errors.txt", "w") as f:
+        for index, row in errors_df.iterrows():
+            f.write("--------------------------------------------------\n\n")
+            f.write(f"{row['actual']} - {row['path']}\n\n")
+            f.write(f"{row['error']}\n\n")
 
     # --------------------------------------------------------------------------
 
