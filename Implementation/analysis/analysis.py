@@ -613,128 +613,37 @@ class DifferencingData(BenchmarkData):
         }
 
 
-def run_main(use_cache: bool = True) -> None:
-    base_df: Optional[pd.DataFrame] = None
-    diff_df: Optional[pd.DataFrame] = None
+def get_benchmark_paths() -> List[Path]:
+    benchmarks: List[Path] = []
 
-    base_results_file = RESULTS_DIR / "base_results.csv"
-    diff_results_file = RESULTS_DIR / "diff_results.csv"
+    for directory in glob.glob(os.path.join(BENCHMARKS_DIR, "*", "*", "*")):
+        benchmark: Path = Path(directory)
+        benchmarks.append(benchmark)
 
-    is_cache_available: bool = False
-
-    # --------------------------------------------------------------------------
-
-    if use_cache:
-        if base_results_file.exists():
-            base_df = pd.read_csv(base_results_file)
-
-        if diff_results_file.exists():
-            diff_df = pd.read_csv(diff_results_file)
-
-        is_cache_available = base_df is not None and diff_df is not None
-
-    if not is_cache_available:
-        base_data: List[Dict[str, Any]] = []
-        diff_data: List[Dict[str, Any]] = []
-
-        for directory in glob.glob(os.path.join(BENCHMARKS_DIR, "*", "*", "*")):
-            for tool_name in ["SE", "DSE", "ARDiff"]:
-                benchmark_path = Path(directory)
-
-                new_base_data = BaseToolData(benchmark_path, tool_name)
-                new_diff_data = DifferencingData(benchmark_path, tool_name)
-
-                if new_diff_data.is_error():
-                    print()
-                    print("--------------------------------------------------")
-                    print()
-                    print(new_diff_data)
-                    print()
-                    print(new_diff_data.errors())
-
-                base_data.append(new_base_data.to_dict())
-                diff_data.append(new_diff_data.to_dict())
-
-        base_df = pd.DataFrame(base_data)
-        diff_df = pd.DataFrame(diff_data)
-        diff_df.insert(4, "actual-base", base_df["actual"])
-
-        RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-
-        base_df.to_csv(base_results_file)
-        diff_df.to_csv(diff_results_file)
-
-    assert base_df is not None
-    assert diff_df is not None
-
-    # --------------------------------------------------------------------------
-
-    pd.set_option("display.max_columns", None)
-    pd.set_option("display.max_colwidth", None)
-    pd.set_option("display.max_rows", None)
-    pd.set_option("display.width", None)
-
-    # --------------------------------------------------------------------------
-
-    strict_base_df = base_df.copy()
-    strict_base_df.loc[base_df["actual"] == "MAYBE_EQ", "actual"] = "UNKNOWN"
-    strict_base_df.loc[base_df["actual"] == "MAYBE_NEQ", "actual"] = "UNKNOWN"
-
-    strict_diff_df = diff_df.copy()
-    strict_diff_df.loc[diff_df["actual"] == "MAYBE_EQ", "actual"] = "UNKNOWN"
-    strict_diff_df.loc[diff_df["actual"] == "MAYBE_NEQ", "actual"] = "UNKNOWN"
-    strict_diff_df.loc[diff_df["actual-base"] == "MAYBE_EQ", "actual-base"] = "UNKNOWN"
-    strict_diff_df.loc[diff_df["actual-base"] == "MAYBE_NEQ", "actual-base"] = "UNKNOWN"
-
-    # --------------------------------------------------------------------------
-
-    lenient_base_df = base_df.copy()
-    lenient_base_df.loc[base_df["actual"] == "MAYBE_EQ", "actual"] = "EQ"
-    lenient_base_df.loc[base_df["actual"] == "MAYBE_NEQ", "actual"] = "NEQ"
-
-    lenient_diff_df = diff_df.copy()
-    lenient_diff_df.loc[diff_df["actual"] == "MAYBE_EQ", "actual"] = "EQ"
-    lenient_diff_df.loc[diff_df["actual"] == "MAYBE_NEQ", "actual"] = "NEQ"
-    lenient_diff_df.loc[diff_df["actual-base"] == "MAYBE_EQ", "actual-base"] = "EQ"
-    lenient_diff_df.loc[diff_df["actual-base"] == "MAYBE_NEQ", "actual-base"] = "NEQ"
-
-    # --------------------------------------------------------------------------
-
-    print("\n---------- LENIENT RESULTS ----------")
-
-    print_results({
-        "SE-base": lenient_base_df.loc[base_df["tool"] == "SE-base"],
-        "SE-diff": lenient_diff_df.loc[diff_df["tool"] == "SE-diff"],
-        "DSE-base": lenient_base_df.loc[base_df["tool"] == "DSE-base"],
-        "DSE-diff": lenient_diff_df.loc[diff_df["tool"] == "DSE-diff"],
-        "ARDiff-base": lenient_base_df.loc[base_df["tool"] == "ARDiff-base"],
-        "ARDiff-diff": lenient_diff_df.loc[diff_df["tool"] == "ARDiff-diff"],
-    })
-
-    print("\n---------- STRICT RESULTS ----------")
-
-    print_results({
-        "SE-base": strict_base_df.loc[base_df["tool"] == "SE-base"],
-        "SE-diff": strict_diff_df.loc[diff_df["tool"] == "SE-diff"],
-        "DSE-base": strict_base_df.loc[base_df["tool"] == "DSE-base"],
-        "DSE-diff": strict_diff_df.loc[diff_df["tool"] == "DSE-diff"],
-        "ARDiff-base": strict_base_df.loc[base_df["tool"] == "ARDiff-base"],
-        "ARDiff-diff": strict_diff_df.loc[diff_df["tool"] == "ARDiff-diff"],
-    })
-
-    print("\n---------- TRUE RESULTS ----------")
-
-    print_results({
-        "SE-base": base_df.loc[base_df["tool"] == "SE-base"],
-        "SE-diff": diff_df.loc[diff_df["tool"] == "SE-diff"],
-        "DSE-base": base_df.loc[base_df["tool"] == "DSE-base"],
-        "DSE-diff": diff_df.loc[diff_df["tool"] == "DSE-diff"],
-        "ARDiff-base": base_df.loc[base_df["tool"] == "ARDiff-base"],
-        "ARDiff-diff": diff_df.loc[diff_df["tool"] == "ARDiff-diff"],
-    })
+    return benchmarks
 
 
-def print_results(results: Dict[str, pd.DataFrame]):
+def create_base_df(tool_name: str) -> pd.DataFrame:
+    data: List[Dict[str, Any]] = []
+
+    for benchmark_path in get_benchmark_paths():
+        base_tool_data = BaseToolData(benchmark_path, tool_name)
+        data.append(base_tool_data.to_dict())
+
+    return pd.DataFrame(data)
+
+
+def create_diff_df(tool_name: str) -> pd.DataFrame:
+    data: List[Dict[str, Any]] = []
+
+    for benchmark_path in get_benchmark_paths():
+        diff_data = DifferencingData(benchmark_path, tool_name)
+        data.append(diff_data.to_dict())
+
+    return pd.DataFrame(data)
+
+
+def print_crosstabs(results: Dict[str, pd.DataFrame]):
     column_order = ["EQ", "MAYBE_EQ", "NEQ", "MAYBE_NEQ", "UNKNOWN", "TIMEOUT", "ERROR", "MISSING", "All"]
 
     print()
@@ -746,15 +655,91 @@ def print_results(results: Dict[str, pd.DataFrame]):
     for title, result_df in results.items():
         result_ct = pd.crosstab(result_df["expected"], result_df["actual"], margins=True)
 
-        missing_classes = [c for c in used_classes if c not in result_ct.columns]
+        missing_classes: List[str] = [c for c in used_classes if c not in result_ct.columns]
         for missing_class in missing_classes:
             result_ct[missing_class] = 0
 
-        result_ct = result_ct[[c for c in column_order if c in result_ct.columns]]
+        result_ct: pd.DataFrame = result_ct[[c for c in column_order if c in result_ct.columns]]
 
         print(f"{title}:")
-        print(result_ct)
+        print(result_ct.to_markdown())
         print()
+
+
+def run_main(use_cache: bool = True) -> None:
+    tool_names = ["SE", "DSE", "ARDiff"]
+
+    true_results: Dict[str, pd.DataFrame] = {}
+
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    for tool_name in tool_names:
+        base_df: Optional[pd.DataFrame]
+        diff_df: Optional[pd.DataFrame]
+
+        base_df_file = RESULTS_DIR / f"{tool_name}_base_df.csv"
+        diff_df_file = RESULTS_DIR / f"{tool_name}_diff_df.csv"
+
+        if use_cache and base_df_file.exists():
+            base_df = pd.read_csv(base_df_file)
+        else:
+            base_df = create_base_df(tool_name)
+            base_df.to_csv(base_df_file)
+
+        if use_cache and diff_df_file.exists():
+            diff_df = pd.read_csv(diff_df_file)
+        else:
+            diff_df = create_diff_df(tool_name)
+            diff_df.insert(4, "actual-base", base_df["actual"])
+            diff_df.to_csv(diff_df_file)
+
+        true_results[f"{tool_name}-base"] = base_df
+        true_results[f"{tool_name}-diff"] = diff_df
+
+    # --------------------------------------------------------------------------
+
+    strict_results: Dict[str, pd.DataFrame] = {}
+    lenient_results: Dict[str, pd.DataFrame] = {}
+
+    for tool_name, df in true_results.items():
+        strict_df: pd.DataFrame = df.copy()
+        strict_df.loc[df["actual"] == "MAYBE_EQ", "actual"] = "UNKNOWN"
+        strict_df.loc[df["actual"] == "MAYBE_NEQ", "actual"] = "UNKNOWN"
+
+        lenient_df: pd.DataFrame = df.copy()
+        lenient_df.loc[df["actual"] == "MAYBE_EQ", "actual"] = "EQ"
+        lenient_df.loc[df["actual"] == "MAYBE_NEQ", "actual"] = "NEQ"
+
+        if "actual-base" in df.columns:
+            strict_df.loc[df["actual-base"] == "MAYBE_EQ", "actual"] = "UNKNOWN"
+            strict_df.loc[df["actual-base"] == "MAYBE_NEQ", "actual"] = "UNKNOWN"
+
+            lenient_df.loc[df["actual-base"] == "MAYBE_EQ", "actual"] = "EQ"
+            lenient_df.loc[df["actual-base"] == "MAYBE_NEQ", "actual"] = "NEQ"
+
+        strict_results[tool_name] = strict_df
+        lenient_results[tool_name] = lenient_df
+
+    # --------------------------------------------------------------------------
+
+    pd.set_option("display.max_columns", None)
+    pd.set_option("display.max_colwidth", None)
+    pd.set_option("display.max_rows", None)
+    pd.set_option("display.width", None)
+
+    # --------------------------------------------------------------------------
+
+    print("\n---------- LENIENT RESULTS ----------")
+
+    print_crosstabs(lenient_results)
+
+    print("\n---------- STRICT RESULTS ----------")
+
+    print_crosstabs(strict_results)
+
+    print("\n---------- TRUE RESULTS ----------")
+
+    print_crosstabs(true_results)
 
 
 if __name__ == "__main__":
