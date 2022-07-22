@@ -296,7 +296,7 @@ public class DSE {
             totalTimes[4] += times[4];
             String outputs = path.split("instrumented")[0];
 
-            /**********************Running the differencing ******************/
+            /**********************Creating the the differencing parameters ******************/
 
             DifferencingParameterFactory factory = new DifferencingParameterFactory();
 

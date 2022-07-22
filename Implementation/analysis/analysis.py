@@ -638,7 +638,7 @@ def run_main(use_cache: bool = True) -> None:
         diff_data: List[Dict[str, Any]] = []
 
         for directory in glob.glob(os.path.join(BENCHMARKS_DIR, "*", "*", "*")):
-            for tool_name in ["DSE", "ARDiff"]:
+            for tool_name in ["SE", "DSE", "ARDiff"]:
                 benchmark_path = Path(directory)
 
                 new_base_data = BaseToolData(benchmark_path, tool_name)
@@ -703,6 +703,8 @@ def run_main(use_cache: bool = True) -> None:
     print("\n---------- LENIENT RESULTS ----------")
 
     print_results({
+        "SE-base": lenient_base_df.loc[base_df["tool"] == "SE-base"],
+        "SE-diff": lenient_diff_df.loc[diff_df["tool"] == "SE-diff"],
         "DSE-base": lenient_base_df.loc[base_df["tool"] == "DSE-base"],
         "DSE-diff": lenient_diff_df.loc[diff_df["tool"] == "DSE-diff"],
         "ARDiff-base": lenient_base_df.loc[base_df["tool"] == "ARDiff-base"],
@@ -712,6 +714,8 @@ def run_main(use_cache: bool = True) -> None:
     print("\n---------- STRICT RESULTS ----------")
 
     print_results({
+        "SE-base": strict_base_df.loc[base_df["tool"] == "SE-base"],
+        "SE-diff": strict_diff_df.loc[diff_df["tool"] == "SE-diff"],
         "DSE-base": strict_base_df.loc[base_df["tool"] == "DSE-base"],
         "DSE-diff": strict_diff_df.loc[diff_df["tool"] == "DSE-diff"],
         "ARDiff-base": strict_base_df.loc[base_df["tool"] == "ARDiff-base"],
@@ -721,6 +725,8 @@ def run_main(use_cache: bool = True) -> None:
     print("\n---------- TRUE RESULTS ----------")
 
     print_results({
+        "SE-base": base_df.loc[base_df["tool"] == "SE-base"],
+        "SE-diff": diff_df.loc[diff_df["tool"] == "SE-diff"],
         "DSE-base": base_df.loc[base_df["tool"] == "DSE-base"],
         "DSE-diff": diff_df.loc[diff_df["tool"] == "DSE-diff"],
         "ARDiff-base": base_df.loc[base_df["tool"] == "ARDiff-base"],

@@ -10,13 +10,16 @@
 //FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 //WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 package Runner;
+
 import DSE.DSE;
 import GradDiff.GradDiff;
 import IMPs.ImpactedS;
+import SE.SE;
 import com.microsoft.z3.Context;
 import equiv.checking.ProjectPaths;
 import equiv.checking.Utils;
 import org.apache.commons.lang3.SystemUtils;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -119,6 +122,28 @@ public class Runner{
                 System.out.println("\n[NOTE] If you want to have a complete summary (exercise all behaviors), make sure your bound is big enough.");
 
             else System.out.println(ANSI_GREEN + "[NOTE] If you want to have a complete summary (exercise all behaviors), make sure your bound is big enough."+ANSI_RESET);
+            ////*******************************************************************************************************************************************+////
+            if(tool.contains("S")) {
+                System.out.println("*****************************************************************************");
+                System.out.println("------------------------------------SE-----------------------------------");
+                System.out.println("*****************************************************************************");
+                boolean parseFromSMTLib = true;// to parse the jpf output into a string similar to the terminal version of Z3 (true for the terminal version when you have Math.XXXX)
+                SE se = new SE(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "SE", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib,true,z3Terminal);
+                boolean finished1 = se.runTool();
+                if (finished1==true)
+                    System.exit(0);
+                try
+                {
+                    Thread.sleep(timeout);
+                }
+                catch (InterruptedException e)
+                {
+                    // log the exception.
+                }
+                System.exit(0);
+            }
+            ////*******************************************************************************************************************************************+////
+            ////*******************************************************************************************************************************************+////
             ////*******************************************************************************************************************************************+////
             if(tool.contains("D")) {
                 System.out.println("*****************************************************************************");

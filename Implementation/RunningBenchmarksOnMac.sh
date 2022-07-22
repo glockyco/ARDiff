@@ -155,6 +155,7 @@ benchmarks=(
 )
 
 tool_names=(
+  "SE"
   "DSE"
 #  "Imp"
 #  "ARDiffR"
@@ -163,6 +164,7 @@ tool_names=(
 )
 
 configurations=(
+  "--tool S --s coral --b 3"
   "--tool D --s coral --b 3"
 #  "--tool I --s coral --b 3"
 #  "--tool A --s coral --b 3 --H R"
