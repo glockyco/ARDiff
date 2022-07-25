@@ -339,6 +339,16 @@ class BaseToolData(BenchmarkData):
 
         return (not is_old_depth_limited) and (not is_new_depth_limited)
 
+    def runtime(self) -> Optional[int]:
+        if self._output is None:
+            return None
+
+        matches: List[str] = re.findall(r"(\d+\.\d+) ms", self._output)
+        times: List[float] = [float(match) / 1000 for match in matches]
+        runtime = int(sum(times))
+
+        return runtime
+
     def errors(self) -> str:
         return self._old_version.errors() + self._new_version.errors()
 
@@ -350,6 +360,7 @@ class BaseToolData(BenchmarkData):
             "actual": self.result().name,
             "has_succeeded": self.has_succeeded(),
             "is_correct": self.is_correct(),
+            "runtime": self.runtime(),
             "error": self.errors(),
         }
 
@@ -559,6 +570,20 @@ class DifferencingData(BenchmarkData):
     def is_eq(self) -> bool:
         return self.result() == Classification.EQ
 
+    def runtime(self) -> Optional[int]:
+        if self.has_failed():
+            return None
+
+        time_index = self._output.rfind("elapsed time:")
+        time_pattern = r"(\d\d:\d\d:\d\d)"
+        match = re.search(time_pattern, self._output[time_index:])
+
+        if match:
+            h, m, s = match.group(1).split(":")
+            return int(h) * 3600 + int(m) * 60 + int(s)
+
+        return None
+
     def errors(self) -> str:
         errors: List[str] = []
 
@@ -609,6 +634,7 @@ class DifferencingData(BenchmarkData):
             "#maybe_neq": self._result_counts[Classification.MAYBE_NEQ],
             "#neq": self._result_counts[Classification.NEQ],
             "#eq": self._result_counts[Classification.EQ],
+            "runtime": self.runtime(),
             "error": self.errors(),
         }
 
