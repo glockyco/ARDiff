@@ -2,6 +2,9 @@
 
 dry_run=false
 
+run_equivalence_checking=true
+run_differencing=true
+
 timeout="300" # seconds
 
 clean=true
@@ -193,39 +196,73 @@ if [ "$clean" = true ] ; then
   done
 fi
 
-for d1 in ../benchmarks/* ; do
-  for d2 in "$d1"/* ; do
-    for d3 in "$d2"/* ; do
-      if [[ ! " ${benchmarks[*]} " =~ " ${d3} " ]]; then
-        if [ "$print_skipped" = true ] ; then
-          printf "Skipping %s ...\n" "${d3}"
-        fi
-        continue
-      fi
-
-      printf "Processing %s ..." "${d3}"
-
-      oldV="${d3}/oldV.java"
-      newV="${d3}/newV.java"
-
-      for i in "${!configurations[@]}" ; do
-        command_1="timeout --verbose --foreground ${timeout}s gradle -PmainClass=Runner.Runner run --args='--path1 ${oldV} --path2 ${newV} ${configurations[$i]}'"
-        command_2="gradle -PmainClass=equiv.checking.DifferencingRunner run --args='${d3} ${tool_names[$i]} ${timeout}'"
-
-        if [ "$print_commands" = true ] ; then
-          printf "\n%s" "${command_1}"
-          printf "\n%s" "${command_2}"
+if [ "$run_equivalence_checking" = true ] ; then
+  for d1 in ../benchmarks/* ; do
+    for d2 in "$d1"/* ; do
+      for d3 in "$d2"/* ; do
+        if [[ ! " ${benchmarks[*]} " =~ " ${d3} " ]]; then
+          if [ "$print_skipped" = true ] ; then
+            printf "Skipping %s ...\n" "${d3}"
+          fi
+          continue
         fi
 
-        if [ "$dry_run" = false ] ; then
-          mkdir -p "${d3}/instrumented/"
+        printf "Processing %s ..." "${d3}"
 
-          eval "${command_1}"
-          eval "${command_2}"
-        fi
+        # ------------------------------------------------------------------------
+
+        for i in "${!configurations[@]}" ; do
+          oldV="${d3}/oldV.java"
+          newV="${d3}/newV.java"
+
+          command="timeout --verbose --foreground ${timeout}s gradle -PmainClass=Runner.Runner run --args='--path1 ${oldV} --path2 ${newV} ${configurations[$i]}'"
+
+          if [ "$print_commands" = true ] ; then
+            printf "\n%s" "${command}"
+          fi
+
+          if [ "$dry_run" = false ] ; then
+            mkdir -p "${d3}/instrumented/"
+            eval "${command}"
+          fi
+        done
+
+        printf "\n"
       done
-
-      printf "\n"
     done
   done
-done
+fi
+
+if [ "$run_differencing" = true ] ; then
+  for d1 in ../benchmarks/* ; do
+    for d2 in "$d1"/* ; do
+      for d3 in "$d2"/* ; do
+        if [[ ! " ${benchmarks[*]} " =~ " ${d3} " ]]; then
+          if [ "$print_skipped" = true ] ; then
+            printf "Skipping %s ...\n" "${d3}"
+          fi
+          continue
+        fi
+
+        printf "Processing %s ..." "${d3}"
+
+        # ------------------------------------------------------------------------
+
+        for i in "${!configurations[@]}" ; do
+          command="gradle -PmainClass=equiv.checking.DifferencingRunner run --args='${d3} ${tool_names[$i]} ${timeout}'"
+
+          if [ "$print_commands" = true ] ; then
+            printf "\n%s" "${command}"
+          fi
+
+          if [ "$dry_run" = false ] ; then
+            mkdir -p "${d3}/instrumented/"
+            eval "${command}"
+          fi
+        done
+
+        printf "\n"
+      done
+    done
+  done
+fi
