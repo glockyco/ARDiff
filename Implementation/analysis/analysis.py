@@ -339,6 +339,13 @@ class BaseToolData(BenchmarkData):
 
         return (not is_old_depth_limited) and (not is_new_depth_limited)
 
+    def iterations(self) -> Optional[int]:
+        if self._output is None:
+            return None
+
+        iterations = self._output.count("Iteration")
+        return iterations if iterations > 0 else None
+
     def runtime(self) -> Optional[int]:
         if self._output is None:
             return None
@@ -360,6 +367,7 @@ class BaseToolData(BenchmarkData):
             "actual": self.result().name,
             "has_succeeded": self.has_succeeded(),
             "is_correct": self.is_correct(),
+            "iterations": self.iterations(),
             "runtime": self.runtime(),
             "error": self.errors(),
         }
