@@ -745,6 +745,19 @@ def run_main(use_cache: bool = True) -> None:
 
     # --------------------------------------------------------------------------
 
+    metrics_base_df: pd.DataFrame = overall_base_df[["path", "tool", "expected", "actual", "runtime"]]
+    metrics_diff_df: pd.DataFrame = overall_diff_df[["path", "tool", "expected", "actual", "runtime"]]
+    metrics_overall_df: pd.DataFrame = pd.concat([metrics_base_df, metrics_diff_df], ignore_index=True)
+    metrics_overall_df["path"] = metrics_overall_df["path"].apply(lambda path: str(Path(path).parent.parent))
+
+    runtimes_df: pd.DataFrame = metrics_overall_df.pivot(["path", "expected"], "tool", "runtime").reset_index()
+    runtimes_df.to_csv(RESULTS_DIR / "_runtimes.csv")
+
+    results_df: pd.DataFrame = metrics_overall_df.pivot(["path", "expected"], "tool", "actual").reset_index()
+    results_df.to_csv(RESULTS_DIR / "_results.csv")
+
+    # --------------------------------------------------------------------------
+
     strict_results: Dict[str, pd.DataFrame] = {}
     lenient_results: Dict[str, pd.DataFrame] = {}
 
