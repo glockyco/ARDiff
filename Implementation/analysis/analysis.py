@@ -74,6 +74,10 @@ class BenchmarkData(ABC):
     def name(self) -> str:
         pass
 
+    @abstractmethod
+    def tool_name(self) -> str:
+        pass
+
     def result(self) -> Classification:
         if self._result is not None:
             return self._result
@@ -196,6 +200,9 @@ class VersionData(BenchmarkData):
 
     def name(self) -> str:
         return self._version_name
+
+    def tool_name(self) -> str:
+        return f"{self._tool_name}-base"
 
     # Cannot reliably detect timeout on the VersionData level,
     # so we only distinguish MISSING / ERROR / UNKNOWN.
@@ -410,6 +417,9 @@ class PartitionData(BenchmarkData):
     def name(self) -> str:
         return f"P{self._partition_id}"
 
+    def tool_name(self) -> str:
+        return f"{self._tool_name}-diff"
+
     def is_missing(self) -> bool:
         # NEQ query files determine whether a partition is missing because
         # they are the first files that should be created for a partition.
@@ -473,6 +483,34 @@ class PartitionData(BenchmarkData):
 
     def has_uif(self) -> bool:
         return self._has_uif
+
+    def path_condition(self) -> Optional[str]:
+        if not self._neq_query_file.exists():
+            return None
+
+        query = self._neq_query_file.read_text()
+        for line in query.split("\n"):
+            if "(assert" in line:
+                return line
+
+        return None
+
+    def constraint_count(self) -> int:
+        path_condition: Optional[str] = self.path_condition()
+        return 0 if path_condition is None else path_condition.count("(and ")
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "path": self.full_path(),
+            "tool": self.tool_name(),
+            "expected": self.expected_result().name,
+            "actual": self.result().name,
+            "has_succeeded": self.has_succeeded(),
+            "is_correct": self.is_correct(),
+            "has_uif": self.has_uif(),
+            "#constraints": self.constraint_count(),
+            "error": self.errors(),
+        }
 
 
 class DifferencingData(BenchmarkData):
@@ -657,24 +695,34 @@ def get_benchmark_paths() -> List[Path]:
     return benchmarks
 
 
-def create_base_df(tool_name: str) -> pd.DataFrame:
-    data: List[Dict[str, Any]] = []
+def create_base_data(tool_name: str) -> List[BaseToolData]:
+    data: List[BaseToolData] = []
 
     for benchmark_path in get_benchmark_paths():
         base_tool_data = BaseToolData(benchmark_path, tool_name)
-        data.append(base_tool_data.to_dict())
+        data.append(base_tool_data)
 
-    return pd.DataFrame(data)
+    return data
 
 
-def create_diff_df(tool_name: str) -> pd.DataFrame:
-    data: List[Dict[str, Any]] = []
+def create_diff_data(tool_name: str) -> List[DifferencingData]:
+    data: List[DifferencingData] = []
 
     for benchmark_path in get_benchmark_paths():
         diff_data = DifferencingData(benchmark_path, tool_name)
-        data.append(diff_data.to_dict())
+        data.append(diff_data)
 
-    return pd.DataFrame(data)
+    return data
+
+
+def create_partition_data(tool_name: str) -> List[PartitionData]:
+    data: List[PartitionData] = []
+
+    for diff_data in create_diff_data(tool_name):
+        for partition in diff_data.partitions():
+            data.append(partition)
+
+    return data
 
 
 def print_crosstabs(results: Dict[str, pd.DataFrame]):
@@ -705,43 +753,93 @@ def run_main(use_cache: bool = True) -> None:
 
     true_base_results: Dict[str, pd.DataFrame] = {}
     true_diff_results: Dict[str, pd.DataFrame] = {}
+    true_partition_results: Dict[str, pd.DataFrame] = {}
     true_results: Dict[str, pd.DataFrame] = {}
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
     for tool_name in tool_names:
-        base_df: Optional[pd.DataFrame]
-        diff_df: Optional[pd.DataFrame]
+        print(f"Collecting {tool_name} data ...")
+
+        base_df: pd.DataFrame
+        diff_df: pd.DataFrame
+        partition_df: pd.DataFrame
 
         base_df_file = RESULTS_DIR / f"{tool_name}_base_df.csv"
         diff_df_file = RESULTS_DIR / f"{tool_name}_diff_df.csv"
+        partition_df_file = RESULTS_DIR / f"{tool_name}_partition_df.csv"
 
         if use_cache and base_df_file.exists():
+            print("  Reading base_df from cache ...")
             base_df = pd.read_csv(base_df_file)
         else:
-            base_df = create_base_df(tool_name)
+            print("  Reading base_df from raw data ...")
+            base_data: List[BaseToolData] = create_base_data(tool_name)
+
+            base_df = pd.DataFrame([d.to_dict() for d in base_data])
             base_df.to_csv(base_df_file)
 
         if use_cache and diff_df_file.exists():
+            print("  Reading diff_df from cache ...")
             diff_df = pd.read_csv(diff_df_file)
         else:
-            diff_df = create_diff_df(tool_name)
+            print("  Reading diff_df from raw data ...")
+            diff_data: List[DifferencingData] = create_diff_data(tool_name)
+
+            diff_df = pd.DataFrame([d.to_dict() for d in diff_data])
             diff_df.insert(4, "actual-base", base_df["actual"])
             diff_df.to_csv(diff_df_file)
 
+            partition_data: List[PartitionData] = create_partition_data(tool_name)
+            partition_df = pd.DataFrame([p.to_dict() for p in partition_data])
+            partition_df.to_csv()
+
+        if use_cache and partition_df_file.exists():
+            print("  Reading partition_df from cache ...")
+            partition_df = pd.read_csv(partition_df_file)
+        else:
+            print("  Reading partition_df from raw data ...")
+            partition_data: List[PartitionData] = create_partition_data(tool_name)
+
+            partition_df = pd.DataFrame([p.to_dict() for p in partition_data])
+            partition_df.to_csv(partition_df_file)
+
         true_base_results[f"{tool_name}-base"] = base_df
         true_diff_results[f"{tool_name}-diff"] = diff_df
+        true_partition_results[f"{tool_name}-diff"] = partition_df
 
         true_results[f"{tool_name}-base"] = base_df
         true_results[f"{tool_name}-diff"] = diff_df
 
+    print("Data collection done!")
+
     # --------------------------------------------------------------------------
 
-    overall_base_df: pd.DataFrame = pd.concat(true_base_results.values())
-    overall_base_df.to_csv(RESULTS_DIR / "overall_base_df.csv")
+    overall_base_df_file: Path = RESULTS_DIR / "overall_base_df.csv"
+    overall_diff_df_file: Path = RESULTS_DIR / "overall_diff_df.csv"
+    overall_partition_df_file: Path = RESULTS_DIR / "overall_partition_df.csv"
 
-    overall_diff_df: pd.DataFrame = pd.concat(true_diff_results.values())
-    overall_diff_df.to_csv(RESULTS_DIR / "overall_diff_df.csv")
+    overall_base_df: pd.DataFrame
+    overall_diff_df: pd.DataFrame
+    overall_partition_df: pd.DataFrame
+
+    if use_cache and overall_base_df_file.exists():
+        overall_base_df = pd.read_csv(overall_base_df_file)
+    else:
+        overall_base_df = pd.concat(true_base_results.values())
+        overall_base_df.to_csv(overall_base_df_file)
+
+    if use_cache and overall_diff_df_file.exists():
+        overall_diff_df = pd.read_csv(overall_diff_df_file)
+    else:
+        overall_diff_df = pd.concat(true_diff_results.values())
+        overall_diff_df.to_csv(overall_diff_df_file)
+
+    if use_cache and overall_partition_df_file.exists():
+        overall_partition_df = pd.read_csv(overall_partition_df_file)
+    else:
+        overall_partition_df = pd.concat(true_partition_results.values())
+        overall_partition_df.to_csv(overall_partition_df_file)
 
     # --------------------------------------------------------------------------
 
