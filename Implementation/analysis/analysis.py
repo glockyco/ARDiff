@@ -8,7 +8,12 @@ from pathlib import Path
 from typing import List, Dict, Optional, Any, Set
 
 import pandas as pd
+from sqlalchemy import inspect, text
+from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy.future.engine import Engine, create_engine, Connection
+from sqlalchemy.orm import Session, sessionmaker
 
+from model import create_schema
 
 CURRENT_DIR: Path = Path(os.path.dirname(os.path.realpath(__file__)))
 ROOT_DIR: Path = CURRENT_DIR / ".." / ".."
@@ -55,28 +60,50 @@ class Classification(Enum):
         return not self.is_success()
 
 
-class BenchmarkData(ABC):
+class Benchmark:
+    def __init__(self, root_dir: Path):
+        self._root_dir: Path = root_dir
+        self._name: str = str(self._root_dir.relative_to(BENCHMARKS_DIR))
+
+    def path(self) -> Path:
+        return self._root_dir
+
+    def expected_result(self) -> Classification:
+        relpath = os.path.join(self._name, "")
+
+        if f"{os.sep}Eq{os.sep}" in relpath:
+            return Classification.EQ
+        elif f"{os.sep}NEq{os.sep}" in relpath:
+            return Classification.NEQ
+
+        error = f"Unable to infer expected classification for {self._name}."
+        raise Exception(error)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "name": str(self._name),
+            "expected": self.expected_result().name,
+        }
+
+
+class BenchmarkResult(ABC):
     def __init__(self, root_dir: Path, tool_name: str):
         self._root_dir: Path = root_dir
         self._tool_name: str = tool_name
         self._result: Optional[Classification] = None
 
     def __str__(self) -> str:
-        return f"{self.result().name} - {self.full_path()}"
+        return f"{self.result().name} - {self.benchmark()} - {self.name()}"
 
-    def full_path(self) -> str:
-        benchmark_path: str = os.path.relpath(self._root_dir, BENCHMARKS_DIR)
-        tool_path: str = os.path.join(benchmark_path, self._tool_name)
-        full_path: str = os.path.join(tool_path, self.name())
-        return full_path
+    def benchmark(self) -> str:
+        return os.path.relpath(self._root_dir, BENCHMARKS_DIR)
 
     @abstractmethod
     def name(self) -> str:
         pass
 
-    @abstractmethod
     def tool_name(self) -> str:
-        pass
+        return self._tool_name
 
     def result(self) -> Classification:
         if self._result is not None:
@@ -102,40 +129,13 @@ class BenchmarkData(ABC):
         if self._result is not None:
             return self._result
 
-        raise Exception(f"Unable to classify {self.full_path()}.")
-
-    def expected_result(self) -> Classification:
-        if f"{os.sep}Eq{os.sep}" in self.full_path():
-            return Classification.EQ
-        elif f"{os.sep}NEq{os.sep}" in self.full_path():
-            return Classification.NEQ
-
-        error = f"Unable to infer expected classification for {self.full_path()}."
-        raise Exception(error)
+        raise Exception(f"Unable to classify {self.benchmark()} - {self.tool_name()} - {self.name()}.")
 
     def has_succeeded(self) -> bool:
         return self.result().is_success()
 
     def has_failed(self) -> bool:
         return self.result().is_failure()
-
-    def is_correct(self):
-        should_be_eq: bool = self.expected_result() == Classification.EQ
-        should_be_neq: bool = self.expected_result() == Classification.NEQ
-
-        if self.has_failed():
-            return False
-
-        if self.is_unknown() or self.is_maybe_neq() or self.is_maybe_eq():
-            return False
-
-        if self.is_neq():
-            return should_be_neq
-
-        if self.is_eq():
-            return should_be_eq
-
-        raise Exception(f"Unable to infer whether {self.full_path()} is correct.")
 
     @abstractmethod
     def is_missing(self) -> bool:
@@ -174,7 +174,7 @@ class BenchmarkData(ABC):
         pass
 
 
-class VersionData(BenchmarkData):
+class VersionResult(BenchmarkResult):
     def __init__(self, root_dir: Path, tool_name: str, version_name: str):
         super().__init__(root_dir, tool_name)
 
@@ -199,10 +199,7 @@ class VersionData(BenchmarkData):
             self._errors = self._error_file.read_text()
 
     def name(self) -> str:
-        return self._version_name
-
-    def tool_name(self) -> str:
-        return f"{self._tool_name}-base"
+        return f"EQ-Check - Version: {self._version_name}"
 
     # Cannot reliably detect timeout on the VersionData level,
     # so we only distinguish MISSING / ERROR / UNKNOWN.
@@ -241,7 +238,7 @@ class VersionData(BenchmarkData):
         return self._is_depth_limited
 
 
-class BaseToolData(BenchmarkData):
+class BaseToolResult(BenchmarkResult):
     def __init__(self, root_dir: Path, tool_name: str):
         super().__init__(root_dir, tool_name)
 
@@ -257,8 +254,8 @@ class BaseToolData(BenchmarkData):
         if self._output is not None:
             self._output_classification = self._classify_output(self._output)
 
-        self._old_version: VersionData = VersionData(root_dir, tool_name, "oldV")
-        self._new_version: VersionData = VersionData(root_dir, tool_name, "newV")
+        self._old_version: VersionResult = VersionResult(root_dir, tool_name, "oldV")
+        self._new_version: VersionResult = VersionResult(root_dir, tool_name, "newV")
 
     @staticmethod
     def _classify_output(output: str) -> Classification:
@@ -290,10 +287,7 @@ class BaseToolData(BenchmarkData):
             raise Exception(f"Cannot classify output: {output}")
 
     def name(self) -> str:
-        return "base"
-
-    def tool_name(self) -> str:
-        return f"{self._tool_name}-{self.name()}"
+        return "EQ-Check"
 
     def is_missing(self) -> bool:
         return self._old_version.is_missing() or self._new_version.is_missing()
@@ -323,10 +317,7 @@ class BaseToolData(BenchmarkData):
         if not self._output_classification == Classification.EQ:
             return False
 
-        is_old_depth_limited: bool = self._old_version.is_depth_limited()
-        is_new_depth_limited: bool = self._new_version.is_depth_limited()
-
-        return is_old_depth_limited or is_new_depth_limited
+        return self.is_depth_limited()
 
     def is_neq(self) -> bool:
         if self._output_classification is None:
@@ -346,7 +337,7 @@ class BaseToolData(BenchmarkData):
 
         return (not is_old_depth_limited) and (not is_new_depth_limited)
 
-    def iterations(self) -> Optional[int]:
+    def iteration_count(self) -> Optional[int]:
         if self._output is None:
             return None
 
@@ -366,21 +357,26 @@ class BaseToolData(BenchmarkData):
     def errors(self) -> str:
         return self._old_version.errors() + self._new_version.errors()
 
+    def is_depth_limited(self) -> bool:
+        is_old_depth_limited: bool = self._old_version.is_depth_limited()
+        is_new_depth_limited: bool = self._new_version.is_depth_limited()
+        return is_old_depth_limited or is_new_depth_limited
+
     def to_dict(self) -> Dict[str, Any]:
         return {
-            "path": self.full_path(),
+            "benchmark": self.benchmark(),
             "tool": self.tool_name(),
-            "expected": self.expected_result().name,
-            "actual": self.result().name,
+            "tool_variant": f"{self.tool_name()}-base",
+            "result": self.result().name,
             "has_succeeded": self.has_succeeded(),
-            "is_correct": self.is_correct(),
-            "iterations": self.iterations(),
+            "is_depth_limited": self.is_depth_limited(),
+            "iteration_count": self.iteration_count(),
             "runtime": self.runtime(),
-            "error": self.errors(),
+            "errors": self.errors(),
         }
 
 
-class PartitionData(BenchmarkData):
+class PartitionResult(BenchmarkResult):
     def __init__(self, root_dir: Path, tool_name: str, partition_id: int) -> None:
         super().__init__(root_dir, tool_name)
 
@@ -415,10 +411,7 @@ class PartitionData(BenchmarkData):
             self._has_uif = self._has_uif_file.read_text() == "true"
 
     def name(self) -> str:
-        return f"P{self._partition_id}"
-
-    def tool_name(self) -> str:
-        return f"{self._tool_name}-diff"
+        return f"Diff - Partition: {self._partition_id}"
 
     def is_missing(self) -> bool:
         # NEQ query files determine whether a partition is missing because
@@ -501,19 +494,18 @@ class PartitionData(BenchmarkData):
 
     def to_dict(self) -> Dict[str, Any]:
         return {
-            "path": self.full_path(),
+            "benchmark": self.benchmark(),
             "tool": self.tool_name(),
-            "expected": self.expected_result().name,
-            "actual": self.result().name,
-            "has_succeeded": self.has_succeeded(),
-            "is_correct": self.is_correct(),
-            "has_uif": self.has_uif(),
-            "#constraints": self.constraint_count(),
-            "error": self.errors(),
+            "tool_variant": f"{self.tool_name()}-diff",
+            "partition": self._partition_id,
+            "result": self.result().name,
+            "has_uninterpreted_functions": self.has_uif(),
+            "constraint_count": self.constraint_count(),
+            "errors": self.errors(),
         }
 
 
-class DifferencingData(BenchmarkData):
+class DifferencingResult(BenchmarkResult):
     def __init__(self, root_dir: Path, tool_name: str):
         super().__init__(root_dir, tool_name)
 
@@ -534,15 +526,15 @@ class DifferencingData(BenchmarkData):
 
         self._is_depth_limited = "depth limit reached" in self._output
 
-        self._partitions: List[PartitionData] = self._init_partitions()
+        self._partitions: List[PartitionResult] = self._init_partitions()
 
         self._result_counts: Dict[Classification, int] = defaultdict(int)
         for partition in self._partitions:
             classification = partition.result()
             self._result_counts[classification] += 1
 
-    def _init_partitions(self) -> List[PartitionData]:
-        partitions: List[PartitionData] = []
+    def _init_partitions(self) -> List[PartitionResult]:
+        partitions: List[PartitionResult] = []
 
         z3_query_pattern = f"IDiff{self._tool_name}-P*-ToSolve-NEQ.txt"
         for query_file in self._instrumented_dir.glob(z3_query_pattern):
@@ -550,17 +542,14 @@ class DifferencingData(BenchmarkData):
             m = re.search(partition_id_pattern, query_file.name)
             if m:
                 partition_id = int(m.group(1))
-                partition = PartitionData(self._root_dir, self._tool_name, partition_id)
+                partition = PartitionResult(self._root_dir, self._tool_name, partition_id)
 
                 partitions.append(partition)
 
         return partitions
 
     def name(self) -> str:
-        return "diff"
-
-    def tool_name(self) -> str:
-        return f"{self._tool_name}-{self.name()}"
+        return "Diff"
 
     # START HERE
     def result(self) -> Classification:
@@ -590,7 +579,7 @@ class DifferencingData(BenchmarkData):
         if self._result is not None:
             return self._result
 
-        raise Exception(f"Unable to classify {self.full_path()}.")
+        raise Exception(f"Unable to classify {self.benchmark()} - {self.tool_name()} - {self.name()}.")
 
     def is_missing(self) -> bool:
         return self.result() == Classification.MISSING
@@ -644,165 +633,219 @@ class DifferencingData(BenchmarkData):
         if len(errors) <= 0:
             return ""
 
-        error_msg: str = f"Error while executing benchmark {self.full_path()}.\n\n"
+        error_msg: str = f"Error while executing benchmark {self.benchmark()}.\n\n"
 
         return error_msg + "\n".join(errors)
 
     def is_depth_limited(self) -> bool:
         return self._is_depth_limited
 
-    def partitions(self) -> List[PartitionData]:
+    def partitions(self) -> List[PartitionResult]:
         return self._partitions
-
-    def succeeded_partitions(self):
-        return list(filter(lambda p: p.has_succeeded(), self._partitions))
-
-    def failed_partitions(self):
-        return list(filter(lambda p: p.has_failed(), self._partitions))
 
     def to_dict(self) -> Dict[str, Any]:
         return {
-            "path": self.full_path(),
+            "benchmark": self.benchmark(),
             "tool": self.tool_name(),
-            "expected": self.expected_result().name,
-            "actual": self.result().name,
+            "tool_variant": f"{self.tool_name()}-diff",
+            "result": self.result().name,
             "has_succeeded": self.has_succeeded(),
-            "is_correct": self.is_correct(),
+            "has_uninterpreted_functions": len(list(filter(lambda p: p.has_uif(), self._partitions))) > 0,
             "is_depth_limited": self.is_depth_limited(),
-            "partitions": len(self._partitions),
-            "has_uif": len(list(filter(lambda p: p.has_uif(), self._partitions))) > 0,
-            "#uif": len(list(filter(lambda p: p.has_uif(), self._partitions))),
-            "#~uif": len(list(filter(lambda p: not p.has_uif(), self._partitions))),
-            "#missing": self._result_counts[Classification.MISSING],
-            "#error": self._result_counts[Classification.ERROR],
-            "#timeout": self._result_counts[Classification.TIMEOUT],
-            "#unknown": self._result_counts[Classification.UNKNOWN],
-            "#maybe_neq": self._result_counts[Classification.MAYBE_NEQ],
-            "#neq": self._result_counts[Classification.NEQ],
-            "#eq": self._result_counts[Classification.EQ],
             "runtime": self.runtime(),
-            "error": self.errors(),
+            "errors": self.errors(),
         }
 
 
-def get_benchmark_paths() -> List[Path]:
-    benchmarks: List[Path] = []
+class Repository:
+    def __init__(self, tool: str, engine: Engine, use_cache: bool = True):
+        self._tool: str = tool
+        self._engine: Engine = engine
+        self._inspector: Inspector = inspect(engine)
+        self._use_cache: bool = use_cache
 
-    for directory in glob.glob(os.path.join(BENCHMARKS_DIR, "*", "*", "*")):
-        benchmark: Path = Path(directory)
-        benchmarks.append(benchmark)
+        self._benchmark_table: str = "benchmark"
+        self._base_table: str = f"{tool}_base".lower()
+        self._diff_table: str = f"{tool}_diff".lower()
+        self._partition_table: str = f"{tool}_partition".lower()
 
-    return benchmarks
+        self._benchmark_data: Optional[List[Benchmark]] = None
+        self._base_data: Optional[List[BaseToolResult]] = None
+        self._diff_data: Optional[List[DifferencingResult]] = None
+        self._partition_data: Optional[List[PartitionResult]] = None
 
+        self._benchmark_df: Optional[pd.DataFrame] = None
+        self._base_df: Optional[pd.DataFrame] = None
+        self._diff_df: Optional[pd.DataFrame] = None
+        self._partition_df: Optional[pd.DataFrame] = None
 
-def create_base_data(tool_name: str) -> List[BaseToolData]:
-    data: List[BaseToolData] = []
+    def read_benchmark_data(self):
+        if self._use_cache and self._benchmark_data is not None:
+            return self._benchmark_data
+        return self._read_benchmark_data_from_disk()
 
-    for benchmark_path in get_benchmark_paths():
-        base_tool_data = BaseToolData(benchmark_path, tool_name)
-        data.append(base_tool_data)
+    def _read_benchmark_data_from_disk(self) -> List[Benchmark]:
+        print(f"Reading benchmark_data from disk ...")
+        self._benchmark_data = []
+        for directory in glob.glob(os.path.join(BENCHMARKS_DIR, "*", "*", "*")):
+            benchmark: Benchmark = Benchmark(Path(directory))
+            self._benchmark_data.append(benchmark)
+        return self._benchmark_data
 
-    return data
+    def read_base_data(self) -> List[BaseToolResult]:
+        if self._use_cache and self._base_data is not None:
+            return self._base_data
+        return self._read_base_data_from_disk()
 
+    def _read_base_data_from_disk(self) -> List[BaseToolResult]:
+        print(f"Reading {self._tool} base_data from disk ...")
+        self._base_data = []
+        for benchmark in self.read_benchmark_data():
+            base_tool_data = BaseToolResult(benchmark.path(), self._tool)
+            self._base_data.append(base_tool_data)
+        return self._base_data
 
-def create_diff_data(tool_name: str) -> List[DifferencingData]:
-    data: List[DifferencingData] = []
+    def read_diff_data(self) -> List[DifferencingResult]:
+        if self._use_cache and self._diff_data is not None:
+            return self._diff_data
+        return self._read_diff_data_from_disk()
 
-    for benchmark_path in get_benchmark_paths():
-        diff_data = DifferencingData(benchmark_path, tool_name)
-        data.append(diff_data)
+    def _read_diff_data_from_disk(self) -> List[DifferencingResult]:
+        print(f"Reading {self._tool} diff_data from disk ...")
+        self._diff_data = []
+        for benchmark in self.read_benchmark_data():
+            diff_data = DifferencingResult(benchmark.path(), self._tool)
+            self._diff_data.append(diff_data)
+        return self._diff_data
 
-    return data
+    def read_partition_data(self) -> List[PartitionResult]:
+        if self._use_cache and self._partition_data is not None:
+            return self._partition_data
+        return self._read_partition_data_from_disk()
 
+    def _read_partition_data_from_disk(self) -> List[PartitionResult]:
+        print(f"Reading {self._tool} partition_data from disk ...")
+        self._partition_data = []
+        for diff_data in self.read_diff_data():
+            for partition in diff_data.partitions():
+                self._partition_data.append(partition)
+        return self._partition_data
 
-def create_partition_data(tool_name: str) -> List[PartitionData]:
-    data: List[PartitionData] = []
+    def read_benchmark_df(self) -> pd.DataFrame:
+        if self._use_cache and self._benchmark_df is not None:
+            return self._benchmark_df
+        if self._use_cache and not self._is_table_empty(self._benchmark_table):
+            return self._read_benchmark_df_from_sql()
+        return self._read_benchmark_df_from_disk()
 
-    for diff_data in create_diff_data(tool_name):
-        for partition in diff_data.partitions():
-            data.append(partition)
+    def _read_benchmark_df_from_sql(self) -> pd.DataFrame:
+        with self._engine.begin() as conn:
+            index_col: List[str] = ["name"]
+            self._benchmark_df = pd.read_sql_table(self._benchmark_table, conn, index_col=index_col)
+            return self._benchmark_df
 
-    return data
+    def _read_benchmark_df_from_disk(self) -> pd.DataFrame:
+        data: List[Benchmark] = self.read_benchmark_data()
+        keys: List[str] = ["name"]
+        self._benchmark_df = self._read_df_from_disk(data, keys, self._benchmark_table)
+        return self._benchmark_df
 
+    def read_base_df(self) -> pd.DataFrame:
+        if self._use_cache and self._base_df is not None:
+            return self._base_df
+        if self._use_cache and not self._is_table_empty(self._base_table):
+            return self._read_base_df_from_sql()
+        return self._read_base_df_from_disk()
 
-def print_crosstabs(results: Dict[str, pd.DataFrame]):
-    column_order = ["EQ", "MAYBE_EQ", "NEQ", "MAYBE_NEQ", "UNKNOWN", "TIMEOUT", "ERROR", "MISSING", "All"]
+    def _read_base_df_from_sql(self) -> pd.DataFrame:
+        with self._engine.begin() as conn:
+            index_col: List[str] = ["benchmark", "tool"]
+            self._base_df = pd.read_sql_table(self._base_table, conn, index_col=index_col)
+            return self._base_df
 
-    print()
+    def _read_base_df_from_disk(self) -> pd.DataFrame:
+        data: List[BaseToolResult] = self.read_base_data()
+        keys: List[str] = ["benchmark", "tool"]
+        self._base_df = self._read_df_from_disk(data, keys, self._base_table)
+        return self._base_df
 
-    used_classes: Set[str] = set()
-    for result_df in results.values():
-        used_classes = used_classes | set(result_df["actual"].unique())
+    def read_diff_df(self) -> pd.DataFrame:
+        if self._use_cache and self._diff_df is not None:
+            return self._diff_df
+        if self._use_cache and not self._is_table_empty(self._diff_table):
+            return self._read_diff_df_from_sql()
+        return self._read_diff_df_from_disk()
 
-    for title, result_df in results.items():
-        result_ct = pd.crosstab(result_df["expected"], result_df["actual"], margins=True)
+    def _read_diff_df_from_sql(self) -> pd.DataFrame:
+        with self._engine.begin() as conn:
+            index_col: List[str] = ["benchmark", "tool"]
+            self._diff_df = pd.read_sql_table(self._diff_table, conn, index_col=index_col)
+            return self._diff_df
 
-        missing_classes: List[str] = [c for c in used_classes if c not in result_ct.columns]
-        for missing_class in missing_classes:
-            result_ct[missing_class] = 0
+    def _read_diff_df_from_disk(self) -> pd.DataFrame:
+        data: List[DifferencingResult] = self.read_diff_data()
+        keys: List[str] = ["benchmark", "tool"]
+        self._diff_df = self._read_df_from_disk(data, keys, self._diff_table)
+        return self._diff_df
 
-        result_ct: pd.DataFrame = result_ct[[c for c in column_order if c in result_ct.columns]]
+    def read_partition_df(self) -> pd.DataFrame:
+        if self._use_cache and self._partition_df is not None:
+            return self._partition_df
+        if self._use_cache and not self._is_table_empty(self._partition_table):
+            return self._read_partition_df_from_sql()
+        return self._read_partition_df_from_disk()
 
-        print(f"{title}:")
-        print(result_ct.to_markdown())
-        print()
+    def _read_partition_df_from_sql(self) -> pd.DataFrame:
+        with self._engine.begin() as conn:
+            index_col: List[str] = ["benchmark", "tool", "partition"]
+            self._partition_df = pd.read_sql_table(self._partition_table, conn, index_col=index_col)
+            return self._partition_df
+
+    def _read_partition_df_from_disk(self) -> pd.DataFrame:
+        data: List[PartitionResult] = self.read_partition_data()
+        keys: List[str] = ["benchmark", "tool", "partition"]
+        self._partition_df = self._read_df_from_disk(data, keys, self._partition_table)
+        return self._partition_df
+
+    def _read_df_from_disk(self, data, keys: List[str], table: str) -> pd.DataFrame:
+        df: pd.DataFrame = pd.DataFrame([d.to_dict() for d in data])
+        df.set_index(keys, inplace=True)
+        with self._engine.begin() as conn:
+            conn.execute(text(f"DELETE FROM {table};"))
+        df.to_sql(table, self._engine, if_exists="append")
+        return df
+
+    def _is_table_empty(self, table: str):
+        conn: Connection
+        with self._engine.begin() as conn:
+            return conn.execute(text(f"SELECT TRUE from {table} LIMIT 1")).fetchone() is None
 
 
 def run_main(use_cache: bool = True) -> None:
-    tool_names = ["SE", "DSE", "ARDiff"]
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    sqlite_db_file: Path = RESULTS_DIR / "sqlite.db"
+    engine: Engine = create_engine(f"sqlite:///{sqlite_db_file}")
+    session: Session = sessionmaker(bind=engine)()
+
+    create_schema(engine, session)
 
     true_base_results: Dict[str, pd.DataFrame] = {}
     true_diff_results: Dict[str, pd.DataFrame] = {}
     true_partition_results: Dict[str, pd.DataFrame] = {}
     true_results: Dict[str, pd.DataFrame] = {}
 
-    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-
-    for tool_name in tool_names:
+    for tool_name in ["ARDiff", "DSE", "SE"]:
         print(f"Collecting {tool_name} data ...")
 
-        base_df: pd.DataFrame
-        diff_df: pd.DataFrame
-        partition_df: pd.DataFrame
+        repository: Repository = Repository(tool_name, engine, use_cache)
 
-        base_df_file = RESULTS_DIR / f"{tool_name}_base_df.csv"
-        diff_df_file = RESULTS_DIR / f"{tool_name}_diff_df.csv"
-        partition_df_file = RESULTS_DIR / f"{tool_name}_partition_df.csv"
+        # Reading benchmark_df to ensure it is saved in the database.
+        repository.read_benchmark_df()
 
-        if use_cache and base_df_file.exists():
-            print("  Reading base_df from cache ...")
-            base_df = pd.read_csv(base_df_file)
-        else:
-            print("  Reading base_df from raw data ...")
-            base_data: List[BaseToolData] = create_base_data(tool_name)
-
-            base_df = pd.DataFrame([d.to_dict() for d in base_data])
-            base_df.to_csv(base_df_file)
-
-        if use_cache and diff_df_file.exists():
-            print("  Reading diff_df from cache ...")
-            diff_df = pd.read_csv(diff_df_file)
-        else:
-            print("  Reading diff_df from raw data ...")
-            diff_data: List[DifferencingData] = create_diff_data(tool_name)
-
-            diff_df = pd.DataFrame([d.to_dict() for d in diff_data])
-            diff_df.insert(4, "actual-base", base_df["actual"])
-            diff_df.to_csv(diff_df_file)
-
-            partition_data: List[PartitionData] = create_partition_data(tool_name)
-            partition_df = pd.DataFrame([p.to_dict() for p in partition_data])
-            partition_df.to_csv()
-
-        if use_cache and partition_df_file.exists():
-            print("  Reading partition_df from cache ...")
-            partition_df = pd.read_csv(partition_df_file)
-        else:
-            print("  Reading partition_df from raw data ...")
-            partition_data: List[PartitionData] = create_partition_data(tool_name)
-
-            partition_df = pd.DataFrame([p.to_dict() for p in partition_data])
-            partition_df.to_csv(partition_df_file)
+        base_df: pd.DataFrame = repository.read_base_df()
+        diff_df: pd.DataFrame = repository.read_diff_df()
+        partition_df: pd.DataFrame = repository.read_partition_df()
 
         true_base_results[f"{tool_name}-base"] = base_df
         true_diff_results[f"{tool_name}-diff"] = diff_df
@@ -812,108 +855,6 @@ def run_main(use_cache: bool = True) -> None:
         true_results[f"{tool_name}-diff"] = diff_df
 
     print("Data collection done!")
-
-    # --------------------------------------------------------------------------
-
-    overall_base_df_file: Path = RESULTS_DIR / "overall_base_df.csv"
-    overall_diff_df_file: Path = RESULTS_DIR / "overall_diff_df.csv"
-    overall_partition_df_file: Path = RESULTS_DIR / "overall_partition_df.csv"
-
-    overall_base_df: pd.DataFrame
-    overall_diff_df: pd.DataFrame
-    overall_partition_df: pd.DataFrame
-
-    if use_cache and overall_base_df_file.exists():
-        overall_base_df = pd.read_csv(overall_base_df_file)
-    else:
-        overall_base_df = pd.concat(true_base_results.values())
-        overall_base_df.to_csv(overall_base_df_file)
-
-    if use_cache and overall_diff_df_file.exists():
-        overall_diff_df = pd.read_csv(overall_diff_df_file)
-    else:
-        overall_diff_df = pd.concat(true_diff_results.values())
-        overall_diff_df.to_csv(overall_diff_df_file)
-
-    if use_cache and overall_partition_df_file.exists():
-        overall_partition_df = pd.read_csv(overall_partition_df_file)
-    else:
-        overall_partition_df = pd.concat(true_partition_results.values())
-        overall_partition_df.to_csv(overall_partition_df_file)
-
-    # --------------------------------------------------------------------------
-
-    metrics_base_df: pd.DataFrame = overall_base_df[["path", "tool", "expected", "actual", "runtime"]]
-    metrics_diff_df: pd.DataFrame = overall_diff_df[["path", "tool", "expected", "actual", "runtime"]]
-    metrics_overall_df: pd.DataFrame = pd.concat([metrics_base_df, metrics_diff_df], ignore_index=True)
-    metrics_overall_df["path"] = metrics_overall_df["path"].apply(lambda path: str(Path(path).parent.parent))
-
-    runtimes_df: pd.DataFrame = metrics_overall_df.pivot(["path", "expected"], "tool", "runtime").reset_index()
-    runtimes_df.to_csv(RESULTS_DIR / "_runtimes.csv")
-
-    results_df: pd.DataFrame = metrics_overall_df.pivot(["path", "expected"], "tool", "actual").reset_index()
-    results_df.to_csv(RESULTS_DIR / "_results.csv")
-
-    # --------------------------------------------------------------------------
-
-    strict_results: Dict[str, pd.DataFrame] = {}
-    lenient_results: Dict[str, pd.DataFrame] = {}
-
-    for tool_name, df in true_results.items():
-        strict_df: pd.DataFrame = df.copy()
-        strict_df.loc[df["actual"] == "MAYBE_EQ", "actual"] = "UNKNOWN"
-        strict_df.loc[df["actual"] == "MAYBE_NEQ", "actual"] = "UNKNOWN"
-
-        lenient_df: pd.DataFrame = df.copy()
-        lenient_df.loc[df["actual"] == "MAYBE_EQ", "actual"] = "EQ"
-        lenient_df.loc[df["actual"] == "MAYBE_NEQ", "actual"] = "NEQ"
-
-        if "actual-base" in df.columns:
-            strict_df.loc[df["actual-base"] == "MAYBE_EQ", "actual"] = "UNKNOWN"
-            strict_df.loc[df["actual-base"] == "MAYBE_NEQ", "actual"] = "UNKNOWN"
-
-            lenient_df.loc[df["actual-base"] == "MAYBE_EQ", "actual"] = "EQ"
-            lenient_df.loc[df["actual-base"] == "MAYBE_NEQ", "actual"] = "NEQ"
-
-        strict_results[tool_name] = strict_df
-        lenient_results[tool_name] = lenient_df
-
-    # --------------------------------------------------------------------------
-
-    pd.set_option("display.max_columns", None)
-    pd.set_option("display.max_colwidth", None)
-    pd.set_option("display.max_rows", None)
-    pd.set_option("display.width", None)
-
-    # --------------------------------------------------------------------------
-
-    columns = ["actual", "path", "error"]
-    base_error_mask = overall_base_df["actual"] == "ERROR"
-    diff_error_mask = overall_diff_df["actual"] == "ERROR"
-    base_errors_df: pd.DataFrame = overall_base_df.loc[base_error_mask, columns]
-    diff_errors_df: pd.DataFrame = overall_diff_df.loc[diff_error_mask, columns]
-
-    errors_df = pd.concat([base_errors_df, diff_errors_df])
-
-    with open(RESULTS_DIR / "errors.txt", "w") as f:
-        for index, row in errors_df.iterrows():
-            f.write("--------------------------------------------------\n\n")
-            f.write(f"{row['actual']} - {row['path']}\n\n")
-            f.write(f"{row['error']}\n\n")
-
-    # --------------------------------------------------------------------------
-
-    print("\n---------- LENIENT RESULTS ----------")
-
-    print_crosstabs(lenient_results)
-
-    print("\n---------- STRICT RESULTS ----------")
-
-    print_crosstabs(strict_results)
-
-    print("\n---------- TRUE RESULTS ----------")
-
-    print_crosstabs(true_results)
 
 
 if __name__ == "__main__":
