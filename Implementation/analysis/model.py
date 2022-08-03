@@ -212,37 +212,46 @@ def create_schema(engine: Engine, session: Session):
             metrics.max_constraints,
             metrics.has_uif,
             metrics.has_no_uif,
+            metrics.has_only_neq,
             metrics.eq,
             metrics.maybe_eq,
             metrics.neq,
             metrics.maybe_neq,
             metrics.unknown,
+            metrics.unreachable,
             metrics.timeout,
             metrics.error,
             metrics.missing
         FROM overall_diff diff
         INNER JOIN benchmark bench ON bench.name = diff.benchmark
         INNER JOIN (
-            SELECT
-                benchmark, tool_variant,
-                COUNT(*) AS partitions,
-                SUM(constraint_count) AS constraints,
-                ROUND(AVG(constraint_count), 2) AS avg_constraints,
-                MIN(constraint_count) AS min_constraints,
-                MAX(constraint_count) AS max_constraints,
-                SUM(has_uninterpreted_functions) AS has_uif,
-                COUNT(*) - SUM(has_uninterpreted_functions) AS has_no_uif,
-                COUNT(CASE result WHEN 'EQ' THEN 1 END) AS eq,
-                COUNT(CASE result WHEN 'MAYBE_EQ' THEN 1 END) AS maybe_eq,
-                COUNT(CASE result WHEN 'NEQ' THEN 1 END) AS neq,
-                COUNT(CASE result WHEN 'MAYBE_NEQ' THEN 1 END) AS maybe_neq,
-                COUNT(CASE result WHEN 'UNKNOWN' THEN 1 END) AS unknown,
-                COUNT(CASE result WHEN 'TIMEOUT' THEN 1 END) AS timeout,
-                COUNT(CASE result WHEN 'ERROR' THEN 1 END) AS error,
-                COUNT(CASE result WHEN 'MISSING' THEN 1 END) AS missing
-            FROM overall_partition GROUP BY tool_variant, benchmark
-            ORDER BY tool_variant, benchmark
-        ) metrics ON diff.benchmark = metrics.benchmark AND diff.tool_variant = metrics.tool_variant;
+            SELECT *,
+                partitions - has_uif AS has_no_uif,
+                partitions = (neq + unreachable) AS has_only_neq
+            FROM (
+                SELECT
+                    benchmark, tool_variant,
+                    COUNT(*) AS partitions,
+                    SUM(constraint_count) AS constraints,
+                    ROUND(AVG(constraint_count), 2) AS avg_constraints,
+                    MIN(constraint_count) AS min_constraints,
+                    MAX(constraint_count) AS max_constraints,
+                    SUM(has_uninterpreted_functions) AS has_uif,
+                    COUNT(CASE result WHEN 'EQ' THEN 1 END) AS eq,
+                    COUNT(CASE result WHEN 'MAYBE_EQ' THEN 1 END) AS maybe_eq,
+                    COUNT(CASE result WHEN 'NEQ' THEN 1 END) AS neq,
+                    COUNT(CASE result WHEN 'MAYBE_NEQ' THEN 1 END) AS maybe_neq,
+                    COUNT(CASE result WHEN 'UNKNOWN' THEN 1 END) AS unknown,
+                    COUNT(CASE result WHEN 'UNREACHABLE' THEN 1 END) AS unreachable,
+                    COUNT(CASE result WHEN 'TIMEOUT' THEN 1 END) AS timeout,
+                    COUNT(CASE result WHEN 'ERROR' THEN 1 END) AS error,
+                    COUNT(CASE result WHEN 'MISSING' THEN 1 END) AS missing
+                FROM overall_partition GROUP BY tool_variant, benchmark
+            )
+        ) metrics
+            ON diff.benchmark = metrics.benchmark
+            AND diff.tool_variant = metrics.tool_variant
+        ORDER BY diff.tool_variant, diff.benchmark
     """)
 
     session.execute("DROP VIEW IF EXISTS overall_runtime_metrics")

@@ -27,7 +27,9 @@ class Classification(Enum):
     ERROR = 2
     TIMEOUT = 3
 
-    UNKNOWN = 4
+    UNREACHABLE = 4
+
+    UNKNOWN = 5
 
     # MAYBE_NEQ:
     # Equivalence checking found the two programs to be NEQ, but:
@@ -36,16 +38,16 @@ class Classification(Enum):
     # Thus, the base programs without uninterpreted functions might actually
     # be EQ rather than NEQ if the NEQ results only arise due to the
     # introduction of uninterpreted functions.
-    MAYBE_NEQ = 5
+    MAYBE_NEQ = 6
 
     # MAYBE_EQ:
     # Equivalence checking found the two programs to be EQ, but the symbolic
     # execution hit the search depth limit. Thus, the programs might be found
     # to be NEQ rather than EQ when using a sufficiently large search depth.
-    MAYBE_EQ = 6
+    MAYBE_EQ = 7
 
-    NEQ = 7
-    EQ = 8
+    NEQ = 8
+    EQ = 9
 
     def is_success(self):
         return self in [
@@ -54,6 +56,7 @@ class Classification(Enum):
             Classification.MAYBE_EQ,
             Classification.MAYBE_NEQ,
             Classification.UNKNOWN,
+            Classification.UNREACHABLE,
         ]
 
     def is_failure(self):
@@ -115,6 +118,8 @@ class BenchmarkResult(ABC):
             self._result = Classification.ERROR
         elif self.is_timeout():
             self._result = Classification.TIMEOUT
+        elif self.is_unreachable():
+            self._result = Classification.UNREACHABLE
         elif self.is_unknown():
             self._result = Classification.UNKNOWN
         elif self.is_maybe_neq():
@@ -147,6 +152,10 @@ class BenchmarkResult(ABC):
 
     @abstractmethod
     def is_timeout(self) -> bool:
+        pass
+
+    @abstractmethod
+    def is_unreachable(self) -> bool:
         pass
 
     @abstractmethod
@@ -211,6 +220,9 @@ class VersionResult(BenchmarkResult):
         return self._errors != ""
 
     def is_timeout(self) -> bool:
+        return False
+
+    def is_unreachable(self) -> bool:
         return False
 
     # Cannot make a specific classification on the VersionData level,
@@ -297,6 +309,9 @@ class BaseToolResult(BenchmarkResult):
 
     def is_timeout(self) -> bool:
         return not self.is_error() and not self._output_file.exists()
+
+    def is_unreachable(self) -> bool:
+        return False
 
     def is_unknown(self) -> bool:
         if self._output_classification is None:
@@ -386,17 +401,25 @@ class PartitionResult(BenchmarkResult):
 
         name_prefix: str = f"IDiff{tool_name}-P{partition_id}"
 
+        pc_query_file_name: str = f"{name_prefix}-ToSolve-PC.txt"
+        pc_answer_file_name: str = f"{name_prefix}-Answer-PC.txt"
         neq_query_file_name: str = f"{name_prefix}-ToSolve-NEQ.txt"
         neq_answer_file_name: str = f"{name_prefix}-Answer-NEQ.txt"
         eq_query_file_name: str = f"{name_prefix}-ToSolve-EQ.txt"
         eq_answer_file_name: str = f"{name_prefix}-Answer-EQ.txt"
         has_uif_file_name: str = f"{name_prefix}-HasUIF.txt"
 
+        self._pc_query_file: Path = self._instrumented_dir / pc_query_file_name
+        self._pc_answer_file: Path = self._instrumented_dir / pc_answer_file_name
         self._neq_query_file: Path = self._instrumented_dir / neq_query_file_name
         self._neq_answer_file: Path = self._instrumented_dir / neq_answer_file_name
         self._eq_query_file: Path = self._instrumented_dir / eq_query_file_name
         self._eq_answer_file: Path = self._instrumented_dir / eq_answer_file_name
         self._has_uif_file: Path = self._instrumented_dir / has_uif_file_name
+
+        self._pc_answer: str = ""
+        if self._pc_answer_file.exists():
+            self._pc_answer = self._pc_answer_file.read_text()
 
         self._neq_answer: str = ""
         if self._neq_answer_file.exists():
@@ -414,21 +437,26 @@ class PartitionResult(BenchmarkResult):
         return f"Diff - Partition: {self._partition_id}"
 
     def is_missing(self) -> bool:
-        # NEQ query files determine whether a partition is missing because
+        # has_uif files determine whether a partition is missing because
         # they are the first files that should be created for a partition.
-        return not self._neq_query_file.exists()
+        return not self._has_uif_file.exists()
 
     def is_error(self) -> bool:
+        has_pc_error = self._pc_answer.startswith("(error")
         has_neq_error = self._neq_answer.startswith("(error")
         has_eq_error = self._eq_answer.startswith("(error")
 
-        return has_neq_error or has_eq_error
+        return has_pc_error or has_neq_error or has_eq_error
 
     def is_timeout(self) -> bool:
-        is_uif_missing = not self._has_uif_file.exists()
-        is_neq_timeout = self._neq_answer == "" or self._neq_answer == "timeout"
+        if not self._has_uif_file.exists():
+            return True
 
-        if is_uif_missing or is_neq_timeout:
+        if self._pc_answer == "" or self._pc_answer == "timeout":
+            return True
+
+        is_neq_timeout = self._neq_answer == "" or self._neq_answer == "timeout"
+        if self._pc_answer == "sat" and is_neq_timeout:
             return True
 
         if self._has_uif and self._neq_answer == "sat":
@@ -436,8 +464,15 @@ class PartitionResult(BenchmarkResult):
 
         return False
 
+    def is_unreachable(self) -> bool:
+        return self._pc_answer == "unsat"
+
     def is_unknown(self) -> bool:
-        return self._neq_answer == "unknown" or self._eq_answer == "unknown"
+        return (
+            self._pc_answer == "unknown" or
+            self._neq_answer == "unknown" or
+            self._eq_answer == "unknown"
+        )
 
     def is_maybe_neq(self) -> bool:
         if not self._neq_answer == "sat":
@@ -478,10 +513,10 @@ class PartitionResult(BenchmarkResult):
         return self._has_uif
 
     def path_condition(self) -> Optional[str]:
-        if not self._neq_query_file.exists():
+        if not self._pc_query_file.exists():
             return None
 
-        query = self._neq_query_file.read_text()
+        query = self._pc_query_file.read_text()
         for line in query.split("\n"):
             if "(assert" in line:
                 return line
@@ -536,9 +571,9 @@ class DifferencingResult(BenchmarkResult):
     def _init_partitions(self) -> List[PartitionResult]:
         partitions: List[PartitionResult] = []
 
-        z3_query_pattern = f"IDiff{self._tool_name}-P*-ToSolve-NEQ.txt"
+        z3_query_pattern = f"IDiff{self._tool_name}-P*-HasUIF.txt"
         for query_file in self._instrumented_dir.glob(z3_query_pattern):
-            partition_id_pattern = f"IDiff{self._tool_name}-P(\\d+)-ToSolve-NEQ.txt"
+            partition_id_pattern = f"IDiff{self._tool_name}-P(\\d+)-HasUIF.txt"
             m = re.search(partition_id_pattern, query_file.name)
             if m:
                 partition_id = int(m.group(1))
@@ -575,6 +610,8 @@ class DifferencingResult(BenchmarkResult):
             self._result = Classification.NEQ
         elif self._result_counts[Classification.EQ] > 0:
             self._result = Classification.EQ
+        elif self._result_counts[Classification.UNREACHABLE] > 0 and self.is_depth_limited():
+            self._result = Classification.MAYBE_EQ
 
         if self._result is not None:
             return self._result
@@ -589,6 +626,9 @@ class DifferencingResult(BenchmarkResult):
 
     def is_timeout(self) -> bool:
         return self.result() == Classification.TIMEOUT
+
+    def is_unreachable(self) -> bool:
+        return False
 
     def is_unknown(self) -> bool:
         return self.result() == Classification.UNKNOWN

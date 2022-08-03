@@ -107,6 +107,20 @@ public class DifferencingListener extends PropertyListenerAdapter {
             throw new RuntimeException(e);
         }
 
+        String z3PcQuery = "";
+        z3PcQuery += declarationsString + "\n\n";
+        z3PcQuery += "; Path Condition:\n";
+        z3PcQuery += "(assert " + pcString + ")\n\n";
+        z3PcQuery += "(check-sat)\n";
+        z3PcQuery += "(get-model)\n";
+
+        String z3PcAnswer = this.runQuery(z3PcQuery, "PC");
+
+        if (!z3PcAnswer.equals("sat")) {
+            stackFrame.setOperand(0, 1, false);
+            return;
+        }
+
         String z3NeqQuery = "";
         z3NeqQuery += declarationsString + "\n\n";
         z3NeqQuery += "; Path Condition:\n";
