@@ -7,7 +7,7 @@ run_differencing=true
 
 timeout="300" # seconds
 
-clean=true
+clean=false
 print_cleaned=true
 print_skipped=false
 print_commands=true
