@@ -628,10 +628,10 @@ class DifferencingResult(BenchmarkResult):
             self._result = Classification.UNKNOWN
         elif self._result_counts[Classification.MAYBE_NEQ] > 0:
             self._result = Classification.MAYBE_NEQ
-        elif self._result_counts[Classification.EQ] > 0 and self._is_depth_limited:
-            self._result = Classification.MAYBE_EQ
         elif self._result_counts[Classification.NEQ] > 0:
             self._result = Classification.NEQ
+        elif self._result_counts[Classification.EQ] > 0 and self.is_depth_limited():
+            self._result = Classification.MAYBE_EQ
         elif self._result_counts[Classification.EQ] > 0:
             self._result = Classification.EQ
         elif self._result_counts[Classification.UNREACHABLE] > 0 and self.is_depth_limited():
