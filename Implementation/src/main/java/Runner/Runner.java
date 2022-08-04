@@ -22,7 +22,10 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 import static equiv.checking.Utils.*;
 
@@ -128,6 +131,7 @@ public class Runner{
                 System.out.println("------------------------------------SE-----------------------------------");
                 System.out.println("*****************************************************************************");
                 boolean parseFromSMTLib = true;// to parse the jpf output into a string similar to the terminal version of Z3 (true for the terminal version when you have Math.XXXX)
+                deleteGeneratedFiles("SE", runner.path);
                 SE se = new SE(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "SE", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib,true,z3Terminal);
                 boolean finished1 = se.runTool();
                 if (finished1==true)
@@ -150,6 +154,7 @@ public class Runner{
                 System.out.println("------------------------------------DSE-----------------------------------");
                 System.out.println("*****************************************************************************");
                 boolean parseFromSMTLib = true;// to parse the jpf output into a string similar to the terminal version of Z3 (true for the terminal version when you have Math.XXXX)
+                deleteGeneratedFiles("DSE", runner.path);
                 DSE dse = new DSE(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "DSE", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib,true,z3Terminal);
                 boolean finished1 = dse.runTool();
                 if (finished1==true)
@@ -188,6 +193,7 @@ public class Runner{
                     System.out.println("------------------------------------ARDIFF-----------------------------------");
                 System.out.println("*****************************************************************************");
                 boolean parseFromSMTLib = true ;
+                deleteGeneratedFiles(toolName, runner.path);
                 GradDiff gradDiff = new GradDiff(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, toolName, SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib, H1, H2, H31, H32, strategy, true,z3Terminal);
                 boolean finished2 = gradDiff.runTool();
                 if (finished2==true)
@@ -210,6 +216,7 @@ public class Runner{
                 System.out.println("------------------------------------IMP-S-----------------------------------");
                 System.out.println("*****************************************************************************");
                 boolean parseFromSMTLib = true ;
+                deleteGeneratedFiles("Imp", runner.path);
                 ImpactedS impactedS = new ImpactedS(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "Imp", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib, true,z3Terminal);
                 boolean finished3 = impactedS.runTool();
                 if (finished3==true)
@@ -501,5 +508,40 @@ public class Runner{
             }
             runTool(tool,path1,path2,solver,bound,timeout,minint,maxint,mindouble,maxdouble,strategy,z3Terminal);
         }
+    }
+
+    public static void deleteGeneratedFiles(String tool, String directory) {
+        getGeneratedFiles(tool, directory).forEach(path -> path.toFile().delete());
+    }
+
+    public static List<Path> getGeneratedFiles(String tool, String directory) {
+        List<Path> generatedFiles = new ArrayList<>();
+
+        Path benchmarkPath = Paths.get(directory);
+        Path instrumentedPath = benchmarkPath.resolve("instrumented");
+        Path outputsPath = benchmarkPath.resolve("outputs");
+        Path modelsPath = benchmarkPath.resolve("z3models");
+
+        generatedFiles.add(instrumentedPath.resolve("blocknewV.txt"));
+        generatedFiles.add(instrumentedPath.resolve("gumtree.txt"));
+        generatedFiles.add(instrumentedPath.resolve("H1Checking.smt2"));
+
+        generatedFiles.add(instrumentedPath.resolve("InewV" + tool + ".java"));
+        generatedFiles.add(instrumentedPath.resolve("InewV" + tool + ".jpf"));
+        generatedFiles.add(instrumentedPath.resolve("InewV" + tool + "JPFError.txt"));
+        generatedFiles.add(instrumentedPath.resolve("InewV" + tool + "JPFOutput.txt"));
+        generatedFiles.add(instrumentedPath.resolve("InewV" + tool + "Terminal.txt"));
+        generatedFiles.add(instrumentedPath.resolve("InewV" + tool + "ToSolve.txt"));
+
+        generatedFiles.add(instrumentedPath.resolve("IoldV" + tool + ".java"));
+        generatedFiles.add(instrumentedPath.resolve("IoldV" + tool + ".jpf"));
+        generatedFiles.add(instrumentedPath.resolve("IoldV" + tool + "JPFError.txt"));
+        generatedFiles.add(instrumentedPath.resolve("IoldV" + tool + "JPFOutput.txt"));
+        generatedFiles.add(instrumentedPath.resolve("IoldV" + tool + "Terminal.txt"));
+
+        generatedFiles.add(outputsPath.resolve(tool + ".txt"));
+        generatedFiles.add(modelsPath.resolve(tool + ".txt"));
+
+        return generatedFiles;
     }
 }
