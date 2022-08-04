@@ -31,7 +31,7 @@ class Classification(Enum):
 
     UNKNOWN = 5
 
-    # MAYBE_NEQ:
+    # MAYBE_NEQ (or maybe EQ):
     # Equivalence checking found the two programs to be NEQ, but:
     # (i) there were uninterpreted functions in the solver query AND
     # (ii) at least one input assignment exists for which the programs are EQ.
@@ -40,10 +40,16 @@ class Classification(Enum):
     # introduction of uninterpreted functions.
     MAYBE_NEQ = 6
 
-    # MAYBE_EQ:
+    # MAYBE_EQ (or maybe NEQ (only benchmark-level)):
     # Equivalence checking found the two programs to be EQ, but the symbolic
     # execution hit the search depth limit. Thus, the programs might be found
     # to be NEQ rather than EQ when using a sufficiently large search depth.
+    #
+    # MAYBE_EQ (or maybe UNREACHABLE (only partition-level)):
+    # Equivalence checking found the two programs to be EQ, but there were
+    # uninterpreted functions in the path condition. Thus, the corresponding
+    # partition of the base program without uninterpreted functions might
+    # actually be UNREACHABLE rather than EQ.
     MAYBE_EQ = 7
 
     NEQ = 8
@@ -496,7 +502,10 @@ class PartitionResult(BenchmarkResult):
         return self._eq_answer == "sat"
 
     def is_maybe_eq(self) -> bool:
-        return False
+        if not self._neq_answer == "unsat":
+            return False
+
+        return self._has_uif_pc
 
     def is_neq(self) -> bool:
         if not self._neq_answer == "sat":
@@ -508,7 +517,10 @@ class PartitionResult(BenchmarkResult):
         return self._eq_answer == "unsat"
 
     def is_eq(self) -> bool:
-        return self._neq_answer == "unsat"
+        if not self._neq_answer == "unsat":
+            return False
+
+        return not self._has_uif_pc
 
     def errors(self) -> str:
         if self.has_succeeded():
@@ -633,6 +645,10 @@ class DifferencingResult(BenchmarkResult):
         elif self._result_counts[Classification.EQ] > 0 and self.is_depth_limited():
             self._result = Classification.MAYBE_EQ
         elif self._result_counts[Classification.EQ] > 0:
+            self._result = Classification.EQ
+        elif self._result_counts[Classification.MAYBE_EQ] > 0 and self.is_depth_limited():
+            self._result = Classification.MAYBE_EQ
+        elif self._result_counts[Classification.MAYBE_EQ] > 0:
             self._result = Classification.EQ
         elif self._result_counts[Classification.UNREACHABLE] > 0 and self.is_depth_limited():
             self._result = Classification.MAYBE_EQ
