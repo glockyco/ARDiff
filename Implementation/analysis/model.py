@@ -45,7 +45,7 @@ class DifferencingResult:
     tool_variant = Column(Text, primary_key=True)
     result = Column(Text)
     has_succeeded = Column(Boolean)
-    has_uninterpreted_functions = Column(Boolean)
+    has_uif = Column(Boolean)
     is_depth_limited = Column(Boolean)
     runtime = Column(Integer)
     errors = Column(Text)
@@ -69,7 +69,10 @@ class PartitionResult:
     tool_variant = Column(Text, primary_key=True)
     partition = Column(Integer, primary_key=True)
     result = Column(Text)
-    has_uninterpreted_functions = Column(Boolean)
+    has_uif = Column(Boolean)
+    has_uif_pc = Column(Boolean)
+    has_uif_v1 = Column(Boolean)
+    has_uif_v2 = Column(Boolean)
     constraint_count = Column(Integer)
     errors = Column(Text)
 
@@ -236,7 +239,10 @@ def create_schema(engine: Engine, session: Session):
                     ROUND(AVG(constraint_count), 2) AS avg_constraints,
                     MIN(constraint_count) AS min_constraints,
                     MAX(constraint_count) AS max_constraints,
-                    SUM(has_uninterpreted_functions) AS has_uif,
+                    SUM(has_uif) AS has_uif,
+                    SUM(has_uif_pc) AS has_uif_pc,
+                    SUM(has_uif_v1) AS has_uif_v1,
+                    SUM(has_uif_v2) AS has_uif_v2,
                     COUNT(CASE result WHEN 'EQ' THEN 1 END) AS eq,
                     COUNT(CASE result WHEN 'MAYBE_EQ' THEN 1 END) AS maybe_eq,
                     COUNT(CASE result WHEN 'NEQ' THEN 1 END) AS neq,

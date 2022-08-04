@@ -77,7 +77,7 @@ public class DifferencingParameters implements Serializable {
     }
 
     public String[] getHasUifFiles() throws IOException {
-        return this.getFiles("glob:**/IDiff" + this.toolName + "-P*-HasUIF.txt");
+        return this.getFiles("glob:**/IDiff" + this.toolName + "-P*-HasUIF*.txt");
     }
 
     private String[] getFiles(String glob) throws IOException {

@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from enum import Enum
 from pathlib import Path
-from typing import List, Dict, Optional, Any, Set
+from typing import List, Dict, Optional, Any
 
 import pandas as pd
 from sqlalchemy import inspect, text
@@ -407,7 +407,9 @@ class PartitionResult(BenchmarkResult):
         neq_answer_file_name: str = f"{name_prefix}-Answer-NEQ.txt"
         eq_query_file_name: str = f"{name_prefix}-ToSolve-EQ.txt"
         eq_answer_file_name: str = f"{name_prefix}-Answer-EQ.txt"
-        has_uif_file_name: str = f"{name_prefix}-HasUIF.txt"
+        has_uif_pc_file_name: str = f"{name_prefix}-HasUIF-PC.txt"
+        has_uif_v1_file_name: str = f"{name_prefix}-HasUIF-v1.txt"
+        has_uif_v2_file_name: str = f"{name_prefix}-HasUIF-v2.txt"
 
         self._pc_query_file: Path = self._instrumented_dir / pc_query_file_name
         self._pc_answer_file: Path = self._instrumented_dir / pc_answer_file_name
@@ -415,7 +417,9 @@ class PartitionResult(BenchmarkResult):
         self._neq_answer_file: Path = self._instrumented_dir / neq_answer_file_name
         self._eq_query_file: Path = self._instrumented_dir / eq_query_file_name
         self._eq_answer_file: Path = self._instrumented_dir / eq_answer_file_name
-        self._has_uif_file: Path = self._instrumented_dir / has_uif_file_name
+        self._has_uif_pc_file: Path = self._instrumented_dir / has_uif_pc_file_name
+        self._has_uif_v1_file: Path = self._instrumented_dir / has_uif_v1_file_name
+        self._has_uif_v2_file: Path = self._instrumented_dir / has_uif_v2_file_name
 
         self._pc_answer: str = ""
         if self._pc_answer_file.exists():
@@ -429,9 +433,17 @@ class PartitionResult(BenchmarkResult):
         if self._eq_answer_file.exists():
             self._eq_answer = self._eq_answer_file.read_text()
 
-        self._has_uif: bool = False
-        if self._has_uif_file.exists():
-            self._has_uif = self._has_uif_file.read_text() == "true"
+        self._has_uif_pc: bool = False
+        if self._has_uif_pc_file.exists():
+            self._has_uif_pc = self._has_uif_pc_file.read_text() == "true"
+
+        self._has_uif_v1: bool = False
+        if self._has_uif_v1_file.exists():
+            self._has_uif_v1 = self._has_uif_v1_file.read_text() == "true"
+
+        self._has_uif_v2: bool = False
+        if self._has_uif_v2_file.exists():
+            self._has_uif_v2 = self._has_uif_v2_file.read_text() == "true"
 
     def name(self) -> str:
         return f"Diff - Partition: {self._partition_id}"
@@ -439,7 +451,7 @@ class PartitionResult(BenchmarkResult):
     def is_missing(self) -> bool:
         # has_uif files determine whether a partition is missing because
         # they are the first files that should be created for a partition.
-        return not self._has_uif_file.exists()
+        return not self._has_uif_pc_file.exists()
 
     def is_error(self) -> bool:
         has_pc_error = self._pc_answer.startswith("(error")
@@ -449,7 +461,7 @@ class PartitionResult(BenchmarkResult):
         return has_pc_error or has_neq_error or has_eq_error
 
     def is_timeout(self) -> bool:
-        if not self._has_uif_file.exists():
+        if not self._has_uif_pc_file.exists():
             return True
 
         if self._pc_answer == "" or self._pc_answer == "timeout":
@@ -459,7 +471,7 @@ class PartitionResult(BenchmarkResult):
         if self._pc_answer == "sat" and is_neq_timeout:
             return True
 
-        if self._has_uif and self._neq_answer == "sat":
+        if self.has_uif() and self._neq_answer == "sat":
             return self._eq_answer == "" or self._eq_answer == "timeout"
 
         return False
@@ -478,7 +490,7 @@ class PartitionResult(BenchmarkResult):
         if not self._neq_answer == "sat":
             return False
 
-        if not self._has_uif:
+        if not self.has_uif():
             return False
 
         return self._eq_answer == "sat"
@@ -490,7 +502,7 @@ class PartitionResult(BenchmarkResult):
         if not self._neq_answer == "sat":
             return False
 
-        if not self._has_uif:
+        if not self.has_uif():
             return True
 
         return self._eq_answer == "unsat"
@@ -510,7 +522,16 @@ class PartitionResult(BenchmarkResult):
         return f"Error while solving partition {self._partition_id}.\n\n{self._neq_answer}"
 
     def has_uif(self) -> bool:
-        return self._has_uif
+        return self.has_uif_pc() or self.has_uif_v1() or self.has_uif_v2()
+
+    def has_uif_pc(self) -> bool:
+        return self._has_uif_pc
+
+    def has_uif_v1(self) -> bool:
+        return self._has_uif_v1
+
+    def has_uif_v2(self) -> bool:
+        return self._has_uif_v2
 
     def path_condition(self) -> Optional[str]:
         if not self._pc_query_file.exists():
@@ -534,7 +555,10 @@ class PartitionResult(BenchmarkResult):
             "tool_variant": f"{self.tool_name()}-diff",
             "partition": self._partition_id,
             "result": self.result().name,
-            "has_uninterpreted_functions": self.has_uif(),
+            "has_uif": self.has_uif(),
+            "has_uif_pc": self.has_uif_pc(),
+            "has_uif_v1": self.has_uif_v1(),
+            "has_uif_v2": self.has_uif_v2(),
             "constraint_count": self.constraint_count(),
             "errors": self.errors(),
         }
@@ -571,9 +595,9 @@ class DifferencingResult(BenchmarkResult):
     def _init_partitions(self) -> List[PartitionResult]:
         partitions: List[PartitionResult] = []
 
-        z3_query_pattern = f"IDiff{self._tool_name}-P*-HasUIF.txt"
+        z3_query_pattern = f"IDiff{self._tool_name}-P*-HasUIF-PC.txt"
         for query_file in self._instrumented_dir.glob(z3_query_pattern):
-            partition_id_pattern = f"IDiff{self._tool_name}-P(\\d+)-HasUIF.txt"
+            partition_id_pattern = f"IDiff{self._tool_name}-P(\\d+)-HasUIF-PC.txt"
             m = re.search(partition_id_pattern, query_file.name)
             if m:
                 partition_id = int(m.group(1))
@@ -690,7 +714,7 @@ class DifferencingResult(BenchmarkResult):
             "tool_variant": f"{self.tool_name()}-diff",
             "result": self.result().name,
             "has_succeeded": self.has_succeeded(),
-            "has_uninterpreted_functions": len(list(filter(lambda p: p.has_uif(), self._partitions))) > 0,
+            "has_uif": len(list(filter(lambda p: p.has_uif(), self._partitions))) > 0,
             "is_depth_limited": self.is_depth_limited(),
             "runtime": self.runtime(),
             "errors": self.errors(),

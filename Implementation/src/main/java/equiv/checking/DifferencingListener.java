@@ -102,7 +102,9 @@ public class DifferencingListener extends PropertyListenerAdapter {
         boolean hasUninterpretedFunctions = pcHasUninterpretedFunctions || aHasUninterpretedFunctions || bHasUninterpretedFunctions;
 
         try {
-            this.writeHasUIF(hasUninterpretedFunctions);
+            this.writeHasUIF(pcHasUninterpretedFunctions, "PC");
+            this.writeHasUIF(aHasUninterpretedFunctions, "v1");
+            this.writeHasUIF(bHasUninterpretedFunctions, "v2");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -230,8 +232,8 @@ public class DifferencingListener extends PropertyListenerAdapter {
         return lines.toString();
     }
 
-    private void writeHasUIF(boolean hasUninterpretedFunctions) throws IOException {
-        String filename = this.parameters.getTargetClassName() + "-P" + this.count + "-HasUIF.txt";
+    private void writeHasUIF(boolean hasUninterpretedFunctions, String name) throws IOException {
+        String filename = this.parameters.getTargetClassName() + "-P" + this.count + "-HasUIF-" + name + ".txt";
         Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
         Files.write(path, String.valueOf(hasUninterpretedFunctions).getBytes());
     }
