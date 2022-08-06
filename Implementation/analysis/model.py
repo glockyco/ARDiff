@@ -196,7 +196,7 @@ def create_schema(engine: Engine, session: Session):
         SELECT benchmark, tool_variant, result, errors FROM overall_base WHERE errors != ''
         UNION ALL
         SELECT benchmark, tool_variant, result, errors FROM overall_diff WHERE errors != ''
-        ORDER BY benchmark, tool_variant
+        ORDER BY tool_variant, result, benchmark
     """)
 
     session.execute("DROP VIEW IF EXISTS overall_diff_metrics")
