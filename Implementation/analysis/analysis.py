@@ -558,7 +558,11 @@ class PartitionResult(BenchmarkResult):
 
     def constraint_count(self) -> int:
         path_condition: Optional[str] = self.path_condition()
-        return 0 if path_condition is None else path_condition.count("(and ")
+        if path_condition is None:
+            return 0
+        if path_condition == "(assert true)":
+            return 0
+        return path_condition.count("(and ") + 1
 
     def to_dict(self) -> Dict[str, Any]:
         return {
