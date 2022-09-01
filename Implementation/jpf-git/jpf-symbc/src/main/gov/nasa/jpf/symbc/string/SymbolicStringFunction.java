@@ -85,6 +85,14 @@ public class SymbolicStringFunction  extends StringSymbolic implements SymbolicF
                 sym_args[i].getVarsVals(varsVals);
     }
 
+    public String getName() {
+        return method_name.startsWith("UF_") ?  method_name : "AF_" + method_name;
+    }
+
+    public Expression[] getSymArgs() {
+        return this.sym_args;
+    }
+
     public String stringPC () {
         String result="";
         if (sym_args!=null)

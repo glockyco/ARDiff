@@ -177,6 +177,10 @@ public class SymbolicRealFunction extends SymbolicReal implements SymbolicFuncti
         return method_name.startsWith("UF_") ?  method_name : "AF_" + method_name;
     }
 
+    public Expression[] getSymArgs() {
+        return this.sym_args;
+    }
+
     public String stringPC () {
         String result="";
         if (sym_args!=null)

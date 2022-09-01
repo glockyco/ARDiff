@@ -19,6 +19,7 @@
 package gov.nasa.jpf.symbc.numeric;
 
 
+import gov.nasa.jpf.symbc.concolic.FunctionExpression;
 import gov.nasa.jpf.symbc.mixednumstrg.SpecialIntegerExpression;
 import gov.nasa.jpf.symbc.mixednumstrg.SpecialRealExpression;
 import gov.nasa.jpf.symbc.string.*;
@@ -142,6 +143,9 @@ public abstract class ConstraintExpressionVisitor {
 	public void preVisit(BinaryRealExpression expr) {
 	}
 
+	public void preVisit(FunctionExpression expr) {
+	}
+
 	public void preVisit(MathRealExpression expr) {
 	}
 
@@ -209,6 +213,9 @@ public abstract class ConstraintExpressionVisitor {
 	}
 
 	public void postVisit(BinaryRealExpression expr) {
+	}
+
+	public void postVisit(FunctionExpression expr) {
 	}
 
 	public void postVisit(MathRealExpression expr) {

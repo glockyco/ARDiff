@@ -40,6 +40,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
     @Override
     public void executeInstruction(VM vm, ThreadInfo currentThread, Instruction instructionToExecute) {
+        // @TODO: Reduce code duplication across DifferencingListener + PathConditionListener.
         if (!(instructionToExecute instanceof JVMReturnInstruction)) {
             return;
         }

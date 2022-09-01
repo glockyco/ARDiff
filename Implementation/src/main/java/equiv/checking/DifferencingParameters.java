@@ -80,6 +80,10 @@ public class DifferencingParameters implements Serializable {
         return this.getFiles("glob:**/IDiff" + this.toolName + "-P*-HasUIF*.txt");
     }
 
+    public String[] getJsonFiles() throws IOException {
+        return this.getFiles("glob:**/IDiff" + this.toolName + "-P*-JSON*.json");
+    }
+
     private String[] getFiles(String glob) throws IOException {
         List<String> answerFiles = new ArrayList<>();
 
@@ -106,6 +110,7 @@ public class DifferencingParameters implements Serializable {
         generatedFiles.addAll(Arrays.asList(this.getZ3AnswerFiles()));
         generatedFiles.addAll(Arrays.asList(this.getZ3ModelFiles()));
         generatedFiles.addAll(Arrays.asList(this.getHasUifFiles()));
+        generatedFiles.addAll(Arrays.asList(this.getJsonFiles()));
         generatedFiles.add(this.getOutputFile());
         generatedFiles.add(this.getErrorFile());
         generatedFiles.add(this.getResultFile());
