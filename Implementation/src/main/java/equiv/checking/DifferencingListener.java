@@ -19,7 +19,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
     protected final DifferencingParameters parameters;
     protected final MethodSpec areEquivalentSpec;
 
-    protected int count =  0;
+    protected int partitionId =  0;
 
     public DifferencingListener(DifferencingParameters parameters) {
         this.parameters = parameters;
@@ -66,7 +66,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
         // -------------------------------------------------------
         // Check equivalence of the two parameters using an SMT solver.
 
-        this.count++;
+        this.partitionId++;
 
         boolean aIsConcrete = expressionA == null;
         boolean bIsConcrete = expressionB == null;
@@ -215,32 +215,32 @@ public class DifferencingListener extends PropertyListenerAdapter {
     }
 
     private void writeHasUIF(boolean hasUninterpretedFunctions, String name) throws IOException {
-        String filename = this.parameters.getTargetClassName() + "-P" + this.count + "-HasUIF-" + name + ".txt";
+        String filename = this.parameters.getTargetClassName() + "-P" + this.partitionId + "-HasUIF-" + name + ".txt";
         Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
         Files.write(path, String.valueOf(hasUninterpretedFunctions).getBytes());
     }
 
     private Path writeQuery(String query, String name) throws IOException {
-        String filename = this.parameters.getTargetClassName() + "-P" + this.count + "-ToSolve-" + name + ".txt";
+        String filename = this.parameters.getTargetClassName() + "-P" + this.partitionId + "-ToSolve-" + name + ".txt";
         Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
         Files.write(path, query.getBytes());
         return path;
     }
 
     private void writeAnswer(String answer, String name) throws IOException {
-        String filename = this.parameters.getTargetClassName() + "-P" + this.count + "-Answer-" + name + ".txt";
+        String filename = this.parameters.getTargetClassName() + "-P" + this.partitionId + "-Answer-" + name + ".txt";
         Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
         Files.write(path, answer.getBytes());
     }
 
     private void writeModel(String model, String name) throws IOException {
-        String filename = this.parameters.getTargetClassName() + "-P" + this.count + "-Model-" + name + ".txt";
+        String filename = this.parameters.getTargetClassName() + "-P" + this.partitionId + "-Model-" + name + ".txt";
         Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
         Files.write(path, model.getBytes());
     }
 
     private void writeErrors(String errors, String name) throws IOException {
-        String filename = this.parameters.getTargetClassName() + "-P" + this.count + "-Errors-" + name + ".txt";
+        String filename = this.parameters.getTargetClassName() + "-P" + this.partitionId + "-Errors-" + name + ".txt";
         Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
         Files.write(path, errors.getBytes());
     }
