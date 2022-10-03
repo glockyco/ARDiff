@@ -1,20 +1,12 @@
 package equiv.checking.transformer;
 
-import equiv.checking.domain.*;
 import equiv.checking.domain.Error;
-import gov.nasa.jpf.symbc.numeric.Constraint;
+import equiv.checking.domain.*;
 import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor;
 
-import java.util.Map;
 import java.util.Stack;
 
 public class SpfToModelTransformer {
-    private final Map<Constraint, SourceLocation> constraintLocations;
-
-    public SpfToModelTransformer(Map<Constraint, SourceLocation> constraintLocations) {
-        this.constraintLocations = constraintLocations;
-    }
-
     public Expression transform(gov.nasa.jpf.symbc.numeric.PathCondition pathCondition) {
         if (pathCondition == null || pathCondition.header == null) {
             return null;
@@ -36,7 +28,7 @@ public class SpfToModelTransformer {
             return null;
         }
 
-        ConstraintExpressionFactoryVisitor visitor = new ConstraintExpressionFactoryVisitor(this.constraintLocations);
+        ConstraintExpressionFactoryVisitor visitor = new ConstraintExpressionFactoryVisitor();
         constraint.accept(visitor);
         return visitor.getExpression();
     }
@@ -46,7 +38,7 @@ public class SpfToModelTransformer {
             return null;
         }
 
-        ConstraintExpressionFactoryVisitor visitor = new ConstraintExpressionFactoryVisitor(this.constraintLocations);
+        ConstraintExpressionFactoryVisitor visitor = new ConstraintExpressionFactoryVisitor();
         constraint.accept(visitor);
         return visitor.getExpression();
     }
@@ -56,7 +48,7 @@ public class SpfToModelTransformer {
             return null;
         }
 
-        ConstraintExpressionFactoryVisitor visitor = new ConstraintExpressionFactoryVisitor(this.constraintLocations);
+        ConstraintExpressionFactoryVisitor visitor = new ConstraintExpressionFactoryVisitor();
         expression.accept(visitor);
         return visitor.getExpression();
     }
@@ -72,12 +64,6 @@ public class SpfToModelTransformer {
 
     private static class ConstraintExpressionFactoryVisitor extends ConstraintExpressionVisitor {
         private final Stack<Expression> stack = new Stack<>();
-
-        private final Map<Constraint, SourceLocation> constraintLocations;
-
-        public ConstraintExpressionFactoryVisitor(Map<Constraint, SourceLocation> constraintLocations) {
-            this.constraintLocations = constraintLocations;
-        }
 
         public Expression getExpression() {
             assert this.stack.size() == 1;
@@ -95,8 +81,7 @@ public class SpfToModelTransformer {
             Expression left = this.stack.pop();
             Operator op = Operator.get(constraint.getComparator().toString());
 
-            SourceLocation location = this.constraintLocations.get(constraint);
-            Operation operation = new Operation(left, op, right, location);
+            Operation operation = new Operation(left, op, right);
 
             if (and == null) {
                 this.stack.push(operation);

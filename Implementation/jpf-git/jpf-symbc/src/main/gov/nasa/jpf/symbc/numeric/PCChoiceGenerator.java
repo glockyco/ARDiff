@@ -131,6 +131,18 @@ public class PCChoiceGenerator extends IntIntervalGenerator {
 		}
 	}
 
+	public PathCondition getPC(int choice) {
+		PathCondition pc;
+
+		pc = PC.get(choice);
+		if (pc != null) {
+			pc.setLineNumber(this.offset);
+			return pc.make_copy();
+		} else {
+			return null;
+		}
+	}
+
 	public IntChoiceGenerator randomize() {
 		return new PCChoiceGenerator(PC.size(), random.nextBoolean());
 	}

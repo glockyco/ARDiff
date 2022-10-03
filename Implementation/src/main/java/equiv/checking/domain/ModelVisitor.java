@@ -14,6 +14,5 @@ public interface ModelVisitor {
     void visit(SymbolicIntegerFunction function);
     void visit(SymbolicRealFunction function);
     void visit(SymbolicStringFunction function);
-    void visit(SourceLocation location);
     void visit(Error error);
 }

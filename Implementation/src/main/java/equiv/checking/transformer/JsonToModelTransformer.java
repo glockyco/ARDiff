@@ -1,8 +1,8 @@
 package equiv.checking.transformer;
 
-import equiv.checking.domain.*;
-import equiv.checking.domain.Error;
 import com.google.gson.*;
+import equiv.checking.domain.Error;
+import equiv.checking.domain.*;
 
 import java.lang.reflect.Type;
 
@@ -25,7 +25,6 @@ public class JsonToModelTransformer {
         builder.registerTypeAdapter(SymbolicIntegerFunction.class, new SymbolicIntegerFunctionDeserializer());
         builder.registerTypeAdapter(SymbolicRealFunction.class, new SymbolicRealFunctionDeserializer());
         builder.registerTypeAdapter(SymbolicStringFunction.class, new SymbolicStringFunctionDeserializer());
-        builder.registerTypeAdapter(SourceLocation.class, new SourceLocationDeserializer());
         builder.registerTypeAdapter(Error.class, new ErrorDeserializer());
 
         builder.registerTypeHierarchyAdapter(Model.class, new ModelDeserializer());
@@ -60,9 +59,8 @@ public class JsonToModelTransformer {
             Expression left = context.deserialize(jsonObject.get("left"), Expression.class);
             Operator op = context.deserialize(jsonObject.get("op"), Operator.class);
             Expression right = context.deserialize(jsonObject.get("right"), Expression.class);
-            SourceLocation location = context.deserialize(jsonObject.get("location"), SourceLocation.class);
 
-            return new Operation(left, op, right, location);
+            return new Operation(left, op, right);
         }
     }
 
@@ -148,21 +146,6 @@ public class JsonToModelTransformer {
             Expression[] args = context.deserialize(jsonObject.get("args"), Expression[].class);
 
             return new SymbolicStringFunction(name, args);
-        }
-    }
-
-    private static class SourceLocationDeserializer implements JsonDeserializer<SourceLocation> {
-        @Override
-        public SourceLocation deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            JsonObject jsonObject = jsonElement.getAsJsonObject();
-
-            String filePath = jsonObject.get("file_path").getAsString();
-            String className = jsonObject.get("class_name").getAsString();
-            String methodName = jsonObject.get("method_name").getAsString();
-            int lineNumber = jsonObject.get("line_number").getAsInt();
-            int choice = jsonObject.get("choice").getAsInt();
-
-            return new SourceLocation(filePath, className, methodName, lineNumber, choice);
         }
     }
 

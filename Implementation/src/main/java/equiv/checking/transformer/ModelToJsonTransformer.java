@@ -1,8 +1,8 @@
 package equiv.checking.transformer;
 
-import equiv.checking.domain.*;
-import equiv.checking.domain.Error;
 import com.google.gson.*;
+import equiv.checking.domain.Error;
+import equiv.checking.domain.*;
 
 import java.lang.reflect.Type;
 
@@ -26,7 +26,6 @@ public class ModelToJsonTransformer {
         builder.registerTypeAdapter(SymbolicIntegerFunction.class, new SymbolicIntegerFunctionSerializer());
         builder.registerTypeAdapter(SymbolicRealFunction.class, new SymbolicRealFunctionSerializer());
         builder.registerTypeAdapter(SymbolicStringFunction.class, new SymbolicStringFunctionSerializer());
-        builder.registerTypeAdapter(SourceLocation.class, new SourceLocationSerializer());
         builder.registerTypeAdapter(Error.class, new ErrorSerializer());
 
         this.gson = builder.create();
@@ -45,7 +44,6 @@ public class ModelToJsonTransformer {
             jsonObject.add("left", context.serialize(operation.left));
             jsonObject.add("op", context.serialize(operation.op));
             jsonObject.add("right", context.serialize(operation.right));
-            jsonObject.add("location", context.serialize(operation.location));
 
             return jsonObject;
         }
@@ -184,22 +182,6 @@ public class ModelToJsonTransformer {
             jsonObject.add("_type", new JsonPrimitive(function.getClass().getSimpleName()));
             jsonObject.add("name", new JsonPrimitive(function.name));
             jsonObject.add("args", jsonArgs);
-
-            return jsonObject;
-        }
-    }
-
-    private static class SourceLocationSerializer implements JsonSerializer<SourceLocation> {
-        @Override
-        public JsonElement serialize(SourceLocation location, Type type, JsonSerializationContext context) {
-            JsonObject jsonObject = new JsonObject();
-
-            jsonObject.add("_type", new JsonPrimitive(location.getClass().getSimpleName()));
-            jsonObject.add("file_path", new JsonPrimitive(location.filePath));
-            jsonObject.add("class_name", new JsonPrimitive(location.className));
-            jsonObject.add("method_name", new JsonPrimitive(location.methodName));
-            jsonObject.add("line_number", new JsonPrimitive(location.lineNumber));
-            jsonObject.add("choice", new JsonPrimitive(location.choice));
 
             return jsonObject;
         }
