@@ -14,41 +14,22 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DifferencingListener extends PropertyListenerAdapter {
     protected final DifferencingParameters parameters;
-    protected final List<MethodSpec> areEquivalentMethods = new ArrayList<>();
+    protected final MethodSpec areEquivalentSpec;
 
     protected int count =  0;
 
     public DifferencingListener(DifferencingParameters parameters) {
         this.parameters = parameters;
-
-        // @TODO: Check if we can make do with fewer method specs.
-        this.areEquivalentMethods.add(MethodSpec.createMethodSpec("*.areEquivalent(int,int)"));
-        this.areEquivalentMethods.add(MethodSpec.createMethodSpec("*.areEquivalent(long,long)"));
-        this.areEquivalentMethods.add(MethodSpec.createMethodSpec("*.areEquivalent(short,short)"));
-        this.areEquivalentMethods.add(MethodSpec.createMethodSpec("*.areEquivalent(byte,byte)"));
-        this.areEquivalentMethods.add(MethodSpec.createMethodSpec("*.areEquivalent(float,float)"));
-        this.areEquivalentMethods.add(MethodSpec.createMethodSpec("*.areEquivalent(double,double)"));
-        this.areEquivalentMethods.add(MethodSpec.createMethodSpec("*.areEquivalent(boolean,boolean)"));
-        // @TODO: Check if method spec for objects works.
-        this.areEquivalentMethods.add(MethodSpec.createMethodSpec("*.areEquivalent(java.lang.Object,java.lang.Object)"));
+        this.areEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + ".areEquivalent");
     }
 
     @Override
     public void executeInstruction(VM vm, ThreadInfo currentThread, Instruction instructionToExecute) {
-        // @TODO: Reduce code duplication across DifferencingListener + PathConditionListener.
-        if (!(instructionToExecute instanceof JVMReturnInstruction)) {
-            return;
-        }
-
         MethodInfo mi = instructionToExecute.getMethodInfo();
-
-        // Intercept execution when returning from one of the "areEquivalentMethods".
-        if (this.areEquivalentMethods.stream().noneMatch(m -> m.matches(mi))) {
+        if (!(instructionToExecute instanceof JVMReturnInstruction) || !this.areEquivalentSpec.matches(mi)) {
             return;
         }
 
