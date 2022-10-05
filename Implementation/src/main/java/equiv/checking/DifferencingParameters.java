@@ -1,5 +1,7 @@
 package equiv.checking;
 
+import equiv.checking.models.Classification;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.*;
@@ -8,6 +10,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class DifferencingParameters implements Serializable {
+    private static final String BENCHMARKS_DIR = "../benchmarks/";
+    private static final Path BENCHMARKS_PATH = Paths.get(BENCHMARKS_DIR);
+
     private final String directory;
     private final String toolName;
     private final MethodDescription oldMethodDescription;
@@ -34,6 +39,30 @@ public class DifferencingParameters implements Serializable {
 
     public String getTargetDirectory() {
         return this.directory;
+    }
+
+    public String getBenchmarkName() {
+        Path path = BENCHMARKS_PATH.relativize(Paths.get(this.directory));
+        return path.subpath(0, 3).toString();
+    }
+
+    public String getExpectedResult() {
+        Path path = BENCHMARKS_PATH.relativize(Paths.get(this.directory));
+
+        // While some benchmarks have the Eq/NEq folder at the second level
+        // of the hierarchy (e.g., ModDiff/Eq/Add), others have it at the
+        // third level (e.g., power/test/Eq), so we have to check both.
+
+        String name1 = path.getName(1).toString();
+        String name2 = path.getName(2).toString();
+
+        if (name1.equals("Eq") || name2.equals("Eq")) {
+            return Classification.EQ.toString();
+        } else if (name1.equals("NEq") || name2.equals("NEq")) {
+            return Classification.NEQ.toString();
+        }
+
+        throw new RuntimeException("Cannot determine expected result for " + this.directory + ".");
     }
 
     public String getParameterFile() {

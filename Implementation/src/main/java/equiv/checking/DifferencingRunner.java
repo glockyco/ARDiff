@@ -146,6 +146,8 @@ public class DifferencingRunner {
 
                 Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
                 JPF jpf = new JPF(config);
+                jpf.addListener(new ExecutionListener(this.parameters, "*.IoldV" + this.parameters.getToolName() + ".snippet"));
+                jpf.addListener(new ExecutionListener(this.parameters, "*.InewV" + this.parameters.getToolName() + ".snippet"));
                 jpf.addListener(new PathConditionListener(this.parameters));
                 jpf.addListener(new DifferencingListener(this.parameters));
                 jpf.run();
