@@ -6,6 +6,7 @@ import differencing.models.PartitionInstruction;
 import differencing.models.Run;
 import differencing.repositories.InstructionRepository;
 import differencing.repositories.PartitionInstructionRepository;
+import differencing.repositories.PartitionRepository;
 import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.jvm.bytecode.JVMReturnInstruction;
 import gov.nasa.jpf.search.Search;
@@ -105,6 +106,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
     public void executeInstruction(VM vm, ThreadInfo currentThread, gov.nasa.jpf.vm.Instruction instructionToExecute) {
         MethodInfo mi = instructionToExecute.getMethodInfo();
         if (instructionToExecute instanceof JVMReturnInstruction && this.areEquivalentSpec.matches(mi)) {
+            PartitionRepository.insertOrUpdate(this.currentPartition);
             InstructionRepository.insertOrUpdate(this.currentInstructions);
             PartitionInstructionRepository.insertOrUpdate(this.currentPartitionInstructions);
 
