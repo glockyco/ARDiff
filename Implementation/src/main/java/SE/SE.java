@@ -174,6 +174,24 @@ public class SE {
         this.times[1] = end - start;
         this.totalTimes[1] += this.times[1];
 
+        /**********************Creating the the differencing parameters ******************/
+
+        DifferencingParameterFactory factory = new DifferencingParameterFactory();
+
+        DifferencingParameters parameters = factory.create(
+            this.toolName,
+            this.path,
+            instrument.packageName(),
+            v1ClassName,
+            v2ClassName,
+            method1.desc,
+            methodParams,
+            variablesNamesTypesMapping
+        );
+
+        Path filepath = Paths.get(parameters.getParameterFile());
+        factory.persist(filepath.toFile(), parameters);
+
         /**********************Running the symbolic execution ******************/
 
         start = System.nanoTime();
@@ -214,24 +232,6 @@ public class SE {
 
         this.times[4] = symbEx.z3time;
         this.totalTimes[4] += this.times[4];
-
-        /**********************Creating the the differencing parameters ******************/
-
-        DifferencingParameterFactory factory = new DifferencingParameterFactory();
-
-        DifferencingParameters parameters = factory.create(
-            this.toolName,
-            this.path,
-            instrument.packageName(),
-            v1ClassName,
-            v2ClassName,
-            method1.desc,
-            methodParams,
-            variablesNamesTypesMapping
-        );
-
-        Path filepath = Paths.get(parameters.getParameterFile());
-        factory.persist(filepath.toFile(), parameters);
 
         return summary;
     }

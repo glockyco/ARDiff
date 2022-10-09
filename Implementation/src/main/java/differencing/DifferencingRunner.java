@@ -45,22 +45,14 @@ public class DifferencingRunner {
 
     public void run(String benchmarkDir, String toolName, int timeout) throws IOException {
         // Read the differencing configuration:
-        Path baseToolOutputFilePath = Paths.get(benchmarkDir, "outputs", toolName + ".txt");
         Path parameterFilePath = Paths.get(benchmarkDir, "instrumented", "IDiff" + toolName + "-Parameters.txt");
 
         DifferencingParameterFactory parameterFactory = new DifferencingParameterFactory();
 
-        if (!baseToolOutputFilePath.toFile().exists() || !parameterFilePath.toFile().exists()) {
-            String error = "";
-            if (!baseToolOutputFilePath.toFile().exists()) {
-                error = "Error: '" + baseToolOutputFilePath + "' does not exist.";
-            } else if (!parameterFilePath.toFile().exists()) {
-                error = "Error: '" + parameterFilePath + "' does not exist.";
-            }
+        if (!parameterFilePath.toFile().exists()) {
+            String error = "Error: '" + parameterFilePath + "' does not exist.";
 
             DifferencingParameters parameters = parameterFactory.create(toolName, benchmarkDir);
-            Arrays.stream(parameters.getGeneratedFiles()).forEach(file -> new File(file).delete());
-
             Arrays.stream(parameters.getGeneratedFiles()).forEach(file -> new File(file).delete());
 
             Classification result = new RunClassifier(

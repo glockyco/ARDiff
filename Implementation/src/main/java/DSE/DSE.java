@@ -281,23 +281,6 @@ public class DSE {
             totalTimes[1] += times[1];
             //int numParam2=instrument.getNumParameters();
 
-            /**********************Running the symbolic execution ******************/
-            start = System.nanoTime();
-            SymbolicExecutionRunner symbEx = new SymbolicExecutionRunner( path,instrument.packageName(),v1ClassName+toolName,v2ClassName+toolName, method2.name, methodParams.length,this.bound, this.timeout, this.SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong,parseFromSMTLib,Z3_TERMINAL);
-            symbEx.creatingJpfFiles();
-            symbEx.runningJavaPathFinder();
-            end = System.nanoTime();
-            times[2] = end - start;
-            totalTimes[2] += times[2];
-            start = System.nanoTime();
-            SMTSummary summary = symbEx.createSMTSummary();
-            end = System.nanoTime();
-            times[3] = end - start;
-            totalTimes[3] += times[3];
-            times[4] = symbEx.z3time;
-            totalTimes[4] += times[4];
-            String outputs = path.split("instrumented")[0];
-
             /**********************Creating the the differencing parameters ******************/
 
             DifferencingParameterFactory factory = new DifferencingParameterFactory();
@@ -315,6 +298,23 @@ public class DSE {
 
             Path filepath = Paths.get(parameters.getParameterFile());
             factory.persist(filepath.toFile(), parameters);
+
+            /**********************Running the symbolic execution ******************/
+            start = System.nanoTime();
+            SymbolicExecutionRunner symbEx = new SymbolicExecutionRunner( path,instrument.packageName(),v1ClassName+toolName,v2ClassName+toolName, method2.name, methodParams.length,this.bound, this.timeout, this.SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong,parseFromSMTLib,Z3_TERMINAL);
+            symbEx.creatingJpfFiles();
+            symbEx.runningJavaPathFinder();
+            end = System.nanoTime();
+            times[2] = end - start;
+            totalTimes[2] += times[2];
+            start = System.nanoTime();
+            SMTSummary summary = symbEx.createSMTSummary();
+            end = System.nanoTime();
+            times[3] = end - start;
+            totalTimes[3] += times[3];
+            times[4] = symbEx.z3time;
+            totalTimes[4] += times[4];
+            String outputs = path.split("instrumented")[0];
 
             return summary;
     }
