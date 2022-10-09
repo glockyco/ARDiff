@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="parameters" type="equiv.checking.DifferencingParameters" -->
+<#-- @ftlvariable name="parameters" type="differencing.DifferencingParameters" -->
 
 <#function isSymbolic type variable>
     <#switch type>

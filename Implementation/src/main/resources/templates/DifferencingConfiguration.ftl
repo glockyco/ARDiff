@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="parameters" type="equiv.checking.DifferencingParameters" -->
+<#-- @ftlvariable name="parameters" type="differencing.DifferencingParameters" -->
 
 target = ${parameters.targetNamespace}.${parameters.targetClassName}
 symbolic.method = ${parameters.targetNamespace}.${parameters.targetClassName}.run(${parameters.symbolicParameters})

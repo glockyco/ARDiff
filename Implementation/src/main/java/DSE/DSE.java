@@ -17,6 +17,8 @@ import com.microsoft.z3.Params;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 import com.microsoft.z3.Tactic;
+import differencing.DifferencingParameterFactory;
+import differencing.DifferencingParameters;
 import equiv.checking.*;
 import equiv.checking.SymbolicExecutionRunner.SMTSummary;
 import javafx.util.Pair;

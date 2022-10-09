@@ -2,7 +2,12 @@ package SE;
 
 import br.usp.each.saeg.asm.defuse.Variable;
 import com.microsoft.z3.Status;
-import equiv.checking.*;
+import differencing.DifferencingParameterFactory;
+import differencing.DifferencingParameters;
+import equiv.checking.ChangeExtractor;
+import equiv.checking.DefUseExtractor;
+import equiv.checking.Instrumentation;
+import equiv.checking.SymbolicExecutionRunner;
 import equiv.checking.SymbolicExecutionRunner.SMTSummary;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
