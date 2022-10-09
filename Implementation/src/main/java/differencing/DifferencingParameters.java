@@ -114,7 +114,7 @@ public class DifferencingParameters implements Serializable {
     }
 
     public String[] getJsonFiles() throws IOException {
-        return this.getFiles("glob:**/IDiff" + this.toolName + "-P*-JSON*.json");
+        return this.getFiles("glob:**/IDiff" + this.toolName + "-*-JSON*.json");
     }
 
     private String[] getFiles(String glob) throws IOException {
