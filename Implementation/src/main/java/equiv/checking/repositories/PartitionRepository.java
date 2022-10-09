@@ -13,8 +13,6 @@ public class PartitionRepository extends Repository {
         "tool, " +
         "partition, " +
         "result, " +
-        "has_succeeded, " +
-        "is_depth_limited, " +
         "has_uif, " +
         "has_uif_pc, " +
         "has_uif_v1, " +
@@ -22,11 +20,9 @@ public class PartitionRepository extends Repository {
         "constraint_count, " +
         "errors" +
         ") " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
         "ON CONFLICT DO UPDATE SET " +
         "result = excluded.result, " +
-        "has_succeeded = excluded.has_succeeded, " +
-        "is_depth_limited = excluded.is_depth_limited, " +
         "has_uif = excluded.has_uif, " +
         "has_uif_pc = excluded.has_uif_pc, " +
         "has_uif_v1 = excluded.has_uif_v1, " +
@@ -45,15 +41,13 @@ public class PartitionRepository extends Repository {
             ps.setObject(1, partition.benchmark);
             ps.setObject(2, partition.tool);
             ps.setObject(3, partition.partition);
-            ps.setObject(4, partition.result);
-            ps.setObject(5, partition.hasSucceeded);
-            ps.setObject(6, partition.isDepthLimited);
-            ps.setObject(7, partition.hasUif);
-            ps.setObject(8, partition.hasUifPc);
-            ps.setObject(9, partition.hasUifV1);
-            ps.setObject(10, partition.hasUifV2);
-            ps.setObject(11, partition.constraintCount);
-            ps.setObject(12, partition.errors);
+            ps.setObject(4, partition.result == null ? null : partition.result.toString());
+            ps.setObject(5, partition.hasUif);
+            ps.setObject(6, partition.hasUifPc);
+            ps.setObject(7, partition.hasUifV1);
+            ps.setObject(8, partition.hasUifV2);
+            ps.setObject(9, partition.constraintCount);
+            ps.setObject(10, partition.errors);
             ps.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);

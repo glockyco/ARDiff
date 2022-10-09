@@ -23,6 +23,9 @@ public class PathConditionListener extends PropertyListenerAdapter {
     private final DifferencingParameters parameters;
     private final MethodSpec areEquivalentSpec;
 
+    private final SpfToModelTransformer spfToModelTransformer;
+    private final ModelToJsonTransformer modelToJsonTransformer;
+
     private final Map<Integer, Map<Integer, PathCondition>> statePcMap = new HashMap<>();
     private final Map<Integer, PathCondition> partitionPcMap = new HashMap<>();
 
@@ -31,13 +34,36 @@ public class PathConditionListener extends PropertyListenerAdapter {
     public PathConditionListener(DifferencingParameters parameters) {
         this.parameters = parameters;
         this.areEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + ".areEquivalent");
+
+        this.spfToModelTransformer = new SpfToModelTransformer();
+        this.modelToJsonTransformer = new ModelToJsonTransformer();
+    }
+
+    @Override
+    public void searchConstraintHit(Search search) {
+        if (search.getVM().getCurrentThread().isFirstStepInsn()) {
+            return;
+        }
+
+        if (search.getDepth() >= search.getDepthLimit()) {
+            PathCondition pc = PathCondition.getPC(search.getVM());
+
+            this.writePathCondition(this.partitionId, pc);
+
+            this.partitionPcMap.put(this.partitionId, pc);
+            this.partitionId++;
+        }
     }
 
     @Override
     public void executeInstruction(VM vm, ThreadInfo currentThread, Instruction instructionToExecute) {
         MethodInfo mi = instructionToExecute.getMethodInfo();
         if (instructionToExecute instanceof JVMReturnInstruction && this.areEquivalentSpec.matches(mi)) {
-            this.partitionPcMap.put(this.partitionId, PathCondition.getPC(vm));
+            PathCondition pc = PathCondition.getPC(vm);
+
+            this.writePathCondition(this.partitionId, pc);
+
+            this.partitionPcMap.put(this.partitionId, pc);
             this.partitionId++;
         }
     }
@@ -59,41 +85,38 @@ public class PathConditionListener extends PropertyListenerAdapter {
             Map<Integer, PathCondition> choicePcMap = this.statePcMap.getOrDefault(vm.getStateId(), new HashMap<>());
             this.statePcMap.putIfAbsent(vm.getStateId(), choicePcMap);
             assert !choicePcMap.containsKey(choice);
+
+            this.writePathCondition(vm.getStateId(), choice, pc);
+
             choicePcMap.put(choice, pc);
         }
     }
 
-    @Override
-    public void searchFinished(Search search) {
+    private void writePathCondition(int partition, PathCondition pc) {
+        Constraint pcConstraint = pc == null ? null : pc.header;
+        Model pcModel = this.spfToModelTransformer.transform(pcConstraint);
+        String pcJson = this.modelToJsonTransformer.transform(pcModel);
+
+        String filename = this.parameters.getTargetClassName() + "-P" + partition + "-JSON-PC.json";
+        Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
+
         try {
-            SpfToModelTransformer spfToModelTransformer = new SpfToModelTransformer();
-            ModelToJsonTransformer modelToJsonTransformer = new ModelToJsonTransformer();
+            Files.write(path, pcJson.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-            for (Integer partition: this.partitionPcMap.keySet()) {
-                PathCondition pc = this.partitionPcMap.get(partition);
+    private void writePathCondition(int state, int choice, PathCondition pc) {
+        Constraint pcConstraint = pc == null ? null : pc.header;
+        Model pcModel = this.spfToModelTransformer.transform(pcConstraint);
+        String pcJson = this.modelToJsonTransformer.transform(pcModel);
 
-                Constraint pcConstraint = pc == null ? null : pc.header;
-                Model pcModel = spfToModelTransformer.transform(pcConstraint);
-                String pcJson = modelToJsonTransformer.transform(pcModel);
+        String filename = this.parameters.getTargetClassName() + "-S" + state + "-C" + choice + "-JSON-PC.json";
+        Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
 
-                String filename = this.parameters.getTargetClassName() + "-P" + partition + "-JSON-PC.json";
-                Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
-                Files.write(path, pcJson.getBytes());
-            }
-
-            for (Integer state: this.statePcMap.keySet()) {
-                for (Integer choice: this.statePcMap.get(state).keySet()) {
-                    PathCondition pc = this.statePcMap.get(state).get(choice);
-
-                    Constraint pcConstraint = pc == null ? null : pc.header;
-                    Model pcModel = spfToModelTransformer.transform(pcConstraint);
-                    String pcJson = modelToJsonTransformer.transform(pcModel);
-
-                    String filename = this.parameters.getTargetClassName() + "-S" + state + "-C" + choice + "-JSON-PC.json";
-                    Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
-                    Files.write(path, pcJson.getBytes());
-                }
-            }
+        try {
+            Files.write(path, pcJson.getBytes());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

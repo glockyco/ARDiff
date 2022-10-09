@@ -1,5 +1,7 @@
 package equiv.checking.models;
 
+import equiv.checking.classification.Classification;
+
 import java.util.Objects;
 
 public class Run {
@@ -8,8 +10,8 @@ public class Run {
     public String tool;
 
     // Non-Index
-    public String result;
-    public Boolean hasSucceeded;
+    public Classification result;
+    public Boolean hasTimedOut;
     public Boolean isDepthLimited;
     public Boolean hasUif;
     public Integer iterationCount;
@@ -23,8 +25,8 @@ public class Run {
     public Run(
         String benchmark,
         String tool,
-        String result,
-        Boolean hasSucceeded,
+        Classification result,
+        Boolean hasTimedOut,
         Boolean isDepthLimited,
         Boolean hasUif,
         Integer iterationCount,
@@ -34,7 +36,7 @@ public class Run {
         this.benchmark = benchmark;
         this.tool = tool;
         this.result = result;
-        this.hasSucceeded = hasSucceeded;
+        this.hasTimedOut = hasTimedOut;
         this.isDepthLimited = isDepthLimited;
         this.hasUif = hasUif;
         this.iterationCount = iterationCount;

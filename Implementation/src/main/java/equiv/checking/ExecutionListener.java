@@ -33,12 +33,11 @@ public class ExecutionListener extends PropertyListenerAdapter {
     private final Map<Integer, ExecutionNode> nodeMap = new HashMap<>();
     private final Map<Integer, Integer> indexMap = new HashMap<>();
 
-    private final Benchmark benchmark;
     private final Run run;
     private final int version;
     private final Set<Partition> partitions = new HashSet<>();
-    private final Set<PartitionInstruction> partitionInstructions = new HashSet<>();
-    private final Set<Instruction> instructions = new HashSet<>();
+    private final Set<PartitionInstruction> currentPartitionInstructions = new HashSet<>();
+    private final Set<Instruction> currentInstructions = new HashSet<>();
 
     private Partition currentPartition;
 
@@ -49,13 +48,12 @@ public class ExecutionListener extends PropertyListenerAdapter {
 
     protected int partitionId =  1;
 
-    public ExecutionListener(DifferencingParameters parameters, String methodToCover) {
+    public ExecutionListener(Run run, DifferencingParameters parameters, String methodToCover) {
+        this.run = run;
         this.parameters = parameters;
         this.methodToCoverSpec = MethodSpec.createMethodSpec(methodToCover);
         this.areEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + ".areEquivalent");
 
-        this.benchmark = new Benchmark(this.parameters.getBenchmarkName(), this.parameters.getExpectedResult());
-        this.run = new Run(this.benchmark.benchmark, this.parameters.getToolName() + "-diff");
         this.currentPartition = new Partition(this.run.benchmark, this.run.tool, this.partitionId);
 
         assert methodToCover.contains("IoldV") || methodToCover.contains("InewV");
@@ -64,11 +62,8 @@ public class ExecutionListener extends PropertyListenerAdapter {
 
     @Override
     public void searchFinished(Search search) {
-        BenchmarkRepository.insertOrUpdate(this.benchmark);
-        RunRepository.insertOrUpdate(this.run);
-        PartitionRepository.insertOrUpdate(this.partitions);
-        InstructionRepository.insertOrUpdate(this.instructions);
-        PartitionInstructionRepository.insertOrUpdate(this.partitionInstructions);
+        InstructionRepository.insertOrUpdate(this.currentInstructions);
+        PartitionInstructionRepository.insertOrUpdate(this.currentPartitionInstructions);
     }
 
     @Override
@@ -106,9 +101,15 @@ public class ExecutionListener extends PropertyListenerAdapter {
     public void executeInstruction(VM vm, ThreadInfo currentThread, gov.nasa.jpf.vm.Instruction instructionToExecute) {
         MethodInfo mi = instructionToExecute.getMethodInfo();
         if (instructionToExecute instanceof JVMReturnInstruction && this.areEquivalentSpec.matches(mi)) {
+            InstructionRepository.insertOrUpdate(this.currentInstructions);
+            PartitionInstructionRepository.insertOrUpdate(this.currentPartitionInstructions);
+
             this.partitions.add(this.currentPartition);
             this.partitionId++;
+
             this.currentPartition = new Partition(this.run.benchmark, this.run.tool, this.partitionId);
+            this.currentInstructions.clear();
+            this.currentPartitionInstructions.clear();
         }
 
         if (this.isInMethodToCover & !vm.getSystemState().isIgnored() && !currentThread.isFirstStepInsn()) {
@@ -160,8 +161,8 @@ public class ExecutionListener extends PropertyListenerAdapter {
                     cg.getNextChoice()
                 );
 
-                this.instructions.add(instruction);
-                this.partitionInstructions.add(partitionInstruction);
+                this.currentInstructions.add(instruction);
+                this.currentPartitionInstructions.add(partitionInstruction);
             }
         }
     }

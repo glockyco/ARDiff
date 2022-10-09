@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS run
     tool TEXT NOT NULL,
 
     result TEXT,
-    has_succeeded BOOLEAN,
+    has_timed_out BOOLEAN,
     is_depth_limited BOOLEAN,
     has_uif BOOLEAN,
     iteration_count INTEGER,
@@ -37,8 +37,6 @@ CREATE TABLE IF NOT EXISTS partition
     partition INTEGER NOT NULL,
 
     result TEXT,
-    has_succeeded BOOLEAN,
-    is_depth_limited BOOLEAN,
     has_uif BOOLEAN,
     has_uif_pc BOOLEAN,
     has_uif_v1 BOOLEAN,

@@ -1,5 +1,7 @@
 package equiv.checking.models;
 
+import equiv.checking.classification.Classification;
+
 import java.util.Objects;
 
 public class Partition {
@@ -9,9 +11,7 @@ public class Partition {
     public int partition;
 
     // Non-Index
-    public String result;
-    public Boolean hasSucceeded;
-    public Boolean isDepthLimited;
+    public Classification result;
     public Boolean hasUif;
     public Boolean hasUifPc;
     public Boolean hasUifV1;
@@ -20,17 +20,14 @@ public class Partition {
     public String errors;
 
     public Partition(String benchmark, String tool, int partition) {
-        this(benchmark, tool, partition, null, null, null, null, null, null, null, null, null);
+        this(benchmark, tool, partition, null, null, null, null, null, null);
     }
 
     public Partition(
         String benchmark,
         String tool,
         int partition,
-        String result,
-        Boolean hasSucceeded,
-        Boolean isDepthLimited,
-        Boolean hasUif,
+        Classification result,
         Boolean hasUifPc,
         Boolean hasUifV1,
         Boolean hasUifV2,
@@ -42,14 +39,19 @@ public class Partition {
         this.partition = partition;
 
         this.result = result;
-        this.hasSucceeded = hasSucceeded;
-        this.isDepthLimited = isDepthLimited;
-        this.hasUif = hasUif;
         this.hasUifPc = hasUifPc;
         this.hasUifV1 = hasUifV1;
         this.hasUifV2 = hasUifV2;
         this.constraintCount = constraintCount;
         this.errors = errors;
+
+        if (hasUifPc == null && hasUifV1 == null && hasUifV2 == null) {
+            this.hasUif = null;
+        } else {
+            this.hasUif = (hasUifPc != null && hasUifPc)
+                || (hasUifV1 != null && hasUifV1)
+                || (hasUifV2 != null && hasUifV2);
+        }
     }
 
     @Override

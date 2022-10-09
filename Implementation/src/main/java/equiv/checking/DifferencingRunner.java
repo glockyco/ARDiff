@@ -1,5 +1,11 @@
 package equiv.checking;
 
+import equiv.checking.classification.Classification;
+import equiv.checking.classification.RunClassifier;
+import equiv.checking.models.Benchmark;
+import equiv.checking.models.Run;
+import equiv.checking.repositories.BenchmarkRepository;
+import equiv.checking.repositories.RunRepository;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -7,44 +13,81 @@ import freemarker.template.TemplateExceptionHandler;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import javax.tools.*;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class DifferencingRunner {
-    private final DifferencingParameters parameters;
-    private final int timeout;
     private final Configuration freeMarkerConfiguration;
 
     public static void main(String[] args) throws IOException, TemplateException {
+        new DifferencingRunner().run(args[0], args[1], Integer.parseInt(args[2]));
+    }
+
+    public DifferencingRunner() throws IOException {
+        /* Create and adjust the FreeMarker configuration singleton */
+        this.freeMarkerConfiguration = new Configuration(Configuration.VERSION_2_3_31);
+        this.freeMarkerConfiguration.setDirectoryForTemplateLoading(new File("src/main/resources/templates"));
+        // Recommended settings for new projects:
+        this.freeMarkerConfiguration.setDefaultEncoding("UTF-8");
+        this.freeMarkerConfiguration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+        this.freeMarkerConfiguration.setLogTemplateExceptions(false);
+        this.freeMarkerConfiguration.setWrapUncheckedExceptions(true);
+        this.freeMarkerConfiguration.setFallbackOnNullLoopVariable(false);
+    }
+
+    public void run(String benchmarkDir, String toolName, int timeout) throws IOException {
         // Read the differencing configuration:
-        String benchmarkDir = args[0];
-        String toolName = args[1];
-
-        int timeout = Integer.parseInt(args[2]);
-
         Path baseToolOutputFilePath = Paths.get(benchmarkDir, "outputs", toolName + ".txt");
         Path parameterFilePath = Paths.get(benchmarkDir, "instrumented", "IDiff" + toolName + "-Parameters.txt");
 
-        if(!baseToolOutputFilePath.toFile().exists()) {
-            System.out.println("Error: '" + baseToolOutputFilePath + "' does not exist.");
-            return;
-        }
-
-        if (!parameterFilePath.toFile().exists()) {
-            System.out.println("Error: '" + parameterFilePath + "' does not exist.");
-            return;
-        }
-
         DifferencingParameterFactory parameterFactory = new DifferencingParameterFactory();
+
+        if (!baseToolOutputFilePath.toFile().exists() || !parameterFilePath.toFile().exists()) {
+            String error = "";
+            if (!baseToolOutputFilePath.toFile().exists()) {
+                error = "Error: '" + baseToolOutputFilePath + "' does not exist.";
+            } else if (!parameterFilePath.toFile().exists()) {
+                error = "Error: '" + parameterFilePath + "' does not exist.";
+            }
+
+            DifferencingParameters parameters = parameterFactory.create(toolName, benchmarkDir);
+            Arrays.stream(parameters.getGeneratedFiles()).forEach(file -> new File(file).delete());
+
+            Arrays.stream(parameters.getGeneratedFiles()).forEach(file -> new File(file).delete());
+
+            Classification result = new RunClassifier(
+                false, true, false, false, Collections.emptySet()
+            ).getClassification();
+
+            Benchmark benchmark = new Benchmark(parameters.getBenchmarkName(), parameters.getExpectedResult());
+
+            Run run = new Run(
+                parameters.getBenchmarkName(),
+                parameters.getToolVariant(),
+                result,
+                null,
+                null,
+                null,
+                null,
+                null,
+                error
+            );
+
+            RunRepository.delete(run);
+            BenchmarkRepository.insertOrUpdate(benchmark);
+            RunRepository.insertOrUpdate(run);
+
+            System.out.println(error);
+            return;
+        }
+
         DifferencingParameters parameters = parameterFactory.load(parameterFilePath.toFile());
 
         // Delete generated files from previous run(s):
@@ -65,8 +108,44 @@ public class DifferencingRunner {
         boolean hasSucceeded = false;
         boolean hasTimedOut = false;
 
+        Benchmark benchmark = new Benchmark(parameters.getBenchmarkName(), parameters.getExpectedResult());
+        Run run = new Run(parameters.getBenchmarkName(), parameters.getToolVariant());
+
+        RunRepository.delete(run);
+        BenchmarkRepository.insertOrUpdate(benchmark);
+        RunRepository.insertOrUpdate(run);
+
+        ExecutionListener v1ExecListener = new ExecutionListener(run, parameters, "*.IoldV" + parameters.getToolName() + ".snippet");
+        ExecutionListener v2ExecListener = new ExecutionListener(run, parameters, "*.InewV" + parameters.getToolName() + ".snippet");
+        PathConditionListener pcListener = new PathConditionListener(parameters);
+        DifferencingListener diffListener = new DifferencingListener(run, parameters);
+
+        long start = System.currentTimeMillis();
+
+        String errors = "";
+
         try (PrintWriter outputWriter = new PrintWriter(outputPath, "UTF-8")) {
             Thread shutdownHook = new Thread(() -> {
+                long finish = System.currentTimeMillis();
+                float runtime = (finish - start) / 1000f;
+
+                Classification result = new RunClassifier(
+                    false, false, true, false,
+                    diffListener.getPartitions()
+                ).getClassification();;
+
+                RunRepository.insertOrUpdate(new Run(
+                    run.benchmark,
+                    run.tool,
+                    result,
+                    false,
+                    diffListener.isDepthLimited(),
+                    diffListener.hasUif(),
+                    1,
+                    runtime,
+                    "Program quit unexpectedly."
+                ));
+
                 outputWriter.println(driverOutputBuffer);
                 outputWriter.println("Program quit unexpectedly.");
                 outputWriter.flush();
@@ -78,11 +157,31 @@ public class DifferencingRunner {
 
                 Runtime.getRuntime().addShutdownHook(shutdownHook);
 
-                new DifferencingRunner(parameters, timeout).runDifferencing();
+                Runnable differencing = () -> {
+                    try {
+                        File javaFile = this.createDifferencingDriverClass(parameters);
+                        this.compile(ProjectPaths.classpath, javaFile);
+                        File configFile = this.createDifferencingJpfConfiguration(parameters);
+
+                        Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
+                        JPF jpf = new JPF(config);
+                        jpf.addListener(v1ExecListener);
+                        jpf.addListener(v2ExecListener);
+                        jpf.addListener(pcListener);
+                        jpf.addListener(diffListener);
+                        jpf.run();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                };
+
+                TimeLimitedCodeBlock.runWithTimeout(differencing, timeout, TimeUnit.SECONDS);
 
                 hasSucceeded = true;
             } catch (TimeoutException e) {
                 try (PrintWriter errorWriter = new PrintWriter(errorPath, "UTF-8")) {
+                    errors = ExceptionUtils.getStackTrace(e);
+
                     e.printStackTrace(driverError);
 
                     errorWriter.println("Differencing failed due to timeout (" + timeout + "s).\n");
@@ -93,6 +192,8 @@ public class DifferencingRunner {
                 hasTimedOut = true;
             } catch (Exception e) {
                 try (PrintWriter errorWriter = new PrintWriter(errorPath, "UTF-8")) {
+                    errors = ExceptionUtils.getStackTrace(e);
+
                     e.printStackTrace(driverError);
 
                     errorWriter.println("Differencing failed due to error.\n");
@@ -114,6 +215,26 @@ public class DifferencingRunner {
             status = "FAILURE";
         }
 
+        long finish = System.currentTimeMillis();
+        float runtime = (finish - start) / 1000f;
+
+        Classification result = new RunClassifier(
+            false, false, !hasTimedOut && !hasSucceeded, hasTimedOut,
+            diffListener.getPartitions()
+        ).getClassification();;
+
+        RunRepository.insertOrUpdate(new Run(
+            run.benchmark,
+            run.tool,
+            result,
+            hasTimedOut,
+            diffListener.isDepthLimited(),
+            diffListener.hasUif(),
+            1,
+            runtime,
+            errors
+        ));
+
         systemOutput.println(status + ": " + parameters.getTargetDirectory());
 
         if (!hasSucceeded && !hasTimedOut) {
@@ -121,54 +242,16 @@ public class DifferencingRunner {
         }
     }
 
-    public DifferencingRunner(DifferencingParameters parameters, int timeout) throws IOException {
-        this.parameters = parameters;
-        this.timeout = timeout;
-
-        // @TODO: Inject FreeMarker configuration into this file (?).
-        /* Create and adjust the FreeMarker configuration singleton */
-        this.freeMarkerConfiguration = new Configuration(Configuration.VERSION_2_3_31);
-        this.freeMarkerConfiguration.setDirectoryForTemplateLoading(new File("src/main/resources/templates"));
-        // Recommended settings for new projects:
-        this.freeMarkerConfiguration.setDefaultEncoding("UTF-8");
-        this.freeMarkerConfiguration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-        this.freeMarkerConfiguration.setLogTemplateExceptions(false);
-        this.freeMarkerConfiguration.setWrapUncheckedExceptions(true);
-        this.freeMarkerConfiguration.setFallbackOnNullLoopVariable(false);
-    }
-
-    public void runDifferencing() throws Exception {
-        Runnable differencing = () -> {
-            try {
-                File javaFile = this.createDifferencingDriverClass();
-                this.compile(ProjectPaths.classpath, javaFile);
-                File configFile = this.createDifferencingJpfConfiguration();
-
-                Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
-                JPF jpf = new JPF(config);
-                jpf.addListener(new ExecutionListener(this.parameters, "*.IoldV" + this.parameters.getToolName() + ".snippet"));
-                jpf.addListener(new ExecutionListener(this.parameters, "*.InewV" + this.parameters.getToolName() + ".snippet"));
-                jpf.addListener(new PathConditionListener(this.parameters));
-                jpf.addListener(new DifferencingListener(this.parameters));
-                jpf.run();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        TimeLimitedCodeBlock.runWithTimeout(differencing, this.timeout, TimeUnit.SECONDS);
-    }
-
-    public File createDifferencingDriverClass() throws IOException, TemplateException {
+    public File createDifferencingDriverClass(DifferencingParameters parameters) throws IOException, TemplateException {
         /* Create a data-model */
         Map<String, Object> root = new HashMap<>();
-        root.put("parameters", this.parameters);
+        root.put("parameters", parameters);
 
         /* Get the template (uses cache internally) */
         Template template = this.freeMarkerConfiguration.getTemplate("DifferencingDriverClass.ftl");
 
         /* Merge data-model with template */
-        File file = new File(this.parameters.getTargetDirectory() + "/" + this.parameters.getTargetClassName() + ".java");
+        File file = new File(parameters.getTargetDirectory() + "/" + parameters.getTargetClassName() + ".java");
         file.getParentFile().mkdirs();
 
         try (PrintWriter writer = new PrintWriter(file)) {
@@ -178,16 +261,16 @@ public class DifferencingRunner {
         return file;
     }
 
-    public File createDifferencingJpfConfiguration() throws IOException, TemplateException {
+    public File createDifferencingJpfConfiguration(DifferencingParameters parameters) throws IOException, TemplateException {
         /* Create a data-model */
         Map<String, Object> root = new HashMap<>();
-        root.put("parameters", this.parameters);
+        root.put("parameters", parameters);
 
         /* Get the template (uses cache internally) */
         Template template = this.freeMarkerConfiguration.getTemplate("DifferencingConfiguration.ftl");
 
         /* Merge data-model with template */
-        File file = new File(this.parameters.getTargetDirectory() + "/" + this.parameters.getTargetClassName() + ".jpf");
+        File file = new File(parameters.getTargetDirectory() + "/" + parameters.getTargetClassName() + ".jpf");
         file.getParentFile().mkdirs();
 
         try (PrintWriter writer = new PrintWriter(file)) {
@@ -197,8 +280,8 @@ public class DifferencingRunner {
         return file;
     }
 
+    // The compile method is copied from ARDiff's equiv.checking.Utils interface.
     private void compile(String classpath,File newFile) throws IOException {
-        //TODO here catch compilation errors, I think it's not an exception, check with Priyanshu
         File path = new File(classpath);
         path.getParentFile().mkdirs();
         //Think about whether to do it for the classpaths in the tool as well (maybe folder instrumented not automatically created)

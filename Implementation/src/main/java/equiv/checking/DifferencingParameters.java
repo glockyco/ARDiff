@@ -1,6 +1,6 @@
 package equiv.checking;
 
-import equiv.checking.models.Classification;
+import equiv.checking.classification.Classification;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -35,6 +35,10 @@ public class DifferencingParameters implements Serializable {
 
     public String getToolName() {
         return this.toolName;
+    }
+
+    public String getToolVariant() {
+        return this.toolName + "-diff";
     }
 
     public String getTargetDirectory() {

@@ -33,6 +33,10 @@ public class DifferencingParameterFactory {
         return gson.fromJson(json, DifferencingParameters.class);
     }
 
+    public DifferencingParameters create(String toolName, String directory) {
+        return new DifferencingParameters(directory, toolName, null, null, null);
+    }
+
     public DifferencingParameters create(
         String toolName,
         String directory,

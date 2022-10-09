@@ -1,15 +1,17 @@
-package equiv.checking.models;
+package equiv.checking.classification;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public enum Classification {
     MISSING("MISSING"),
+    BASE_TOOL_MISSING("BASE_TOOL_MISSING"),
     ERROR("ERROR"),
-    TIMEOUT("TIMEOUT"),
 
     UNREACHABLE("UNREACHABLE"),
 
+    TIMEOUT("TIMEOUT"),
+    DEPTH_LIMITED("DEPTH_LIMITED"),
     UNKNOWN("UNKNOWN"),
 
     MAYBE_NEQ("MAYBE_NEQ"),
