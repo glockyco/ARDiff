@@ -159,7 +159,37 @@ public class DifferencingListener extends PropertyListenerAdapter {
         String z3PcAnswer = this.runQuery(z3PcQuery, "PC");
 
         if (!z3PcAnswer.equals("sat")) {
+            // -------------------------------------------------------
+            // Replace the return value of the intercepted method
+            // with the result of the equivalence check.
+
             stackFrame.setOperand(0, 1, false);
+
+            // -------------------------------------------------------
+            // Add partition information to the collected data.
+
+            Classification result = new PartitionClassifier(
+                false, false, false, false, false,
+                z3PcAnswer, "", "", hasUifPc, hasUifV1, hasUifV2
+            ).getClassification();
+
+            Partition partition = new Partition(
+                this.run.benchmark,
+                this.run.tool,
+                this.partitionId,
+                result,
+                hasUifPc,
+                hasUifV1,
+                hasUifV2,
+                this.getConstraintCount(pcConstraint),
+                ""
+            );
+
+            PartitionRepository.insertOrUpdate(partition);
+
+            this.partitions.add(partition);
+            this.partitionId++;
+
             return;
         }
 
