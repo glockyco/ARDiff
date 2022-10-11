@@ -148,8 +148,8 @@ public class SpfToModelTransformer {
 
         @Override
         public void postVisit(gov.nasa.jpf.symbc.numeric.MathRealExpression expression) {
-            Expression right = this.stack.pop();
-            Expression left = this.stack.pop();
+            Expression right = expression.getArg2() == null ? null : this.stack.pop();
+            Expression left = expression.getArg1() == null ? null : this.stack.pop();
             Operator op = Operator.get(expression.getOp().toString());
 
             this.stack.push(new Operation(left, op, right));

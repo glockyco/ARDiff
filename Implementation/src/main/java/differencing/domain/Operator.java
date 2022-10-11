@@ -48,7 +48,9 @@ public enum Operator implements Model {
     MATCHES("matches"),
     NOMATCHES("nomatches"),
     REGIONMATCHES("regionmatches"),
-    NOREGIONMATCHES("noregionmatches");
+    NOREGIONMATCHES("noregionmatches"),
+
+    SQRT("sqrt");
 
     private final String symbol;
 

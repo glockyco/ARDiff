@@ -24,6 +24,12 @@ public class Operation implements Expression {
 
     @Override
     public String toString() {
+        if (this.left == null) {
+            assert this.right == null;
+            return "(" + this.op + ")";
+        } else if (this.right == null) {
+            return this.op + " (" + this.left + ")";
+        }
         return "(" + this.left + " " + this.op + " " + this.right + ")";
     }
 
