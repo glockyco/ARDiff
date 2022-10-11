@@ -15,7 +15,9 @@ import DSE.DSE;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import com.microsoft.z3.*;
+import differencing.classification.Classification;
 import equiv.checking.ChangeExtractor;
+import equiv.checking.OutputClassifier;
 import equiv.checking.ProjectPaths;
 import equiv.checking.SymbolicExecutionRunner.SMTSummary;
 import javafx.util.Pair;
@@ -63,7 +65,7 @@ public class GradDiff extends DSE {
      * This is the main function to run ARDiff
      * @return
      */
-    public boolean runTool(){
+    public Classification runTool(){
         boolean gumTreePassed = false;
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
@@ -105,15 +107,15 @@ public class GradDiff extends DSE {
             BufferedWriter br = new BufferedWriter(new FileWriter(file));
             br.write(summary.toWrite);
             br.close();
-
+            return OutputClassifier.classify(finalRes);
         } catch (Exception e) {
             if(!gumTreePassed)
                 System.out.println("An error/exception occurred when identifying the changes between the two methods.\n" +
                         "The GumTree module is still under development. Please check your examples or report this issue to us.\n\n");
             else System.out.println("An error/exception occurred when instrumenting the files or running the equivalence checking. Please report this issue to us.\n\n");
             e.printStackTrace();
+            return Classification.ERROR;
         }
-        return true;
     }
 
     /**

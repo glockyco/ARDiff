@@ -19,6 +19,7 @@ import com.microsoft.z3.Status;
 import com.microsoft.z3.Tactic;
 import differencing.DifferencingParameterFactory;
 import differencing.DifferencingParameters;
+import differencing.classification.Classification;
 import equiv.checking.*;
 import equiv.checking.SymbolicExecutionRunner.SMTSummary;
 import javafx.util.Pair;
@@ -153,7 +154,7 @@ public class DSE {
      * The main method to run DSE
      * @return
      */
-    public boolean runTool(){
+    public Classification runTool(){
         boolean gumTreePassed = false;
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
@@ -184,14 +185,15 @@ public class DSE {
             BufferedWriter br = new BufferedWriter(new FileWriter(file));
             br.write(summary.toWrite);
             br.close();
+            return OutputClassifier.classify(result);
         } catch (Exception e) {
             if(!gumTreePassed)
                 System.out.println("An error/exception occurred when identifying changes between the two methods.\n" +
                         "Please double-check your examples or report this issue to us as the GumTree module is still under development.\n\n");
             else System.out.println("An error/exception occurred when instrumenting the files or running the equivalence checking. Please report this issue to us.\n\n");
             e.printStackTrace();
+            return Classification.ERROR;
         }
-        return true;
     }
 
     /**

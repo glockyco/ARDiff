@@ -3,6 +3,7 @@ package differencing;
 import differencing.classification.Classification;
 import differencing.classification.RunClassifier;
 import differencing.models.Benchmark;
+import differencing.models.Partition;
 import differencing.models.Run;
 import differencing.repositories.BenchmarkRepository;
 import differencing.repositories.RunRepository;
@@ -56,7 +57,8 @@ public class DifferencingRunner {
             Arrays.stream(parameters.getGeneratedFiles()).forEach(file -> new File(file).delete());
 
             Classification result = new RunClassifier(
-                false, true, false, false, Collections.emptySet()
+                false, true, false, false,
+                Collections.<Partition>emptySet()
             ).getClassification();
 
             Benchmark benchmark = new Benchmark(parameters.getBenchmarkName(), parameters.getExpectedResult());
@@ -125,7 +127,7 @@ public class DifferencingRunner {
                 Classification result = new RunClassifier(
                     false, false, true, false,
                     diffListener.getPartitions()
-                ).getClassification();;
+                ).getClassification();
 
                 RunRepository.insertOrUpdate(new Run(
                     run.benchmark,

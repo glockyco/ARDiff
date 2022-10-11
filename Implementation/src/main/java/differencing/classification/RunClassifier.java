@@ -5,6 +5,7 @@ import differencing.models.Partition;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class RunClassifier implements Classifier {
@@ -15,9 +16,19 @@ public class RunClassifier implements Classifier {
         boolean isBaseToolMissing,
         boolean isError,
         boolean isTimeout,
-        Collection<Partition> partitions
+        Set<Partition> partitions
     ) {
-        Map<Classification, Integer> classifications = this.getClassifications(partitions);
+        this(isMissing, isBaseToolMissing, isError, isTimeout, partitions.stream().map(p -> p.result).collect(Collectors.toList()));
+    }
+
+    public RunClassifier(
+        boolean isMissing,
+        boolean isBaseToolMissing,
+        boolean isError,
+        boolean isTimeout,
+        Collection<Classification> partitionClassifications
+    ) {
+        Map<Classification, Integer> classifications = this.getClassifications(partitionClassifications);
 
         // Partitions should never have a MISSING or BASE_TOOL_MISSING status.
         // This is because we don't know (and can't know) which partitions
@@ -35,7 +46,7 @@ public class RunClassifier implements Classifier {
         int neqCount = classifications.get(Classification.NEQ);
         int eqCount = classifications.get(Classification.EQ);
 
-        int partitionCount = partitions.size();
+        int partitionCount = partitionClassifications.size();
 
         if (isMissing) {
             // A run should be classified as MISSING if we've never even tried
@@ -95,13 +106,13 @@ public class RunClassifier implements Classifier {
         }
     }
 
-    private Map<Classification, Integer> getClassifications(Iterable<Partition> partitions) {
+    private Map<Classification, Integer> getClassifications(Iterable<Classification> partitionClassifications) {
         Map<Classification, Integer> classifications = Arrays.stream(Classification.values())
             .collect(Collectors.toMap(v -> v, v -> 0));
 
-        for (Partition partition : partitions) {
-            int count = classifications.get(partition.result);
-            classifications.put(partition.result, count + 1);
+        for (Classification partitionClassification : partitionClassifications) {
+            int count = classifications.get(partitionClassification);
+            classifications.put(partitionClassification, count + 1);
         }
 
         return classifications;

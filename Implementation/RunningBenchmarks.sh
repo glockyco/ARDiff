@@ -215,7 +215,7 @@ if [ "$run_equivalence_checking" = true ] ; then
           oldV="${d3}/oldV.java"
           newV="${d3}/newV.java"
 
-          command="gtimeout --verbose --foreground ${timeout}s gradle -PmainClass=Runner.Runner run --args='--path1 ${oldV} --path2 ${newV} ${configurations[$i]}'"
+          command="gradle -PmainClass=Runner.Runner run --args='--path1 ${oldV} --path2 ${newV} ${configurations[$i]} --rt ${timeout}'"
 
           if [ "$print_commands" = true ] ; then
             printf "\n%s" "${command}"
@@ -249,7 +249,7 @@ if [ "$run_differencing" = true ] ; then
         # ------------------------------------------------------------------------
 
         for i in "${!configurations[@]}" ; do
-          command="gradle -PmainClass=equiv.checking.DifferencingRunner run --args='${d3} ${tool_names[$i]} ${timeout}'"
+          command="gradle -PmainClass=differencing.DifferencingRunner run --args='${d3} ${tool_names[$i]} ${timeout}'"
 
           if [ "$print_commands" = true ] ; then
             printf "\n%s" "${command}"

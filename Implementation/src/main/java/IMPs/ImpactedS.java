@@ -13,6 +13,8 @@ package IMPs;
 
 import br.usp.each.saeg.asm.defuse.Variable;
 import com.microsoft.z3.Status;
+import differencing.classification.Classification;
+import differencing.classification.RunClassifier;
 import equiv.checking.*;
 import static equiv.checking.Utils.DEBUG;
 import equiv.checking.SymbolicExecutionRunner.SMTSummary;
@@ -133,7 +135,7 @@ public class ImpactedS {
      * This is the main function to run the tool
      * @return
      */
-    public boolean runTool(){
+    public Classification runTool(){
         boolean gumTreePassed = false;
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
@@ -157,14 +159,15 @@ public class ImpactedS {
             writer.write(result);
             writer.close();
             fwNew.close();;
+            return OutputClassifier.classify(result);
         } catch (Exception e) {
             if(!gumTreePassed)
                 System.out.println("An error/exception occurred when identifying the changes between the two methods.\n" +
                         "The GumTree module is still under development. Please check your examples or report this issue to us.\n\n");
             else System.out.println("An error/exception occurred when instrumenting the files or running the equivalence checking. Please report this issue to us.\n\n");
             e.printStackTrace();
+            return Classification.ERROR;
         }
-        return true;
     }
 
 
@@ -294,8 +297,6 @@ public class ImpactedS {
         result +="\n-----------------------END-------------------------------------------\n";
         return result;
     }
-
-    
 
     public static void main(String[] args) throws Exception {
         ImpactedS impactedS = new ImpactedS("src/examples/demo/benchmarks/oldV.java","src/examples/demo/benchmarks/newV.java",100,300*100,"Imp","z3");

@@ -4,10 +4,8 @@ import br.usp.each.saeg.asm.defuse.Variable;
 import com.microsoft.z3.Status;
 import differencing.DifferencingParameterFactory;
 import differencing.DifferencingParameters;
-import equiv.checking.ChangeExtractor;
-import equiv.checking.DefUseExtractor;
-import equiv.checking.Instrumentation;
-import equiv.checking.SymbolicExecutionRunner;
+import differencing.classification.Classification;
+import equiv.checking.*;
 import equiv.checking.SymbolicExecutionRunner.SMTSummary;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
@@ -100,7 +98,7 @@ public class SE {
         }
     }
 
-    public boolean runTool() {
+    public Classification runTool() {
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
             String path = this.ranByUser ? this.path + "instrumented" : this.path;
@@ -121,11 +119,13 @@ public class SE {
             Path modelsPath = Paths.get(outputs + "z3models/" + this.toolName + ".txt");
             modelsPath.getParent().toFile().mkdirs();
             Files.write(modelsPath, summary.toWrite.getBytes());
+
+            return OutputClassifier.classify(result);
         } catch (Exception e) {
             System.out.println("An error/exception occurred when instrumenting the files or running the equivalence checking. Please report this issue to us.\n\n");
             e.printStackTrace();
+            return Classification.ERROR;
         }
-        return true;
     }
 
     public SMTSummary runEquivalenceChecking() throws Exception {
