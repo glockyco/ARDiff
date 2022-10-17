@@ -13,7 +13,8 @@ public class Error implements Model {
 
     @Override
     public void accept(ModelVisitor visitor) {
-        visitor.visit(this);
+        visitor.preVisit(this);
+        visitor.postVisit(this);
     }
 
     public String toString() {

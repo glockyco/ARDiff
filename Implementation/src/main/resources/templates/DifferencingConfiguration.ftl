@@ -1,4 +1,5 @@
 <#-- @ftlvariable name="parameters" type="differencing.DifferencingParameters" -->
+<#-- @ftlvariable name="timeout" type="int" -->
 
 target = ${parameters.targetNamespace}.${parameters.targetClassName}
 symbolic.method = ${parameters.targetNamespace}.${parameters.targetClassName}.run(${parameters.symbolicParameters})
@@ -15,7 +16,7 @@ symbolic.lazy=on
 symbolic.arrays=true
 symbolic.strings = true
 symbolic.dp=coral
-symbolic.string_dp_timeout_ms=30000
+symbolic.string_dp_timeout_ms=${timeout?string.computer}
 search.depth_limit=10
 listener = gov.nasa.jpf.symbc.SymbolicListener
 search.multiple_errors=true

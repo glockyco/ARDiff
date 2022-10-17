@@ -19,7 +19,15 @@ public class Operation implements Expression {
 
     @Override
     public void accept(ModelVisitor visitor) {
-        visitor.visit(this);
+        visitor.preVisit(this);
+        this.op.accept(visitor);
+        if (this.left != null) {
+            this.left.accept(visitor);
+        }
+        if (this.right != null) {
+            this.right.accept(visitor);
+        }
+        visitor.postVisit(this);
     }
 
     @Override

@@ -1,51 +1,5 @@
 <#-- @ftlvariable name="parameters" type="differencing.DifferencingParameters" -->
 
-<#function isSymbolic type variable>
-    <#switch type>
-        <#case "int">
-            <#return "Debug.isSymbolicInteger(${variable})">
-        <#case "long">
-            <#return "Debug.isSymbolicLong(${variable})">
-        <#case "short">
-            <#return "Debug.isSymbolicShort(${variable})">
-        <#case "byte">
-            <#return "Debug.isSymbolicByte(${variable})">
-        <#case "char">
-            <#return "Debug.isSymbolicChar(${variable})">
-        <#case "double">
-            <#return "Debug.isSymbolicReal(${variable})">
-        <#case "boolean">
-            <#return "Debug.isSymbolicBoolean(${variable})">
-        <#case "String">
-            <#return "Debug.isSymbolicString(${variable})">
-        <#default>
-            <#return "false">
-    </#switch>
-</#function>
-
-<#function toString type variable>
-    <#switch type>
-        <#case "int">
-            <#return "Debug.getSymbolicIntegerValue(${variable})">
-        <#case "long">
-            <#return "Debug.getSymbolicLongValue(${variable})">
-        <#case "short">
-            <#return "Debug.getSymbolicShortValue(${variable})">
-        <#case "byte">
-            <#return "Debug.getSymbolicByteValue(${variable})">
-        <#case "char">
-            <#return "Debug.getSymbolicCharValue(${variable})">
-        <#case "double">
-            <#return "Debug.getSymbolicRealValue(${variable})">
-        <#case "boolean">
-            <#return "Debug.getSymbolicBooleanValue(${variable})">
-        <#case "String">
-            <#return "Debug.getSymbolicStringValue(${variable})">
-        <#default>
-            <#return "String.valueOf(${variable})">
-    </#switch>
-</#function>
-
 package ${parameters.targetNamespace};
 
 import ${parameters.newNamespace}.${parameters.newClassName};
@@ -105,20 +59,6 @@ public class ${parameters.targetClassName} {
             error_new = e;
         }
 
-        String result_old_str = "";
-        if (${isSymbolic(parameters.oldReturnType, "result_old")}) {
-            result_old_str = ${toString(parameters.oldReturnType, "result_old")};
-        } else {
-            result_old_str = String.valueOf(result_old);
-        }
-
-        String result_new_str = "";
-        if (${isSymbolic(parameters.oldReturnType, "result_old")}) {
-            result_new_str = ${toString(parameters.newReturnType, "result_new")};
-        } else {
-            result_new_str = String.valueOf(result_new);
-        }
-
         boolean areErrorsEquivalent = Objects.equals(error_old, error_new);
 
         System.out.println("Differencing Driver Output:");
@@ -133,10 +73,10 @@ public class ${parameters.targetClassName} {
                 String msg = "result_old (" + error_old + ") != result_new (" + error_new + ")";
                 throw new DifferentOutputsException(msg);
             } else if (error_old != null) { // && error_new == null
-                String msg = "result_old (" + error_old + ") != result_new (" + result_new_str + ")";
+                String msg = "result_old (" + error_old + ") != result_new";
                 throw new DifferentOutputsException(msg);
             } else { // error_old == null & error_new != null
-                String msg = "result_old (" + result_old_str + ") != result_new (" + error_new + ")";
+                String msg = "result_old != result_new (" + error_new + ")";
                 throw new DifferentOutputsException(msg);
             }
         }
@@ -144,12 +84,10 @@ public class ${parameters.targetClassName} {
         boolean areResultsEquivalent = areEquivalent(result_old, result_new);
 
         System.out.println("  Results:");
-        System.out.println("  - Old: " + result_old_str);
-        System.out.println("  - New: " + result_new_str);
         System.out.println("  - Equivalent: " + areResultsEquivalent);
 
         if (!areResultsEquivalent) {
-            String msg = "result_old (" + result_old_str + ") != result_new (" + result_new_str + ")";
+            String msg = "result_old != result_new";
             throw new DifferentOutputsException(msg);
         }
 

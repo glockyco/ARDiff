@@ -11,7 +11,8 @@ public class ConstantInteger implements Expression {
 
     @Override
     public void accept(ModelVisitor visitor) {
-        visitor.visit(this);
+        visitor.preVisit(this);
+        visitor.postVisit(this);
     }
 
     @Override

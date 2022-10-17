@@ -16,7 +16,11 @@ public class SymbolicStringFunction implements Expression {
 
     @Override
     public void accept(ModelVisitor visitor) {
-        visitor.visit(this);
+        visitor.preVisit(this);
+        for (Expression arg: args) {
+            arg.accept(visitor);
+        }
+        visitor.postVisit(this);
     }
 
     @Override

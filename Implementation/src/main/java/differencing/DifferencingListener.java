@@ -1,11 +1,14 @@
 package differencing;
 
+import com.microsoft.z3.Status;
 import differencing.classification.Classification;
 import differencing.classification.PartitionClassifier;
+import differencing.domain.Model;
 import differencing.models.Partition;
 import differencing.models.Run;
 import differencing.repositories.PartitionRepository;
-import equiv.checking.ProjectPaths;
+import differencing.transformer.SpfToModelTransformer;
+import differencing.transformer.ValueToModelTransformer;
 import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.jvm.bytecode.JVMReturnInstruction;
 import gov.nasa.jpf.search.Search;
@@ -15,12 +18,6 @@ import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.util.MethodSpec;
 import gov.nasa.jpf.vm.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,16 +25,21 @@ public class DifferencingListener extends PropertyListenerAdapter {
     private final Run run;
     private final DifferencingParameters parameters;
     private final MethodSpec areEquivalentSpec;
+    private final SatisfiabilityChecker satChecker;
+
+    private final ValueToModelTransformer valToModel = new ValueToModelTransformer();
+    private final SpfToModelTransformer spfToModel = new SpfToModelTransformer();
 
     private final Set<Partition> partitions = new HashSet<>();
 
     private int partitionId =  1;
     private boolean isDepthLimited = false;
 
-    public DifferencingListener(Run run, DifferencingParameters parameters) {
+    public DifferencingListener(Run run, DifferencingParameters parameters, int solverTimeout) {
         this.run = run;
         this.parameters = parameters;
         this.areEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + ".areEquivalent");
+        this.satChecker = new SatisfiabilityChecker(solverTimeout);
     }
 
     public Set<Partition> getPartitions() {
@@ -63,8 +65,8 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
             PathCondition pathCondition = PathCondition.getPC(search.getVM());
             Constraint pcConstraint = pathCondition.header;
-            String pcString = pcConstraint != null ? pcConstraint.prefix_notation() : "true";
-            boolean hasUifPc = pcString.contains("UF_");
+            Model pcModel = this.spfToModel.transform(pcConstraint);
+            boolean hasUifPc = HasUifVisitor.hasUif(pcModel);
 
             // We don't have any v1/2 results, so there can't be any UIFs in them.
             boolean hasUifV1 = false;
@@ -137,28 +139,21 @@ public class DifferencingListener extends PropertyListenerAdapter {
         boolean v1IsConcrete = v1Expression == null;
         boolean v2IsConcrete = v2Expression == null;
 
-        String pcString = pcConstraint != null ? pcConstraint.prefix_notation() : "true";
-        String v1String = v1IsConcrete ? v1Value.toString() : v1Expression.prefix_notation();
-        String v2String = v2IsConcrete ? v2Value.toString() : v2Expression.prefix_notation();
+        Model pcModel = this.spfToModel.transform(pcConstraint);
+        Model v1Model = v1IsConcrete ? this.valToModel.transform(v1Value) : this.spfToModel.transform(v1Expression);
+        Model v2Model = v2IsConcrete ? this.valToModel.transform(v2Value) : this.spfToModel.transform(v2Expression);
 
-        String declarationsString = this.getDeclarations(pcConstraint, v1Expression, v2Expression);
-
-        boolean hasUifPc = pcString.contains("UF_");
-        boolean hasUifV1 = v1String.contains("UF_");
-        boolean hasUifV2 = v2String.contains("UF_");
+        boolean hasUifPc = HasUifVisitor.hasUif(pcModel);
+        boolean hasUifV1 = HasUifVisitor.hasUif(v1Model);
+        boolean hasUifV2 = HasUifVisitor.hasUif(v2Model);
 
         boolean hasUif = hasUifPc || hasUifV1 || hasUifV2;
 
-        String z3PcQuery = "";
-        z3PcQuery += declarationsString + "\n\n";
-        z3PcQuery += "; Path Condition:\n";
-        z3PcQuery += "(assert " + pcString + ")\n\n";
-        z3PcQuery += "(check-sat)\n";
-        z3PcQuery += "(get-model)\n";
+        Status pcStatus = this.satChecker.checkPc(pcModel);
 
-        String z3PcAnswer = this.runQuery(z3PcQuery, "PC");
+        String pcAnswer = pcStatus == null ? "" : pcStatus == Status.SATISFIABLE ? "sat" : pcStatus == Status.UNSATISFIABLE ? "unsat" : "unknown";
 
-        if (!z3PcAnswer.equals("sat")) {
+        if (pcStatus != Status.SATISFIABLE) {
             // -------------------------------------------------------
             // Replace the return value of the intercepted method
             // with the result of the equivalence check.
@@ -170,7 +165,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
             Classification result = new PartitionClassifier(
                 false, false, false, false, false,
-                z3PcAnswer, "", "", hasUifPc, hasUifV1, hasUifV2
+                pcAnswer, "", "", hasUifPc, hasUifV1, hasUifV2
             ).getClassification();
 
             Partition partition = new Partition(
@@ -193,21 +188,12 @@ public class DifferencingListener extends PropertyListenerAdapter {
             return;
         }
 
-        String z3NeqQuery = "";
-        z3NeqQuery += declarationsString + "\n\n";
-        z3NeqQuery += "; Path Condition:\n";
-        z3NeqQuery += "(assert " + pcString + ")\n\n";
-        z3NeqQuery += "; Non-Equivalence Check:\n";
-        z3NeqQuery += "(assert (not (= " + v1String + " " + v2String + ")))\n\n";
-        z3NeqQuery += "(check-sat)\n";
-        z3NeqQuery += "(get-model)\n";
+        Status neqStatus = this.satChecker.checkNeq(pcModel, v1Model, v2Model);
 
-        String z3NeqAnswer = this.runQuery(z3NeqQuery, "NEQ");
+        boolean areEquivalent = neqStatus == Status.UNSATISFIABLE;
 
-        boolean areEquivalent = z3NeqAnswer.equals("unsat");
-
-        String z3EqAnswer = "";
-        if (z3NeqAnswer.equals("sat") && hasUif) {
+        Status eqStatus = null;
+        if (neqStatus == Status.SATISFIABLE && hasUif) {
             // If we've found the two results to be non-equivalent,
             // but there were uninterpreted functions in the solver query,
             // provide further information, so we might be able to tell
@@ -220,16 +206,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
             // but cannot find them to be actually equivalent rather than
             // non-equivalent.
 
-            String z3EqQuery = "";
-            z3EqQuery += declarationsString + "\n\n";
-            z3EqQuery += "; Path Condition:\n";
-            z3EqQuery += "(assert " + pcString + ")\n\n";
-            z3EqQuery += "; Equivalence Check:\n";
-            z3EqQuery += "(assert (= " + v1String + " " + v2String + "))\n\n";
-            z3EqQuery += "(check-sat)\n";
-            z3EqQuery += "(get-model)\n";
-
-            z3EqAnswer = this.runQuery(z3EqQuery, "EQ");
+            eqStatus = this.satChecker.checkEq(pcModel, v1Model, v2Model);
         }
 
         // -------------------------------------------------------
@@ -241,9 +218,12 @@ public class DifferencingListener extends PropertyListenerAdapter {
         // -------------------------------------------------------
         // Add partition information to the collected data.
 
+        String neqAnswer = neqStatus == null ? "" : neqStatus == Status.SATISFIABLE ? "sat" : neqStatus == Status.UNSATISFIABLE ? "unsat" : "unknown";
+        String eqAnswer = eqStatus == null ? "" : eqStatus == Status.SATISFIABLE ? "sat" : eqStatus == Status.UNSATISFIABLE ? "unsat" : "unknown";
+
         Classification result = new PartitionClassifier(
             false, false, false, false, false,
-            z3PcAnswer, z3NeqAnswer, z3EqAnswer, hasUifPc, hasUifV1, hasUifV2
+            pcAnswer, neqAnswer, eqAnswer, hasUifPc, hasUifV1, hasUifV2
         ).getClassification();
 
         Partition partition = new Partition(
@@ -264,24 +244,6 @@ public class DifferencingListener extends PropertyListenerAdapter {
         this.partitionId++;
     }
 
-    private String getDeclarations(Constraint pc, Expression v1, Expression v2) {
-        CreateDeclarationsVisitor visitor = new CreateDeclarationsVisitor();
-
-        if (pc != null) {
-            pc.accept(visitor);
-        }
-
-        if (v1 != null) {
-            v1.accept(visitor);
-        }
-
-        if (v2 != null) {
-            v2.accept(visitor);
-        }
-
-        return visitor.getDeclarations();
-    }
-
     private int getConstraintCount(Constraint pcConstraint) {
         int constraintCount = 0;
         Constraint c = pcConstraint;
@@ -290,70 +252,5 @@ public class DifferencingListener extends PropertyListenerAdapter {
             c = c.and;
         }
         return constraintCount;
-    }
-
-    private String runQuery(String z3Query, String name) {
-        try {
-            Path z3QueryPath = this.writeQuery(z3Query, name);
-
-            String mainCommand = ProjectPaths.z3 +" -smt2 " + z3QueryPath + " -T:1";
-
-            Process z3Process = Runtime.getRuntime().exec(mainCommand);
-            BufferedReader in = new BufferedReader(new InputStreamReader(z3Process.getInputStream()));
-            BufferedReader err = new BufferedReader(new InputStreamReader(z3Process.getErrorStream()));
-
-            String z3Answer = in.readLine();
-            String z3Model = this.readLines(in);
-            String z3Errors = this.readLines(err);
-
-            this.writeAnswer(z3Answer, name);
-
-            if (z3Answer.startsWith("(error")) {
-                throw new RuntimeException("z3 Error: " + z3Answer);
-            }
-
-            if (!z3Errors.isEmpty()) {
-                throw new RuntimeException("z3 Error: " + z3Errors);
-            }
-
-            if (z3Answer.equals("sat")) {
-                // If the query is satisfiable, the solver provides the corresponding model.
-                this.writeModel(z3Model, name);
-            }
-
-            return z3Answer;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String readLines(BufferedReader reader) throws IOException {
-        StringBuilder lines = new StringBuilder();
-
-        String line = "";
-        while ((line = reader.readLine()) != null) {
-            lines.append(line).append("\n");
-        }
-
-        return lines.toString();
-    }
-
-    private Path writeQuery(String query, String name) throws IOException {
-        String filename = this.parameters.getTargetClassName() + "-P" + this.partitionId + "-ToSolve-" + name + ".txt";
-        Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
-        Files.write(path, query.getBytes());
-        return path;
-    }
-
-    private void writeAnswer(String answer, String name) throws IOException {
-        String filename = this.parameters.getTargetClassName() + "-P" + this.partitionId + "-Answer-" + name + ".txt";
-        Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
-        Files.write(path, answer.getBytes());
-    }
-
-    private void writeModel(String model, String name) throws IOException {
-        String filename = this.parameters.getTargetClassName() + "-P" + this.partitionId + "-Model-" + name + ".txt";
-        Path path = Paths.get(this.parameters.getTargetDirectory(), filename).toAbsolutePath();
-        Files.write(path, model.getBytes());
     }
 }

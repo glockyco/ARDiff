@@ -29,7 +29,7 @@ public class DifferencingRunner {
     private final Configuration freeMarkerConfiguration;
 
     public static void main(String[] args) throws IOException, TemplateException {
-        new DifferencingRunner().run(args[0], args[1], Integer.parseInt(args[2]));
+        new DifferencingRunner().run(args[0], args[1], Integer.parseInt(args[2]), Integer.parseInt(args[3]));
     }
 
     public DifferencingRunner() throws IOException {
@@ -44,7 +44,7 @@ public class DifferencingRunner {
         this.freeMarkerConfiguration.setFallbackOnNullLoopVariable(false);
     }
 
-    public void run(String benchmarkDir, String toolName, int timeout) throws IOException {
+    public void run(String benchmarkDir, String toolName, int runTimeout, int solverTimeout) throws IOException {
         // Read the differencing configuration:
         Path parameterFilePath = Paths.get(benchmarkDir, "instrumented", "IDiff" + toolName + "-Parameters.txt");
 
@@ -113,7 +113,7 @@ public class DifferencingRunner {
         ExecutionListener v1ExecListener = new ExecutionListener(run, parameters, "*.IoldV" + parameters.getToolName() + ".snippet");
         ExecutionListener v2ExecListener = new ExecutionListener(run, parameters, "*.InewV" + parameters.getToolName() + ".snippet");
         PathConditionListener pcListener = new PathConditionListener(parameters);
-        DifferencingListener diffListener = new DifferencingListener(run, parameters);
+        DifferencingListener diffListener = new DifferencingListener(run, parameters, solverTimeout);
 
         long start = System.currentTimeMillis();
 
@@ -156,7 +156,7 @@ public class DifferencingRunner {
                     try {
                         File javaFile = this.createDifferencingDriverClass(parameters);
                         this.compile(ProjectPaths.classpath, javaFile);
-                        File configFile = this.createDifferencingJpfConfiguration(parameters);
+                        File configFile = this.createDifferencingJpfConfiguration(parameters, solverTimeout);
 
                         Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
                         JPF jpf = new JPF(config);
@@ -170,7 +170,7 @@ public class DifferencingRunner {
                     }
                 };
 
-                TimeLimitedCodeBlock.runWithTimeout(differencing, timeout, TimeUnit.SECONDS);
+                TimeLimitedCodeBlock.runWithTimeout(differencing, runTimeout, TimeUnit.SECONDS);
 
                 hasSucceeded = true;
             } catch (TimeoutException e) {
@@ -179,7 +179,7 @@ public class DifferencingRunner {
 
                     e.printStackTrace(driverError);
 
-                    errorWriter.println("Differencing failed due to timeout (" + timeout + "s).\n");
+                    errorWriter.println("Differencing failed due to timeout (" + runTimeout + "s).\n");
                     errorWriter.println(driverErrorBuffer);
                     errorWriter.flush();
                 }
@@ -256,10 +256,11 @@ public class DifferencingRunner {
         return file;
     }
 
-    public File createDifferencingJpfConfiguration(DifferencingParameters parameters) throws IOException, TemplateException {
+    public File createDifferencingJpfConfiguration(DifferencingParameters parameters, int timeout) throws IOException, TemplateException {
         /* Create a data-model */
         Map<String, Object> root = new HashMap<>();
         root.put("parameters", parameters);
+        root.put("timeout", timeout * 1000);
 
         /* Get the template (uses cache internally) */
         Template template = this.freeMarkerConfiguration.getTemplate("DifferencingConfiguration.ftl");

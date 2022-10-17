@@ -5,78 +5,97 @@ import java.util.Map;
 
 public enum Operator implements Model {
 
-    EQ("=="),
-    NE("!="),
-    LT("<"),
-    LE("<="),
-    GT(">"),
-    GE(">="),
+    EQ("==", " == ", " = "),
+    NE("!=", " != "),
+    LT("<", " < "),
+    LE("<=", " <= "),
+    GT(">", " > "),
+    GE(">=", " >= "),
 
-    PLUS("+"),
-    MINUS("-"),
-    MUL("*"),
-    DIV("/"),
-    POW("**"),
-    MOD("%"),
+    PLUS("+", " + "),
+    MINUS("-", " - "),
+    MUL("*", " * "),
+    DIV("/", " / "),
+    MOD("%", " % "),
 
-    AND("&"),
-    OR("|"),
-    XOR("^"),
+    AND("&", " & "),
+    OR("|", " | "),
+    XOR("^", " ^ "),
 
-    EQUALS("equals"),
-    NOTEQUALS("notequals"),
-    EQUALSIGNORECASE("equalsignorecase"),
-    NOTEQUALSIGNORECASE("notequalsignorecase"),
-    STARTSWITH("startswith"),
-    NOTSTARTSWITH("notstartswith"),
-    ENDSWITH("endswith"),
-    NOTENDSWITH("notendswith"),
-    CONTAINS("contains"),
-    NOTCONTAINS("notcontains"),
-    ISINTEGER("isinteger"),
-    NOTINTEGER("notinteger"),
-    ISFLOAT("isfloat"),
-    NOTFLOAT("notfloat"),
-    ISLONG("islong"),
-    NOTLONG("notlong"),
-    ISDOUBLE("isdouble"),
-    NOTDOUBLE("notdouble"),
-    ISBOOLEAN("isboolean"),
-    NOTBOOLEAN("notboolean"),
-    EMPTY("empty"),
-    NOTEMPTY("notempty"),
-    MATCHES("matches"),
-    NOMATCHES("nomatches"),
-    REGIONMATCHES("regionmatches"),
-    NOREGIONMATCHES("noregionmatches"),
+    POW("pow", " pow "),
+    SQRT("sqrt", " sqrt "),
+    EXP("exp", " exp "),
+    LOG("log", " log "),
 
-    SQRT("sqrt");
+    SIN("sin", " sin "),
+    COS("cos", " cos "),
+    TAN("tan", " tan "),
+    ASIN("asin", " asin "),
+    ACOS("acos", " acos "),
+    ATAN("atan", " atan "),
+    ATAN2("atan2", " atan2 "),
 
-    private final String symbol;
+    SHIFTL("<<"),
+    SHIFTR(">>"),
+    SHIFTUR(">>>"),
 
-    private static final Map<String, Operator> lookup = new HashMap<String, Operator>();
+    EQUALS("equals", " equals "),
+    NOTEQUALS("notequals", " notequals "),
+    EQUALSIGNORECASE("equalsignorecase", " equalsignorecase "),
+    NOTEQUALSIGNORECASE("notequalsignorecase", " notequalsignorecase "),
+    STARTSWITH("startswith", " startswith "),
+    NOTSTARTSWITH("notstartswith", " notstartswith " ),
+    ENDSWITH("endswith", " endswith "),
+    NOTENDSWITH("notendswith", " notendswith "),
+    CONTAINS("contains", " contains "),
+    NOTCONTAINS("notcontains", " notcontains "),
+    ISINTEGER("isinteger", " isinteger "),
+    NOTINTEGER("notinteger", " notinteger "),
+    ISFLOAT("isfloat", " isfloat "),
+    NOTFLOAT("notfloat", " notfloat "),
+    ISLONG("islong", " islong "),
+    NOTLONG("notlong", " notlong "),
+    ISDOUBLE("isdouble", " isdouble "),
+    NOTDOUBLE("notdouble", " notdouble "),
+    ISBOOLEAN("isboolean", " isboolean "),
+    NOTBOOLEAN("notboolean", " notboolean "),
+    EMPTY("empty", " empty "),
+    NOTEMPTY("notempty", " notempty "),
+    MATCHES("matches", " matches "),
+    NOMATCHES("nomatches", " notmatches "),
+    REGIONMATCHES("regionmatches", " regionmatches "),
+    NOREGIONMATCHES("noregionmatches", " notregionmatches ");
+
+    private final String[] symbols;
+
+    private static final Map<String, Operator> lookup = new HashMap<>();
 
     static {
         for (Operator op : Operator.values()) {
-            lookup.put(op.symbol, op);
+            for (String symbol : op.symbols) {
+                lookup.put(symbol, op);
+            }
         }
     }
 
-    Operator(final String symbol) {
-        this.symbol = symbol;
+    Operator(final String ... symbols) {
+        assert symbols.length > 0;
+        this.symbols = symbols;
     }
 
     public static Operator get(String symbol) {
-        return lookup.get(symbol.trim());
+        assert lookup.containsKey(symbol);
+        return lookup.get(symbol);
     }
 
     @Override
     public void accept(ModelVisitor visitor) {
-        visitor.visit(this);
+        visitor.preVisit(this);
+        visitor.postVisit(this);
     }
 
     @Override
     public String toString() {
-        return symbol;
+        return this.symbols[0];
     }
 }
