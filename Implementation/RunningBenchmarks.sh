@@ -1,13 +1,21 @@
 #!/bin/bash
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+BASE_JAR_PATH="${SCRIPT_DIR}/build/libs/ARDiff-base-1.0-SNAPSHOT-all.jar"
+DIFF_JAR_PATH="${SCRIPT_DIR}/build/libs/ARDiff-diff-1.0-SNAPSHOT-all.jar"
+
+# Configuration settings
+
 dry_run=false
 
-run_equivalence_checking=true
-run_differencing=true
+run_base=true
+run_diff=true
 
 timeout="300" # seconds
 
 clean=false
+build=true
 print_cleaned=true
 print_skipped=false
 print_commands=true
@@ -175,6 +183,8 @@ configurations=(
   "--tool A --s coral --b 3 --H H123"
 )
 
+# Remove results from previous runs
+
 if [ "$clean" = true ] ; then
   for d1 in ../benchmarks/* ; do
     for d2 in "$d1"/* ; do
@@ -196,73 +206,87 @@ if [ "$clean" = true ] ; then
   done
 fi
 
-if [ "$run_equivalence_checking" = true ] ; then
-  for d1 in ../benchmarks/* ; do
-    for d2 in "$d1"/* ; do
-      for d3 in "$d2"/* ; do
-        if [[ ! " ${benchmarks[*]} " =~ " ${d3} " ]]; then
-          if [ "$print_skipped" = true ] ; then
-            printf "Skipping %s ...\n" "${d3}"
-          fi
-          continue
+# Build the application JAR files
+
+if [ "$build" = true ] ; then
+  printf "Building JAR files ..."
+
+  # Build base JAR
+  command="gradle -PmainClass=Runner.Runner shadowJar"
+
+  if [ "$print_commands" = true ] ; then
+    printf "\n%s" "${command}"
+  fi
+
+  if [ "$dry_run" = false ] ; then
+    eval "${command}"
+  fi
+
+  # Build diff JAR
+  command="gradle -PmainClass=differencing.DifferencingRunner shadowJar"
+
+  if [ "$print_commands" = true ] ; then
+    printf "\n%s" "${command}"
+  fi
+
+  if [ "$dry_run" = false ] ; then
+    eval "${command}"
+  fi
+
+  printf "\n"
+fi
+
+# Process the benchmark programs
+
+for d1 in ../benchmarks/* ; do
+  for d2 in "$d1"/* ; do
+    for d3 in "$d2"/* ; do
+      if [[ ! " ${benchmarks[*]} " =~ " ${d3} " ]]; then
+        if [ "$print_skipped" = true ] ; then
+          printf "Skipping %s ...\n" "${d3}"
         fi
+        continue
+      fi
 
-        printf "Processing %s ..." "${d3}"
+      printf "Processing %s ..." "${d3}"
 
-        # ------------------------------------------------------------------------
-
-        for i in "${!configurations[@]}" ; do
+      for i in "${!configurations[@]}" ; do
+        # Run base tool(s)
+        if [ "$run_base" = true ] ; then
           oldV="${d3}/oldV.java"
           newV="${d3}/newV.java"
 
-          command="gradle -PmainClass=Runner.Runner run --args='--path1 ${oldV} --path2 ${newV} ${configurations[$i]} --rt ${timeout}'"
+          base_command="java -jar '${BASE_JAR_PATH}' --path1 ${oldV} --path2 ${newV} ${configurations[$i]} --rt ${timeout}"
 
           if [ "$print_commands" = true ] ; then
-            printf "\n%s" "${command}"
+            printf "\n%s" "${base_command}"
           fi
 
           if [ "$dry_run" = false ] ; then
+            printf "\n"
             mkdir -p "${d3}/instrumented/"
-            eval "${command}"
+            eval "${base_command}"
           fi
-        done
-
-        printf "\n"
-      done
-    done
-  done
-fi
-
-if [ "$run_differencing" = true ] ; then
-  for d1 in ../benchmarks/* ; do
-    for d2 in "$d1"/* ; do
-      for d3 in "$d2"/* ; do
-        if [[ ! " ${benchmarks[*]} " =~ " ${d3} " ]]; then
-          if [ "$print_skipped" = true ] ; then
-            printf "Skipping %s ...\n" "${d3}"
-          fi
-          continue
         fi
 
-        printf "Processing %s ..." "${d3}"
-
-        # ------------------------------------------------------------------------
-
-        for i in "${!configurations[@]}" ; do
-          command="gradle -PmainClass=differencing.DifferencingRunner run --args='${d3} ${tool_names[$i]} ${timeout}'"
+        # Run diff tool(s)
+        if [ "$run_diff" = true ] ; then
+          diff_command="java -jar '${DIFF_JAR_PATH}' ${d3} ${tool_names[$i]} ${timeout} 30"
 
           if [ "$print_commands" = true ] ; then
-            printf "\n%s" "${command}"
+            printf "\n%s" "${diff_command}"
           fi
 
           if [ "$dry_run" = false ] ; then
+            printf "\n"
             mkdir -p "${d3}/instrumented/"
-            eval "${command}"
+            eval "${diff_command}"
           fi
-        done
-
-        printf "\n"
+        fi
       done
+
+      printf "\n"
+
     done
   done
-fi
+done

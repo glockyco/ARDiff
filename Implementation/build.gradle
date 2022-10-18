@@ -1,4 +1,5 @@
 plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'application'
     id 'java'
 }
@@ -38,12 +39,22 @@ jar {
     destinationDirectory = file("target/artifacts/Implementation_jar")
     archiveFileName = "Implementation.jar"
 
+    manifest {
+        attributes(
+            'Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join(' '),
+            'Main-Class': "Runner.Runner"
+        )
+    }
+}
+
+shadowJar {
     def mainClass = project.hasProperty("mainClass") ? project.getProperty("mainClass") : "Runner.Runner"
+
+    archiveBaseName.set(project.name + (mainClass == "Runner.Runner" ? "-base" : "-diff"))
 
     manifest {
         attributes(
-                'Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join(' '),
-                'Main-Class': mainClass
+            'Main-Class': mainClass
         )
     }
 }
