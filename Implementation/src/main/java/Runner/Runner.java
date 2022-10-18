@@ -16,7 +16,6 @@ import GradDiff.GradDiff;
 import IMPs.ImpactedS;
 import SE.SE;
 import com.microsoft.z3.Context;
-import differencing.TimeLimitedCodeBlock;
 import differencing.classification.Classification;
 import differencing.classification.RunClassifier;
 import differencing.models.Benchmark;
@@ -35,9 +34,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static equiv.checking.Utils.*;
 
@@ -106,7 +102,7 @@ public class Runner{
             System.out.println("[WARNING] If you want to have a complete summary (exercise all behaviors), make sure your bound is big enough.");
     }
 
-    public static void runTool(String tool, String p1, String p2, String solver,int b,int rt, int st, int minInt,int maxInt,double minDouble,double maxDouble,String strategy,boolean z3Terminal) throws Exception {
+    public static void runTool(String tool, String p1, String p2, String solver,int b,int t, int minInt,int maxInt,double minDouble,double maxDouble,String strategy,boolean z3Terminal) throws Exception {
         Benchmark benchmark = new Benchmark(getBenchmarkName(p1), getBenchmarkExpected(p1));
         Run run = new Run(benchmark.benchmark, getToolVariant(tool, strategy));
 
@@ -114,19 +110,14 @@ public class Runner{
         BenchmarkRepository.insertOrUpdate(benchmark);
         RunRepository.insertOrUpdate(run);
 
-        boolean hasSucceeded = false;
-        boolean hasTimedOut = false;
-
-        String errors = "";
-
         long start = System.currentTimeMillis();
 
-        Thread shutdownHook = new Thread(() -> {
-            long finish = System.currentTimeMillis();
-            float runtime = (finish - start) / 1000f;
+        boolean hasSucceeded = false;
+        String errors = "";
 
+        Thread shutdownHook = new Thread(() -> {
             Classification result = new RunClassifier(
-                false, false, true, false,
+                false, false, false, true,
                 Collections.emptyList()
             ).getClassification();
 
@@ -134,15 +125,13 @@ public class Runner{
                 run.benchmark,
                 run.tool,
                 result,
-                false,
+                true,
                 null,
                 null,
                 null,
-                runtime,
-                "Program quit unexpectedly."
+                (System.currentTimeMillis() - start) / 1000f,
+                ""
             ));
-
-            System.exit(1);
         });
 
         Runtime.getRuntime().addShutdownHook(shutdownHook);
@@ -150,25 +139,17 @@ public class Runner{
         Classification classification;
 
         try {
-            Callable<Classification> equivalenceChecking = () -> runTool(tool,p1,p2,solver,b,st,minInt,maxInt,minDouble,maxDouble,strategy,z3Terminal);
-            classification = TimeLimitedCodeBlock.runWithTimeout(equivalenceChecking, rt, TimeUnit.SECONDS);
+            classification = runToolInternal(tool, p1, p2, solver, b, t, minInt, maxInt, minDouble, maxDouble, strategy, z3Terminal);
             hasSucceeded = true;
-        } catch (TimeoutException e) {
-            classification = Classification.TIMEOUT;
-            errors = ExceptionUtils.getStackTrace(e);
-            hasTimedOut = true;
         } catch (Exception e) {
             classification = Classification.ERROR;
             errors = ExceptionUtils.getStackTrace(e);
-        } finally {
-            Runtime.getRuntime().removeShutdownHook(shutdownHook);
         }
 
-        long finish = System.currentTimeMillis();
-        float runtime = (finish - start) / 1000f;
+        Runtime.getRuntime().removeShutdownHook(shutdownHook);
 
         Classification result = new RunClassifier(
-            false, false, !hasTimedOut && !hasSucceeded, hasTimedOut,
+            false, false, !hasSucceeded, false,
             Collections.singletonList(classification)
         ).getClassification();
 
@@ -176,15 +157,13 @@ public class Runner{
             run.benchmark,
             run.tool,
             result,
-            hasTimedOut,
+            false,
             null,
             null,
             null,
-            runtime,
+            (System.currentTimeMillis() - start) / 1000f,
             errors
         ));
-
-        System.exit(0);
     }
 
     private static String getToolVariant(String tool, String strategy) {
@@ -230,7 +209,7 @@ public class Runner{
         throw new RuntimeException("Cannot determine expected result for " + path1 + ".");
     }
 
-    public static Classification runTool(String tool, String p1, String p2, String solver,int b,int st, int minInt,int maxInt,double minDouble,double maxDouble,String strategy,boolean z3Terminal) {
+    private static Classification runToolInternal(String tool, String p1, String p2, String solver,int b,int t, int minInt,int maxInt,double minDouble,double maxDouble,String strategy,boolean z3Terminal) {
         try {
             //the path to two target versions
             ////************************************************************************+////
@@ -242,7 +221,7 @@ public class Runner{
             long maxLong = (long)maxInt;
             ////************************************************************************+////
             //the time out for the constraint solving
-            int solverTimeout = st * 1000;// (100 seconds * 1000 ms) for z3. and jpf which both are in MS
+            int timeout = t * 1000;// (100 seconds * 1000 ms) for z3. and jpf which both are in MS
             ////************************************************************************+////
             //the choice of the constraint solvers
             String SMTSolver = solver;
@@ -264,7 +243,7 @@ public class Runner{
                 System.out.println("*****************************************************************************");
                 boolean parseFromSMTLib = true;// to parse the jpf output into a string similar to the terminal version of Z3 (true for the terminal version when you have Math.XXXX)
                 deleteGeneratedFiles("SE", runner.path);
-                SE se = new SE(runner.path, runner.MethodPath1, runner.MethodPath2, bound, solverTimeout, "SE", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib,true,z3Terminal);
+                SE se = new SE(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "SE", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib,true,z3Terminal);
                 return se.runTool();
             }
             ////*******************************************************************************************************************************************+////
@@ -276,7 +255,7 @@ public class Runner{
                 System.out.println("*****************************************************************************");
                 boolean parseFromSMTLib = true;// to parse the jpf output into a string similar to the terminal version of Z3 (true for the terminal version when you have Math.XXXX)
                 deleteGeneratedFiles("DSE", runner.path);
-                DSE dse = new DSE(runner.path, runner.MethodPath1, runner.MethodPath2, bound, solverTimeout, "DSE", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib,true,z3Terminal);
+                DSE dse = new DSE(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "DSE", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib,true,z3Terminal);
                 return dse.runTool();
             }
             ////*******************************************************************************************************************************************+////
@@ -304,7 +283,7 @@ public class Runner{
                 System.out.println("*****************************************************************************");
                 boolean parseFromSMTLib = true ;
                 deleteGeneratedFiles(toolName, runner.path);
-                GradDiff gradDiff = new GradDiff(runner.path, runner.MethodPath1, runner.MethodPath2, bound, solverTimeout, toolName, SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib, H1, H2, H31, H32, strategy, true,z3Terminal);
+                GradDiff gradDiff = new GradDiff(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, toolName, SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib, H1, H2, H31, H32, strategy, true,z3Terminal);
                 return gradDiff.runTool();
             }
             ////*******************************************************************************************************************************************+////
@@ -316,7 +295,7 @@ public class Runner{
                 System.out.println("*****************************************************************************");
                 boolean parseFromSMTLib = true ;
                 deleteGeneratedFiles("Imp", runner.path);
-                ImpactedS impactedS = new ImpactedS(runner.path, runner.MethodPath1, runner.MethodPath2, bound, solverTimeout, "Imp", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib, true,z3Terminal);
+                ImpactedS impactedS = new ImpactedS(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "Imp", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib, true,z3Terminal);
                 return impactedS.runTool();
             }
         } catch (Exception e) {
@@ -367,8 +346,7 @@ public class Runner{
         String solver = "coral";
         String strategy = "H123";
         int bound = 5;//loop bound
-        int runTimeout = 3600;
-        int solverTimeout = 300;
+        int timeout = 3600;
         int minint = -100;
         int maxint = 100;
         double mindouble = -100.0;
@@ -398,19 +376,12 @@ public class Runner{
                         }
                         solver = args[i + 1];
                 }
-                if(args[i].equals("--rt")){
+                if(args[i].equals("--t")){
                     if (args.length < i + 2) {
-                        System.out.println("You need to specify the run timeout. If not, remove the argument --rt");
+                        System.out.println("You need to specify the timeout. If not, remove the argument --t");
                         System.exit(1);
                     }
-                    runTimeout = Integer.parseInt(args[i + 1]);
-                }
-                if(args[i].equals("--st")){
-                    if (args.length < i + 2) {
-                        System.out.println("You need to specify the solver timeout. If not, remove the argument --t");
-                        System.exit(1);
-                    }
-                    solverTimeout = Integer.parseInt(args[i + 1]);
+                    timeout = Integer.parseInt(args[i + 1]);
                 }
                 if (args[i].equals("--b")) {
 
@@ -469,7 +440,7 @@ public class Runner{
             System.exit(1);
         }
 
-        runTool(tool,path1,path2,solver,bound,runTimeout,solverTimeout,minint,maxint,mindouble,maxdouble,strategy,z3Terminal);
+        runTool(tool,path1,path2,solver,bound,timeout,minint,maxint,mindouble,maxdouble,strategy,z3Terminal);
     }
 
     public static void deleteGeneratedFiles(String tool, String directory) {

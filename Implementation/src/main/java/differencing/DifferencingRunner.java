@@ -22,14 +22,16 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class DifferencingRunner {
     private final Configuration freeMarkerConfiguration;
 
     public static void main(String[] args) throws IOException, TemplateException {
-        new DifferencingRunner().run(args[0], args[1], Integer.parseInt(args[2]), Integer.parseInt(args[3]));
+        // Arguments: [benchmark] [tool] [solver-timeout]
+        // - [benchmark]: Path to the benchmark directory, e.g., ../benchmarks/.
+        // - [tool]: SE, DSEs, Imp, ARDiffs, ARDiffR, or ARDiffH3.
+        // - [solver-timeout]: Maximum time to use per diff solver query.
+        new DifferencingRunner().run(args[0], args[1], Integer.parseInt(args[2]));
     }
 
     public DifferencingRunner() throws IOException {
@@ -44,7 +46,7 @@ public class DifferencingRunner {
         this.freeMarkerConfiguration.setFallbackOnNullLoopVariable(false);
     }
 
-    public void run(String benchmarkDir, String toolName, int runTimeout, int solverTimeout) throws IOException {
+    public void run(String benchmarkDir, String toolName, int solverTimeout) throws IOException {
         // Read the differencing configuration:
         Path parameterFilePath = Paths.get(benchmarkDir, "instrumented", "IDiff" + toolName + "-Parameters.txt");
 
@@ -100,9 +102,6 @@ public class DifferencingRunner {
         String outputPath = parameters.getOutputFile();
         String errorPath = parameters.getErrorFile();
 
-        boolean hasSucceeded = false;
-        boolean hasTimedOut = false;
-
         Benchmark benchmark = new Benchmark(parameters.getBenchmarkName(), parameters.getExpectedResult());
         Run run = new Run(parameters.getBenchmarkName(), parameters.getToolVariant());
 
@@ -117,15 +116,16 @@ public class DifferencingRunner {
 
         long start = System.currentTimeMillis();
 
+        boolean hasSucceeded = false;
         String errors = "";
 
-        try (PrintWriter outputWriter = new PrintWriter(outputPath, "UTF-8")) {
+        try (
+            PrintWriter outputWriter = new PrintWriter(outputPath, "UTF-8");
+            PrintWriter errorWriter = new PrintWriter(errorPath, "UTF-8")
+        ) {
             Thread shutdownHook = new Thread(() -> {
-                long finish = System.currentTimeMillis();
-                float runtime = (finish - start) / 1000f;
-
                 Classification result = new RunClassifier(
-                    false, false, true, false,
+                    false, false, false, true,
                     diffListener.getPartitions()
                 ).getClassification();
 
@@ -133,17 +133,20 @@ public class DifferencingRunner {
                     run.benchmark,
                     run.tool,
                     result,
-                    false,
+                    true,
                     diffListener.isDepthLimited(),
                     diffListener.hasUif(),
                     1,
-                    runtime,
-                    "Program quit unexpectedly."
+                    (System.currentTimeMillis() - start) / 1000f,
+                    ""
                 ));
 
                 outputWriter.println(driverOutputBuffer);
-                outputWriter.println("Program quit unexpectedly.");
+                outputWriter.println("Forced program shutdown.");
                 outputWriter.flush();
+
+                systemError.println("TIMEOUT: " + parameters.getTargetDirectory() + " -> " + result);
+                systemError.flush();
             });
 
             try {
@@ -152,49 +155,27 @@ public class DifferencingRunner {
 
                 Runtime.getRuntime().addShutdownHook(shutdownHook);
 
-                Runnable differencing = () -> {
-                    try {
-                        File javaFile = this.createDifferencingDriverClass(parameters);
-                        this.compile(ProjectPaths.classpath, javaFile);
-                        File configFile = this.createDifferencingJpfConfiguration(parameters, solverTimeout);
+                File javaFile = this.createDifferencingDriverClass(parameters);
+                this.compile(ProjectPaths.classpath, javaFile);
+                File configFile = this.createDifferencingJpfConfiguration(parameters, solverTimeout);
 
-                        Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
-                        JPF jpf = new JPF(config);
-                        jpf.addListener(v1ExecListener);
-                        jpf.addListener(v2ExecListener);
-                        jpf.addListener(pcListener);
-                        jpf.addListener(diffListener);
-                        jpf.run();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                };
-
-                TimeLimitedCodeBlock.runWithTimeout(differencing, runTimeout, TimeUnit.SECONDS);
+                Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
+                JPF jpf = new JPF(config);
+                jpf.addListener(v1ExecListener);
+                jpf.addListener(v2ExecListener);
+                jpf.addListener(pcListener);
+                jpf.addListener(diffListener);
+                jpf.run();
 
                 hasSucceeded = true;
-            } catch (TimeoutException e) {
-                try (PrintWriter errorWriter = new PrintWriter(errorPath, "UTF-8")) {
-                    errors = ExceptionUtils.getStackTrace(e);
-
-                    e.printStackTrace(driverError);
-
-                    errorWriter.println("Differencing failed due to timeout (" + runTimeout + "s).\n");
-                    errorWriter.println(driverErrorBuffer);
-                    errorWriter.flush();
-                }
-
-                hasTimedOut = true;
             } catch (Exception e) {
-                try (PrintWriter errorWriter = new PrintWriter(errorPath, "UTF-8")) {
-                    errors = ExceptionUtils.getStackTrace(e);
+                errors = ExceptionUtils.getStackTrace(e);
 
-                    e.printStackTrace(driverError);
+                e.printStackTrace(driverError);
 
-                    errorWriter.println("Differencing failed due to error.\n");
-                    errorWriter.println(driverErrorBuffer);
-                    errorWriter.flush();
-                }
+                errorWriter.println("Differencing failed due to error.\n");
+                errorWriter.println(driverErrorBuffer);
+                errorWriter.flush();
             } finally {
                 outputWriter.println(driverOutputBuffer);
                 outputWriter.flush();
@@ -203,18 +184,8 @@ public class DifferencingRunner {
             }
         }
 
-        String status = "SUCCESS";
-        if (hasTimedOut) {
-            status = "TIMEOUT";
-        } else if (!hasSucceeded) {
-            status = "FAILURE";
-        }
-
-        long finish = System.currentTimeMillis();
-        float runtime = (finish - start) / 1000f;
-
         Classification result = new RunClassifier(
-            false, false, !hasTimedOut && !hasSucceeded, hasTimedOut,
+            false, false, !hasSucceeded, false,
             diffListener.getPartitions()
         ).getClassification();;
 
@@ -222,18 +193,18 @@ public class DifferencingRunner {
             run.benchmark,
             run.tool,
             result,
-            hasTimedOut,
+            false,
             diffListener.isDepthLimited(),
             diffListener.hasUif(),
             1,
-            runtime,
+            (System.currentTimeMillis() - start) / 1000f,
             errors
         ));
 
-        systemOutput.println(status + ": " + parameters.getTargetDirectory());
-
-        if (!hasSucceeded && !hasTimedOut) {
-            systemOutput.println(driverErrorBuffer);
+        if (hasSucceeded) {
+            systemOutput.println("SUCCESS:" + parameters.getTargetDirectory() + " -> " + result);
+        } else {
+            systemError.println("ERROR: " + parameters.getTargetDirectory() + " -> " + result);
         }
     }
 
