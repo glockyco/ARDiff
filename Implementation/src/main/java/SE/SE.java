@@ -98,7 +98,7 @@ public class SE {
         }
     }
 
-    public Classification runTool() {
+    public Classification runTool() throws Exception {
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
             String path = this.ranByUser ? this.path + "instrumented" : this.path;
@@ -124,7 +124,7 @@ public class SE {
         } catch (Exception e) {
             System.out.println("An error/exception occurred when instrumenting the files or running the equivalence checking. Please report this issue to us.\n\n");
             e.printStackTrace();
-            return Classification.ERROR;
+            throw e;
         }
     }
 

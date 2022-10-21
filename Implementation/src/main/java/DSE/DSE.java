@@ -154,7 +154,7 @@ public class DSE {
      * The main method to run DSE
      * @return
      */
-    public Classification runTool(){
+    public Classification runTool() throws Exception {
         boolean gumTreePassed = false;
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
@@ -192,7 +192,7 @@ public class DSE {
                         "Please double-check your examples or report this issue to us as the GumTree module is still under development.\n\n");
             else System.out.println("An error/exception occurred when instrumenting the files or running the equivalence checking. Please report this issue to us.\n\n");
             e.printStackTrace();
-            return Classification.ERROR;
+            throw e;
         }
     }
 
