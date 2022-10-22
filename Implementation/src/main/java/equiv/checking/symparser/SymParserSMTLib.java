@@ -50,7 +50,7 @@ public class SymParserSMTLib extends AbstractSymParser{
 
     public void initFunctionDefinitions(){
         functionsDefinitions = "(define-fun exp ((x Real)) Real (^ 2.718281828459045 x)) \n" +
-                "(define-fun sqrt ((x Real)) Real (^ 0.5 x)) \n" +
+                "(define-fun sqrt ((x Real)) Real (^ x 0.5)) \n" +
                 "(declare-fun log (Real) Real) \n";
         //"(assert (forall ((x Real)) (= (log (exp x)) x))) \n "+
         //"(assert (forall ((x Real)) (= (exp (log x)) x))) \n";
