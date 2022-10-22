@@ -9,13 +9,14 @@ DIFF_JAR_PATH="${SCRIPT_DIR}/build/libs/ARDiff-diff-1.0-SNAPSHOT-all.jar"
 
 dry_run=false
 
-run_base=true
-run_diff=true
+clean=false
+build=true
 
 timeout="300" # seconds
 
-clean=false
-build=true
+run_base=true
+run_diff=true
+
 print_cleaned=true
 print_skipped=false
 print_commands=true
@@ -248,44 +249,46 @@ for d1 in ../benchmarks/* ; do
         continue
       fi
 
-      printf "Processing %s ..." "${d3}"
+      if [ "$run_base" = true ] || [ "$run_diff" = true ] ; then
+        printf "Processing %s ..." "${d3}"
 
-      for i in "${!configurations[@]}" ; do
-        # Run base tool(s)
-        if [ "$run_base" = true ] ; then
-          oldV="${d3}/oldV.java"
-          newV="${d3}/newV.java"
+        for i in "${!configurations[@]}" ; do
+          # Run base tool(s)
+          if [ "$run_base" = true ] ; then
+            oldV="${d3}/oldV.java"
+            newV="${d3}/newV.java"
 
-          base_command="timeout --verbose --foreground ${timeout}s java -jar '${BASE_JAR_PATH}' --path1 ${oldV} --path2 ${newV} ${configurations[$i]}"
+            base_command="timeout --verbose --foreground ${timeout}s java -jar '${BASE_JAR_PATH}' --path1 ${oldV} --path2 ${newV} ${configurations[$i]}"
 
-          if [ "$print_commands" = true ] ; then
-            printf "\n%s" "${base_command}"
+            if [ "$print_commands" = true ] ; then
+              printf "\n%s" "${base_command}"
+            fi
+
+            if [ "$dry_run" = false ] ; then
+              printf "\n"
+              mkdir -p "${d3}/instrumented/"
+              eval "${base_command}"
+            fi
           fi
 
-          if [ "$dry_run" = false ] ; then
-            printf "\n"
-            mkdir -p "${d3}/instrumented/"
-            eval "${base_command}"
+          # Run diff tool(s)
+          if [ "$run_diff" = true ] ; then
+            diff_command="timeout --verbose --foreground ${timeout}s java -jar '${DIFF_JAR_PATH}' ${d3} ${tool_names[$i]} 30"
+
+            if [ "$print_commands" = true ] ; then
+              printf "\n%s" "${diff_command}"
+            fi
+
+            if [ "$dry_run" = false ] ; then
+              printf "\n"
+              mkdir -p "${d3}/instrumented/"
+              eval "${diff_command}"
+            fi
           fi
-        fi
+        done
 
-        # Run diff tool(s)
-        if [ "$run_diff" = true ] ; then
-          diff_command="timeout --verbose --foreground ${timeout}s java -jar '${DIFF_JAR_PATH}' ${d3} ${tool_names[$i]} 30"
-
-          if [ "$print_commands" = true ] ; then
-            printf "\n%s" "${diff_command}"
-          fi
-
-          if [ "$dry_run" = false ] ; then
-            printf "\n"
-            mkdir -p "${d3}/instrumented/"
-            eval "${diff_command}"
-          fi
-        fi
-      done
-
-      printf "\n"
+        printf "\n"
+      fi
 
     done
   done
