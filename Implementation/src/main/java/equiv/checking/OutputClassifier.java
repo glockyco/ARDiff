@@ -8,9 +8,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class OutputClassifier {
-    public static Classification classify(String output) {
+    public static Classification classify(String output, boolean isDepthLimited) {
         if (output.contains("Output : EQUIVALENT")) {
-            return Classification.EQ;
+            if (isDepthLimited) {
+                return Classification.MAYBE_EQ;
+            } else {
+                return Classification.EQ;
+            }
         } else if (output.contains("Output : NOT EQUIVALENT")) {
             return Classification.NEQ;
         } else if (output.contains("Output : UNKNOWN")) {

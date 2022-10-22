@@ -119,8 +119,8 @@ public class SE {
             modelsPath.getParent().toFile().mkdirs();
             Files.write(modelsPath, summary.toWrite.getBytes());
 
-            summary.classification = OutputClassifier.classify(result);
             summary.isDepthLimited = OutputClassifier.isDepthLimited(this.path, this.toolName);
+            summary.classification = OutputClassifier.classify(result, summary.isDepthLimited);
 
             return summary;
         } catch (Exception e) {

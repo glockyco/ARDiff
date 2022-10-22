@@ -161,8 +161,8 @@ public class ImpactedS {
             writer.close();
             fwNew.close();;
 
-            summary.classification = OutputClassifier.classify(result);
             summary.isDepthLimited = OutputClassifier.isDepthLimited(this.path, this.toolName);
+            summary.classification = OutputClassifier.classify(result, summary.isDepthLimited);
 
             return summary;
         } catch (Exception e) {

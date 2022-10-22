@@ -107,8 +107,8 @@ public class GradDiff extends DSE {
             br.write(summary.toWrite);
             br.close();
 
-            summary.classification = OutputClassifier.classify(finalRes);
             summary.isDepthLimited = OutputClassifier.isDepthLimited(this.path, this.toolName);
+            summary.classification = OutputClassifier.classify(finalRes, summary.isDepthLimited);
             summary.iterationCount = index;
 
             return summary;
