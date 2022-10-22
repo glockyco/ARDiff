@@ -4,7 +4,6 @@ import br.usp.each.saeg.asm.defuse.Variable;
 import com.microsoft.z3.Status;
 import differencing.DifferencingParameterFactory;
 import differencing.DifferencingParameters;
-import differencing.classification.Classification;
 import equiv.checking.*;
 import equiv.checking.SymbolicExecutionRunner.SMTSummary;
 import org.objectweb.asm.ClassReader;
@@ -98,7 +97,7 @@ public class SE {
         }
     }
 
-    public Classification runTool() throws Exception {
+    public SMTSummary runTool() throws Exception {
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
             String path = this.ranByUser ? this.path + "instrumented" : this.path;
@@ -120,7 +119,10 @@ public class SE {
             modelsPath.getParent().toFile().mkdirs();
             Files.write(modelsPath, summary.toWrite.getBytes());
 
-            return OutputClassifier.classify(result);
+            summary.classification = OutputClassifier.classify(result);
+            summary.isDepthLimited = OutputClassifier.isDepthLimited(this.path, this.toolName);
+
+            return summary;
         } catch (Exception e) {
             System.out.println("An error/exception occurred when instrumenting the files or running the equivalence checking. Please report this issue to us.\n\n");
             e.printStackTrace();

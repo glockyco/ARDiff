@@ -23,6 +23,7 @@ import differencing.models.Run;
 import differencing.repositories.BenchmarkRepository;
 import differencing.repositories.RunRepository;
 import equiv.checking.ProjectPaths;
+import equiv.checking.SymbolicExecutionRunner.SMTSummary;
 import equiv.checking.Utils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -112,9 +113,6 @@ public class Runner{
 
         long start = System.currentTimeMillis();
 
-        boolean hasSucceeded = false;
-        String errors = "";
-
         Thread shutdownHook = new Thread(() -> {
             Classification result = new RunClassifier(
                 false, false, false, true,
@@ -136,11 +134,21 @@ public class Runner{
 
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
+        boolean hasSucceeded = false;
+        String errors = "";
+
         Classification classification;
+        boolean isDepthLimited = false;
+        boolean hasUif = false;
+        int iterationCount = 1;
 
         try {
-            classification = runToolInternal(tool, p1, p2, solver, b, t, minInt, maxInt, minDouble, maxDouble, strategy, z3Terminal);
+            SMTSummary summary = runToolInternal(tool, p1, p2, solver, b, t, minInt, maxInt, minDouble, maxDouble, strategy, z3Terminal);
             hasSucceeded = true;
+            classification = summary.classification;
+            isDepthLimited = summary.isDepthLimited;
+            hasUif = !summary.noUFunctions;
+            iterationCount = summary.iterationCount;
         } catch (Exception e) {
             classification = Classification.ERROR;
             errors = ExceptionUtils.getStackTrace(e);
@@ -158,9 +166,9 @@ public class Runner{
             run.tool,
             result,
             false,
-            null,
-            null,
-            null,
+            isDepthLimited,
+            hasUif,
+            iterationCount,
             (System.currentTimeMillis() - start) / 1000f,
             errors
         ));
@@ -209,7 +217,7 @@ public class Runner{
         throw new RuntimeException("Cannot determine expected result for " + path1 + ".");
     }
 
-    private static Classification runToolInternal(String tool, String p1, String p2, String solver,int b,int t, int minInt,int maxInt,double minDouble,double maxDouble,String strategy,boolean z3Terminal) {
+    private static SMTSummary runToolInternal(String tool, String p1, String p2, String solver, int b, int t, int minInt, int maxInt, double minDouble, double maxDouble, String strategy, boolean z3Terminal) {
         try {
             //the path to two target versions
             ////************************************************************************+////

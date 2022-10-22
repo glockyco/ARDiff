@@ -15,7 +15,6 @@ import DSE.DSE;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import com.microsoft.z3.*;
-import differencing.classification.Classification;
 import equiv.checking.ChangeExtractor;
 import equiv.checking.OutputClassifier;
 import equiv.checking.ProjectPaths;
@@ -65,7 +64,7 @@ public class GradDiff extends DSE {
      * This is the main function to run ARDiff
      * @return
      */
-    public Classification runTool() throws Exception {
+    public SMTSummary runTool() throws Exception {
         boolean gumTreePassed = false;
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
@@ -107,7 +106,12 @@ public class GradDiff extends DSE {
             BufferedWriter br = new BufferedWriter(new FileWriter(file));
             br.write(summary.toWrite);
             br.close();
-            return OutputClassifier.classify(finalRes);
+
+            summary.classification = OutputClassifier.classify(finalRes);
+            summary.isDepthLimited = OutputClassifier.isDepthLimited(this.path, this.toolName);
+            summary.iterationCount = index;
+
+            return summary;
         } catch (Exception e) {
             if(!gumTreePassed)
                 System.out.println("An error/exception occurred when identifying the changes between the two methods.\n" +

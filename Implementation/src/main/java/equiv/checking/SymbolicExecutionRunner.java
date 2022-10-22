@@ -12,6 +12,7 @@
 package equiv.checking;
 
 import com.microsoft.z3.*;
+import differencing.classification.Classification;
 import equiv.checking.symparser.AbstractSymParser;
 import equiv.checking.symparser.SymParser;
 import equiv.checking.symparser.SymParserSMTLib;
@@ -95,6 +96,10 @@ public class SymbolicExecutionRunner {
 		public String toWrite, reasonUnknown, declarations, firstSummary, secondSummary;
 		public AbstractSymParser parser;
 		public boolean noUFunctions;
+
+		public Classification classification = null;
+		public boolean isDepthLimited = false;
+		public int iterationCount = 1;
 
 		public SMTSummary() {
 			uFunctionsOld = new HashMap<>();

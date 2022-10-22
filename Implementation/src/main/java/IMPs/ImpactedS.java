@@ -13,18 +13,19 @@ package IMPs;
 
 import br.usp.each.saeg.asm.defuse.Variable;
 import com.microsoft.z3.Status;
-import differencing.classification.Classification;
-import differencing.classification.RunClassifier;
-import equiv.checking.*;
-import static equiv.checking.Utils.DEBUG;
+import equiv.checking.ChangeExtractor;
+import equiv.checking.DefUseExtractor;
+import equiv.checking.Instrumentation;
+import equiv.checking.OutputClassifier;
 import equiv.checking.SymbolicExecutionRunner.SMTSummary;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.analysis.AnalyzerException;
 
 import java.io.*;
 import java.util.*;
+
+import static equiv.checking.Utils.DEBUG;
 
 public class ImpactedS {
     protected String MethodPath1,MethodPath2;
@@ -135,7 +136,7 @@ public class ImpactedS {
      * This is the main function to run the tool
      * @return
      */
-    public Classification runTool() throws Exception {
+    public SMTSummary runTool() throws Exception {
         boolean gumTreePassed = false;
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
@@ -159,7 +160,11 @@ public class ImpactedS {
             writer.write(result);
             writer.close();
             fwNew.close();;
-            return OutputClassifier.classify(result);
+
+            summary.classification = OutputClassifier.classify(result);
+            summary.isDepthLimited = OutputClassifier.isDepthLimited(this.path, this.toolName);
+
+            return summary;
         } catch (Exception e) {
             if(!gumTreePassed)
                 System.out.println("An error/exception occurred when identifying the changes between the two methods.\n" +

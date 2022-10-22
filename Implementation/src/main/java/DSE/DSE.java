@@ -19,7 +19,6 @@ import com.microsoft.z3.Status;
 import com.microsoft.z3.Tactic;
 import differencing.DifferencingParameterFactory;
 import differencing.DifferencingParameters;
-import differencing.classification.Classification;
 import equiv.checking.*;
 import equiv.checking.SymbolicExecutionRunner.SMTSummary;
 import javafx.util.Pair;
@@ -154,7 +153,7 @@ public class DSE {
      * The main method to run DSE
      * @return
      */
-    public Classification runTool() throws Exception {
+    public SMTSummary runTool() throws Exception {
         boolean gumTreePassed = false;
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
@@ -185,7 +184,11 @@ public class DSE {
             BufferedWriter br = new BufferedWriter(new FileWriter(file));
             br.write(summary.toWrite);
             br.close();
-            return OutputClassifier.classify(result);
+
+            summary.classification = OutputClassifier.classify(result);
+            summary.isDepthLimited = OutputClassifier.isDepthLimited(this.path, this.toolName);
+
+            return summary;
         } catch (Exception e) {
             if(!gumTreePassed)
                 System.out.println("An error/exception occurred when identifying changes between the two methods.\n" +
