@@ -23,6 +23,8 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static equiv.checking.Utils.DEBUG;
@@ -138,6 +140,7 @@ public class ImpactedS {
      */
     public SMTSummary runTool() throws Exception {
         boolean gumTreePassed = false;
+        Path benchmarkPath = Paths.get(this.path);
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
             if(ranByUser) {
@@ -161,8 +164,8 @@ public class ImpactedS {
             writer.close();
             fwNew.close();;
 
-            summary.isDepthLimited = OutputClassifier.isDepthLimited(this.path, this.toolName);
-            summary.classification = OutputClassifier.classify(result, summary.isDepthLimited);
+            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName);
+            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName);
 
             return summary;
         } catch (Exception e) {

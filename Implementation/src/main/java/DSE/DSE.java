@@ -155,6 +155,7 @@ public class DSE {
      */
     public SMTSummary runTool() throws Exception {
         boolean gumTreePassed = false;
+        Path benchmarkPath = Paths.get(this.path);
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
             if(ranByUser) {
@@ -185,8 +186,8 @@ public class DSE {
             br.write(summary.toWrite);
             br.close();
 
-            summary.isDepthLimited = OutputClassifier.isDepthLimited(this.path, this.toolName);
-            summary.classification = OutputClassifier.classify(result, summary.isDepthLimited);
+            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName);
+            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName);
 
             return summary;
         } catch (Exception e) {

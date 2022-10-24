@@ -22,6 +22,7 @@ import differencing.models.Benchmark;
 import differencing.models.Run;
 import differencing.repositories.BenchmarkRepository;
 import differencing.repositories.RunRepository;
+import equiv.checking.OutputClassifier;
 import equiv.checking.ProjectPaths;
 import equiv.checking.SymbolicExecutionRunner.SMTSummary;
 import equiv.checking.Utils;
@@ -30,6 +31,7 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -104,6 +106,8 @@ public class Runner{
     }
 
     public static void runTool(String tool, String p1, String p2, String solver,int b,int t, int minInt,int maxInt,double minDouble,double maxDouble,String strategy,boolean z3Terminal) throws Exception {
+        String toolName = getToolName(tool, strategy);
+
         Benchmark benchmark = new Benchmark(getBenchmarkName(p1), getBenchmarkExpected(p1));
         Run run = new Run(benchmark.benchmark, getToolVariant(tool, strategy));
 
@@ -114,9 +118,27 @@ public class Runner{
         long start = System.currentTimeMillis();
 
         Thread shutdownHook = new Thread(() -> {
+            Path benchmarkPath = Paths.get("../benchmarks/" + benchmark.benchmark);
+
+            List<Classification> classifications;
+            Boolean isDepthLimited = null;
+            Boolean hasUif = null;
+            Integer iterationCount = null;
+
+            try {
+                Classification classification = OutputClassifier.classify(benchmarkPath, toolName);
+                classifications = classification != null ? Collections.singletonList(classification) : Collections.emptyList();
+                isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, toolName);
+                hasUif = OutputClassifier.hasUif(benchmarkPath, toolName);
+                iterationCount = OutputClassifier.getIterationCount(benchmarkPath, toolName);
+            } catch (IOException e) {
+                e.printStackTrace(System.err);
+                classifications = Collections.emptyList();
+            }
+
             Classification result = new RunClassifier(
                 false, false, false, true,
-                Collections.emptyList()
+                classifications
             ).getClassification();
 
             RunRepository.insertOrUpdate(new Run(
@@ -124,9 +146,9 @@ public class Runner{
                 run.tool,
                 result,
                 true,
-                null,
-                null,
-                null,
+                isDepthLimited,
+                hasUif,
+                iterationCount,
                 (System.currentTimeMillis() - start) / 1000f,
                 ""
             ));

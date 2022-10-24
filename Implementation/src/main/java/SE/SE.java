@@ -98,6 +98,7 @@ public class SE {
     }
 
     public SMTSummary runTool() throws Exception {
+        Path benchmarkPath = Paths.get(this.path);
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
             String path = this.ranByUser ? this.path + "instrumented" : this.path;
@@ -119,8 +120,8 @@ public class SE {
             modelsPath.getParent().toFile().mkdirs();
             Files.write(modelsPath, summary.toWrite.getBytes());
 
-            summary.isDepthLimited = OutputClassifier.isDepthLimited(this.path, this.toolName);
-            summary.classification = OutputClassifier.classify(result, summary.isDepthLimited);
+            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName);
+            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName);
 
             return summary;
         } catch (Exception e) {

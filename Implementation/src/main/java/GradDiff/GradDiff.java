@@ -22,6 +22,8 @@ import equiv.checking.SymbolicExecutionRunner.SMTSummary;
 import javafx.util.Pair;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,6 +68,7 @@ public class GradDiff extends DSE {
      */
     public SMTSummary runTool() throws Exception {
         boolean gumTreePassed = false;
+        Path benchmarkPath = Paths.get(this.path);
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
             if(ranByUser) {
@@ -86,29 +89,30 @@ public class GradDiff extends DSE {
                result += finalRes;
                index ++;
 
+                String outputs = path.split("instrumented")[0];
+                File newFile = new File(outputs+"outputs/" + this.toolName + ".txt");
+                newFile.getParentFile().mkdir();
+                if(!newFile.exists())
+                    newFile.createNewFile();
+                FileWriter fwNew=new FileWriter(newFile);
+                BufferedWriter writer=new BufferedWriter(fwNew);
+                writer.write(result);
+                writer.close();
+                fwNew.close();
+
+                File file = new File(outputs+"z3models/" + this.toolName + ".txt");
+                file.getParentFile().mkdir();
+                if(!file.exists())
+                    file.createNewFile();
+                BufferedWriter br = new BufferedWriter(new FileWriter(file));
+                br.write(summary.toWrite);
+                br.close();
             }
+
             System.out.println(updateUserOutput(finalRes));
-            String outputs = path.split("instrumented")[0];
-            File newFile = new File(outputs+"outputs/" + this.toolName + ".txt");
-            newFile.getParentFile().mkdir();
-            if(!newFile.exists())
-                newFile.createNewFile();
-            FileWriter fwNew=new FileWriter(newFile);
-            BufferedWriter writer=new BufferedWriter(fwNew);
-            writer.write(result);
-            writer.close();
-            fwNew.close();
 
-            File file = new File(outputs+"z3models/" + this.toolName + ".txt");
-            file.getParentFile().mkdir();
-            if(!file.exists())
-                file.createNewFile();
-            BufferedWriter br = new BufferedWriter(new FileWriter(file));
-            br.write(summary.toWrite);
-            br.close();
-
-            summary.isDepthLimited = OutputClassifier.isDepthLimited(this.path, this.toolName);
-            summary.classification = OutputClassifier.classify(finalRes, summary.isDepthLimited);
+            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName);
+            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName);
             summary.iterationCount = index;
 
             return summary;
