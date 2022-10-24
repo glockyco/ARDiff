@@ -164,15 +164,15 @@ public class GradDiff extends DSE {
                 //Here we should not run the first heuristic thus ?
                 //H1 = false;
         }
-        else {// SAT
+        else { // if (smtSummary.status == Status.SATISFIABLE)
             result += "  -Initialization : " + times[0] / (Math.pow(10, 6)) + " ms\n";
             result += "  -Def-use and uninterpreted functions : " + times[1] / (Math.pow(10, 6)) + " ms\n";
             result += "  -Symbolic execution  : " + times[2] / (Math.pow(10, 6)) + " ms\n";
             result += "  -Creating Z3 expressions  : " + times[3] / (Math.pow(10, 6)) + " ms\n";
             result += "  -Constraint solving : " + times[4] / (Math.pow(10, 6)) + " ms\n";
-            result += "Output : NOT EQUIVALENT\n";
             if(smtSummary.noUFunctions) {
                 onGoing = false;
+                result += "Output : NOT EQUIVALENT\n";
                 result +="\n------------------------------NOTHING To REFINE---------------------------------------\n";
                 result +="\n------------------------------END Of REFINEMENT----------------------------------------\n";
                 result +="\n------------------------------END----------------------------------------\n";
@@ -191,6 +191,7 @@ public class GradDiff extends DSE {
             if (status == Status.UNSATISFIABLE) {// no chance to be EQUIVALENT
                 onGoing = false;
                 if(debug) {
+                    result += "Output : NOT EQUIVALENT\n";
                     result += "After checking for satisfiability : \n";
                     result += "-----------------------FINAL RESULTS-------------------------------------------\n";
                     result += "   -Constraint solving : " + endF / (Math.pow(10, 6)) + " ms\n";
@@ -198,14 +199,19 @@ public class GradDiff extends DSE {
                     result += "\n------------------------------END----------------------------------------\n";
                 }
                 else{
+                    result += "Output : NOT EQUIVALENT\n";
                     result +="\n------------------------------NOTHING To REFINE---------------------------------------\n";
                     result +="\n------------------------------END Of REFINEMENT----------------------------------------\n";
                     result +="\n------------------------------END----------------------------------------\n";
                 }
                 smtSummary.context.close();
                 return result;
+            } else {
+                result += "Output : UNKNOWN \n";
+                result +="Reason : solver found a counterexample, but it could be due to too much abstraction";
             }
         }
+        // if ((neqResult == UNKNOWN && hasUif) || (neqResult == SAT && eqResult != SAT && hasUif))
         result += "\n------------------------------To be continued (REFINING)----------------------------------------\n";
             long start = System.nanoTime();
             String s = getNextToRefine(smtSummary);
