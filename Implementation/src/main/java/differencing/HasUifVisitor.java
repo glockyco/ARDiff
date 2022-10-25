@@ -21,16 +21,22 @@ public class HasUifVisitor extends ModelVisitor {
 
     @Override
     public void preVisit(SymbolicIntegerFunction function) {
-        this.hasUif = true;
+        if (function.name.startsWith("UF_")) {
+            this.hasUif = true;
+        }
     }
 
     @Override
     public void preVisit(SymbolicRealFunction function) {
-        this.hasUif = true;
+        if (function.name.startsWith("UF_")) {
+            this.hasUif = true;
+        }
     }
 
     @Override
     public void preVisit(SymbolicStringFunction function) {
-        this.hasUif = true;
+        if (function.name.startsWith("UF_")) {
+            this.hasUif = true;
+        }
     }
 }
