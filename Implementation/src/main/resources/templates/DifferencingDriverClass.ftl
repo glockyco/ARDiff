@@ -31,14 +31,16 @@ class DifferentOutputsException extends RuntimeException {
 
 public class ${parameters.targetClassName} {
 
-    public static boolean areEquivalent(int a, int b) { return false; }
-    public static boolean areEquivalent(long a, long b) { return false; }
-    public static boolean areEquivalent(short a, short b) { return false; }
-    public static boolean areEquivalent(byte a, byte b) { return false; }
-    public static boolean areEquivalent(float a, float b) { return false; }
-    public static boolean areEquivalent(double a, double b) { return false; }
-    public static boolean areEquivalent(boolean a, boolean b) { return false; }
-    public static boolean areEquivalent(Object a, Object b) { return false; }
+    public static boolean areErrorsEquivalent(Object a, Object b) { return false; }
+
+    public static boolean areResultsEquivalent(int a, int b) { return false; }
+    public static boolean areResultsEquivalent(long a, long b) { return false; }
+    public static boolean areResultsEquivalent(short a, short b) { return false; }
+    public static boolean areResultsEquivalent(byte a, byte b) { return false; }
+    public static boolean areResultsEquivalent(float a, float b) { return false; }
+    public static boolean areResultsEquivalent(double a, double b) { return false; }
+    public static boolean areResultsEquivalent(boolean a, boolean b) { return false; }
+    public static boolean areResultsEquivalent(Object a, Object b) { return false; }
 
     public static ${parameters.oldReturnType} run(${parameters.inputParameters}) {
         ${parameters.oldReturnType} result_old = ${parameters.oldResultDefaultValue};
@@ -59,7 +61,7 @@ public class ${parameters.targetClassName} {
             error_new = e;
         }
 
-        boolean areErrorsEquivalent = Objects.equals(error_old, error_new);
+        boolean areErrorsEquivalent = areErrorsEquivalent(error_old, error_new);
 
         System.out.println("Differencing Driver Output:");
 
@@ -81,7 +83,7 @@ public class ${parameters.targetClassName} {
             }
         }
 
-        boolean areResultsEquivalent = areEquivalent(result_old, result_new);
+        boolean areResultsEquivalent = areResultsEquivalent(result_old, result_new);
 
         System.out.println("  Results:");
         System.out.println("  - Equivalent: " + areResultsEquivalent);

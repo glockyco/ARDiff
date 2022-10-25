@@ -1,14 +1,16 @@
 package differencing.classification;
 
+import com.microsoft.z3.Status;
+
 public class PartitionClassifier implements Classifier {
     private final boolean isMissing;
     private final boolean isBaseToolMissing;
     private final boolean isError;
     private final boolean isTimeout;
     private final boolean isDepthLimited;
-    private final String pcAnswer;
-    private final String neqAnswer;
-    private final String eqAnswer;
+    private final Status pcStatus;
+    private final Status neqStatus;
+    private final Status eqStatus;
     private final boolean hasUif;
     private final boolean hasUifPc;
 
@@ -18,9 +20,9 @@ public class PartitionClassifier implements Classifier {
         boolean isError,
         boolean isTimeout,
         boolean isDepthLimited,
-        String pcAnswer,
-        String neqAnswer,
-        String eqAnswer,
+        Status pcStatus,
+        Status neqStatus,
+        Status eqStatus,
         boolean hasUifPc,
         boolean hasUifV1,
         boolean hasUifV2
@@ -36,9 +38,9 @@ public class PartitionClassifier implements Classifier {
         this.isError = isError;
         this.isTimeout = isTimeout;
         this.isDepthLimited = isDepthLimited;
-        this.pcAnswer = pcAnswer;
-        this.neqAnswer = neqAnswer;
-        this.eqAnswer = eqAnswer;
+        this.pcStatus = pcStatus;
+        this.neqStatus = neqStatus;
+        this.eqStatus = eqStatus;
         this.hasUif = hasUifPc || hasUifV1 || hasUifV2;
         this.hasUifPc = hasUifPc;
     }
@@ -88,12 +90,12 @@ public class PartitionClassifier implements Classifier {
 
     @Override
     public boolean isUnreachable() {
-        return this.pcAnswer.equals("unsat");
+        return this.pcStatus == Status.UNSATISFIABLE;
     }
 
     @Override
     public boolean isTimeout() {
-        return this.isTimeout || this.pcAnswer.equals("timeout") || this.neqAnswer.equals("timeout") || this.eqAnswer.equals("timeout");
+        return this.isTimeout;
     }
 
     @Override
@@ -105,7 +107,7 @@ public class PartitionClassifier implements Classifier {
     public boolean isUnknown() {
         // The solver was unable to provide a sat or unsat answer for the query.
         // Thus, we can't say whether the two versions are equivalent or not.
-        return this.pcAnswer.equals("unknown") || this.neqAnswer.equals("unknown") || this.eqAnswer.equals("unknown");
+        return this.pcStatus == Status.UNKNOWN || this.neqStatus == Status.UNKNOWN || this.eqStatus == Status.UNKNOWN;
     }
 
     @Override
@@ -117,7 +119,7 @@ public class PartitionClassifier implements Classifier {
         // Thus, the base programs without uninterpreted functions might actually
         // be EQ rather than NEQ if the NEQ results only arise due to the
         // introduction of uninterpreted functions.
-        return this.neqAnswer.equals("sat") && this.eqAnswer.equals("sat");
+        return this.neqStatus == Status.SATISFIABLE && this.eqStatus == Status.SATISFIABLE;
     }
 
     @Override
@@ -127,16 +129,16 @@ public class PartitionClassifier implements Classifier {
         // uninterpreted functions in the path condition. Thus, the corresponding
         // partition of the base program without uninterpreted functions might
         // actually be UNREACHABLE rather than EQ.
-        return this.neqAnswer.equals("unsat") && this.hasUifPc;
+        return this.neqStatus == Status.UNSATISFIABLE && this.hasUifPc;
     }
 
     @Override
     public boolean isNeq() {
-        return (this.neqAnswer.equals("sat") && !this.hasUif) || this.eqAnswer.equals("unsat");
+        return (this.neqStatus == Status.SATISFIABLE && !this.hasUif) || this.eqStatus == Status.UNSATISFIABLE;
     }
 
     @Override
     public boolean isEq() {
-        return this.neqAnswer.equals("unsat") && !this.hasUifPc;
+        return this.neqStatus == Status.UNSATISFIABLE && !this.hasUifPc;
     }
 }

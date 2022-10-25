@@ -25,7 +25,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
     private final DifferencingParameters parameters;
 
     private final MethodSpec methodToCoverSpec;
-    private final MethodSpec areEquivalentSpec;
+    private final MethodSpec runSpec;
 
     // Note: all code that involves ExecutionNodes is only there to make
     // debugging easier by providing a tree view of all instructions executed
@@ -57,18 +57,12 @@ public class ExecutionListener extends PropertyListenerAdapter {
         this.run = run;
         this.parameters = parameters;
         this.methodToCoverSpec = MethodSpec.createMethodSpec(methodToCover);
-        this.areEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + ".areEquivalent");
+        this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + ".run");
 
         this.currentPartition = new Partition(this.run.benchmark, this.run.tool, this.partitionId);
 
         assert methodToCover.contains("IoldV") || methodToCover.contains("InewV");
         this.version = methodToCover.contains("IoldV") ? 1 : 2;
-    }
-
-    @Override
-    public void searchFinished(Search search) {
-        InstructionRepository.insertOrUpdate(this.currentInstructions);
-        PartitionInstructionRepository.insertOrUpdate(this.currentPartitionInstructions);
     }
 
     @Override
@@ -103,19 +97,26 @@ public class ExecutionListener extends PropertyListenerAdapter {
     }
 
     @Override
+    public void searchConstraintHit(Search search) {
+        if (search.getVM().getCurrentThread().isFirstStepInsn()) {
+            return;
+        }
+        this.startNextPartition();
+    }
+
+    @Override
+    public void propertyViolated(Search search) {
+        if (search.getVM().getCurrentThread().isFirstStepInsn()) {
+            return;
+        }
+        this.startNextPartition();
+    }
+
+    @Override
     public void executeInstruction(VM vm, ThreadInfo currentThread, gov.nasa.jpf.vm.Instruction instructionToExecute) {
         MethodInfo mi = instructionToExecute.getMethodInfo();
-        if (instructionToExecute instanceof JVMReturnInstruction && this.areEquivalentSpec.matches(mi)) {
-            PartitionRepository.insertOrUpdate(this.currentPartition);
-            InstructionRepository.insertOrUpdate(this.currentInstructions);
-            PartitionInstructionRepository.insertOrUpdate(this.currentPartitionInstructions);
-
-            this.partitions.add(this.currentPartition);
-            this.partitionId++;
-
-            this.currentPartition = new Partition(this.run.benchmark, this.run.tool, this.partitionId);
-            this.currentInstructions.clear();
-            this.currentPartitionInstructions.clear();
+        if (instructionToExecute instanceof JVMReturnInstruction && this.runSpec.matches(mi)) {
+            this.startNextPartition();
         }
 
         if (this.isInMethodToCover & !vm.getSystemState().isIgnored() && !currentThread.isFirstStepInsn()) {
@@ -171,6 +172,19 @@ public class ExecutionListener extends PropertyListenerAdapter {
                 this.currentPartitionInstructions.add(partitionInstruction);
             }
         }
+    }
+
+    private void startNextPartition() {
+        PartitionRepository.insertOrUpdate(this.currentPartition);
+        InstructionRepository.insertOrUpdate(this.currentInstructions);
+        PartitionInstructionRepository.insertOrUpdate(this.currentPartitionInstructions);
+
+        this.partitions.add(this.currentPartition);
+        this.partitionId++;
+
+        this.currentPartition = new Partition(this.run.benchmark, this.run.tool, this.partitionId);
+        this.currentInstructions.clear();
+        this.currentPartitionInstructions.clear();
     }
 
     private static class ExecutionNode {

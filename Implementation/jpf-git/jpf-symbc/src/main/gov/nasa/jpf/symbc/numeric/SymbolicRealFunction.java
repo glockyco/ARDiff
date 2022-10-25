@@ -85,7 +85,7 @@ public class SymbolicRealFunction extends SymbolicReal implements SymbolicFuncti
         // here we need to use reflection to invoke the method with
         // name method_name and with parameters the solutions of the arguments
 
-        assert(sym_args!=null && sym_args.length >0);
+        assert(sym_args!=null);
 
         try {
             if(clsLoader == null) {

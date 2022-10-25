@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class PathConditionListener extends PropertyListenerAdapter {
     private final DifferencingParameters parameters;
-    private final MethodSpec areEquivalentSpec;
+    private final MethodSpec runSpec;
 
     private final SpfToModelTransformer spfToModelTransformer;
     private final ModelToJsonTransformer modelToJsonTransformer;
@@ -33,7 +33,7 @@ public class PathConditionListener extends PropertyListenerAdapter {
 
     public PathConditionListener(DifferencingParameters parameters) {
         this.parameters = parameters;
-        this.areEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + ".areEquivalent");
+        this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + ".run");
 
         this.spfToModelTransformer = new SpfToModelTransformer();
         this.modelToJsonTransformer = new ModelToJsonTransformer();
@@ -44,27 +44,22 @@ public class PathConditionListener extends PropertyListenerAdapter {
         if (search.getVM().getCurrentThread().isFirstStepInsn()) {
             return;
         }
+        this.startNextPartition();
+    }
 
-        if (search.getDepth() >= search.getDepthLimit()) {
-            PathCondition pc = PathCondition.getPC(search.getVM());
-
-            this.writePathCondition(this.partitionId, pc);
-
-            this.partitionPcMap.put(this.partitionId, pc);
-            this.partitionId++;
+    @Override
+    public void propertyViolated(Search search) {
+        if (search.getVM().getCurrentThread().isFirstStepInsn()) {
+            return;
         }
+        this.startNextPartition();
     }
 
     @Override
     public void executeInstruction(VM vm, ThreadInfo currentThread, Instruction instructionToExecute) {
         MethodInfo mi = instructionToExecute.getMethodInfo();
-        if (instructionToExecute instanceof JVMReturnInstruction && this.areEquivalentSpec.matches(mi)) {
-            PathCondition pc = PathCondition.getPC(vm);
-
-            this.writePathCondition(this.partitionId, pc);
-
-            this.partitionPcMap.put(this.partitionId, pc);
-            this.partitionId++;
+        if (instructionToExecute instanceof JVMReturnInstruction && this.runSpec.matches(mi)) {
+            this.startNextPartition();
         }
     }
 
@@ -90,6 +85,13 @@ public class PathConditionListener extends PropertyListenerAdapter {
 
             choicePcMap.put(choice, pc);
         }
+    }
+
+    private void startNextPartition() {
+        PathCondition pc = PathCondition.getPC(VM.getVM());
+        this.writePathCondition(this.partitionId, pc);
+        this.partitionPcMap.put(this.partitionId, pc);
+        this.partitionId++;
     }
 
     private void writePathCondition(int partition, PathCondition pc) {
