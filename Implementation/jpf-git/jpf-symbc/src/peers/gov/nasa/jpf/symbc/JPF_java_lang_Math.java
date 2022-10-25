@@ -142,7 +142,12 @@ public class JPF_java_lang_Math extends NativePeer{
     return Math.random();
   }
 
-  
+  @MJI
+  public static int getExponent__D__I (MJIEnv env, int clsObjRef, double a) {
+    System.err.println("Warning: Math.getExponent not modeled yet");
+    return Math.getExponent(a);
+  }
+
   @MJI
   public static double exp__D__D (MJIEnv env, int clsObjRef, double a) {
       Object [] attrs = env.getArgAttributes();

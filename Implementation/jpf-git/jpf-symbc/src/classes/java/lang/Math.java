@@ -111,7 +111,7 @@ public class Math {
 
 	  public native static double random ();
 
-	  
+	  public native static int getExponent ( double a );
 
 	  public native static double exp ( double a) ;
 

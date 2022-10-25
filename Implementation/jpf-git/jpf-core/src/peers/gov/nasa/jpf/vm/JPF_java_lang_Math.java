@@ -118,7 +118,12 @@ public class JPF_java_lang_Math extends NativePeer {
   public long round__D__J (MJIEnv env, int clsObjRef, double a){
     return Math.round(a);
   }
-  
+
+  @MJI
+  public int getExponent__D__I (MJIEnv env, int clsObjRef, double a) {
+    return Math.getExponent(a);
+  }
+
   @MJI
   public double exp__D__D (MJIEnv env, int clsObjRef, double a) {
     return Math.exp(a);
