@@ -9,10 +9,11 @@ public class PartitionClassifier implements Classifier {
     private final boolean isTimeout;
     private final boolean isDepthLimited;
     private final Status pcStatus;
+    private final Status notPcStatus;
     private final Status neqStatus;
     private final Status eqStatus;
-    private final boolean hasUif;
-    private final boolean hasUifPc;
+
+    private final Classification classification;
 
     public PartitionClassifier(
         boolean isMissing,
@@ -21,11 +22,9 @@ public class PartitionClassifier implements Classifier {
         boolean isTimeout,
         boolean isDepthLimited,
         Status pcStatus,
+        Status notPcStatus,
         Status neqStatus,
-        Status eqStatus,
-        boolean hasUifPc,
-        boolean hasUifV1,
-        boolean hasUifV2
+        Status eqStatus
     ) {
         // Partitions should never have a MISSING or BASE_TOOL_MISSING status.
         // This is because we don't know (and can't know) which partitions
@@ -39,106 +38,151 @@ public class PartitionClassifier implements Classifier {
         this.isTimeout = isTimeout;
         this.isDepthLimited = isDepthLimited;
         this.pcStatus = pcStatus;
+        this.notPcStatus = notPcStatus;
         this.neqStatus = neqStatus;
         this.eqStatus = eqStatus;
-        this.hasUif = hasUifPc || hasUifV1 || hasUifV2;
-        this.hasUifPc = hasUifPc;
+
+        this.classification = this.classify();
     }
 
     @Override
     public Classification getClassification() {
-        if (this.isMissing()) {
-            return Classification.MISSING;
-        } else if (this.isBaseToolMissing()) {
-            return Classification.BASE_TOOL_MISSING;
-        } else if (this.isError()) {
-            return Classification.ERROR;
-        } else if (this.isUnreachable()) {
+        return this.classification;
+    }
+
+    private Classification classify() {
+        // pcStatus and notPcStatus MUST be provided.
+        assert this.pcStatus != null;
+        assert this.notPcStatus != null;
+
+        // If neqStatus is SAT, eqStatus MUST also be provided.
+        assert this.neqStatus != Status.SATISFIABLE || this.eqStatus != null;
+
+        if (this.pcStatus == Status.UNSATISFIABLE) {
+            // If we know that the partition is unreachable,
+            // we can just ignore the partition irrespective
+            // of any other information we might have about it.
             return Classification.UNREACHABLE;
-        } else if (this.isTimeout()) {
+        } else if (this.isMissing) {
+            return Classification.MISSING;
+        } else if (this.isBaseToolMissing) {
+            return Classification.BASE_TOOL_MISSING;
+        } else if (this.isError) {
+            return Classification.ERROR;
+        } else if (this.isTimeout) {
             return Classification.TIMEOUT;
-        } else if (this.isDepthLimited()) {
+        } else if (this.isDepthLimited) {
             return Classification.DEPTH_LIMITED;
-        } else if (this.isUnknown()) {
-            return Classification.UNKNOWN;
-        } else if (this.isMaybeNeq()) {
-            return Classification.MAYBE_NEQ;
-        } else if (this.isMaybeEq()) {
-            return Classification.MAYBE_EQ;
-        } else if (this.isNeq()) {
-            return Classification.NEQ;
-        } else if (this.isEq()) {
-            return Classification.EQ;
+        } else {
+            if (this.pcStatus == Status.UNKNOWN
+                || this.notPcStatus == Status.UNKNOWN
+                || this.neqStatus == Status.UNKNOWN
+                || this.eqStatus == Status.UNKNOWN
+            ) {
+                return Classification.UNKNOWN;
+            } else {
+                // We have indication that this partition is reachable.
+                assert this.pcStatus == Status.SATISFIABLE;
+                if (this.notPcStatus == Status.UNSATISFIABLE) {
+                    // We're sure that this partition is reachable.
+                    if (this.neqStatus == Status.SATISFIABLE) {
+                        // We have indication hat this partition is NEQ.
+                        if (this.eqStatus == Status.UNSATISFIABLE) {
+                            // We're sure that this partition is NEQ.
+                            return Classification.NEQ;
+                        } else {
+                            // We're unsure whether this partition is NEQ.
+                            assert this.eqStatus == Status.SATISFIABLE;
+                            return Classification.MAYBE_NEQ;
+                        }
+                    } else {
+                        // We have no indication that this partition is NEQ.
+                        assert this.neqStatus == Status.UNSATISFIABLE;
+                        return Classification.EQ;
+                    }
+                } else {
+                    // We're unsure whether this partition is reachable.
+                    assert this.notPcStatus == Status.SATISFIABLE;
+                    if (this.neqStatus == Status.SATISFIABLE) {
+                        // We have indication that this partition is NEQ. Since
+                        // we're unsure whether this partition is reachable,
+                        // we can only classify it as MAYBE_NEQ, irrespective
+                        // of whether we're sure or unsure about the partition
+                        // being NEQ, i.e.:
+                        // "maybe REACHABLE" +       NEQ = MAYBE_NEQ, and
+                        // "maybe REACHABLE" + MAYBE_NEQ = MAYBE_NEQ.
+                        // So the result is the same in both cases.
+                        return Classification.MAYBE_NEQ;
+                    } else {
+                        // We have no indication that this partition is NEQ.
+                        assert this.neqStatus == Status.UNSATISFIABLE;
+                        return Classification.EQ;
+                        // Note that classifications on the partition level
+                        // never result in MAYBE_EQ. This is because MAYBE_EQ
+                        // results only arise if we have a *partial* result
+                        // without any indication of non-equivalence. Since we
+                        // only include partitions once we fully analyzed them
+                        // (or mark them as TIMEOUT, DEPTH_LIMITED, etc. if we
+                        // cannot (fully) analyze them) such partial results
+                        // cannot arise.
+                    }
+                }
+            }
         }
-        throw new RuntimeException("Unable to classify partition.");
     }
 
     @Override
     public boolean isMissing() {
-        return this.isMissing;
+        return this.classification == Classification.MISSING;
     }
 
     @Override
     public boolean isBaseToolMissing() {
-        return this.isBaseToolMissing;
+        return this.classification == Classification.BASE_TOOL_MISSING;
     }
 
     @Override
     public boolean isError() {
-        return this.isError;
+        return this.classification == Classification.ERROR;
     }
 
     @Override
     public boolean isUnreachable() {
-        return this.pcStatus == Status.UNSATISFIABLE;
+        return this.classification == Classification.UNREACHABLE;
     }
 
     @Override
     public boolean isTimeout() {
-        return this.isTimeout;
+        return this.classification == Classification.TIMEOUT;
     }
 
     @Override
     public boolean isDepthLimited() {
-        return this.isDepthLimited;
+        return this.classification == Classification.DEPTH_LIMITED;
     }
 
     @Override
     public boolean isUnknown() {
-        // The solver was unable to provide a sat or unsat answer for the query.
-        // Thus, we can't say whether the two versions are equivalent or not.
-        return this.pcStatus == Status.UNKNOWN || this.neqStatus == Status.UNKNOWN || this.eqStatus == Status.UNKNOWN;
+        return this.classification == Classification.UNKNOWN;
     }
 
     @Override
     public boolean isMaybeNeq() {
-        // MAYBE_NEQ (or maybe EQ):
-        // Equivalence checking found the two programs to be NEQ, but:
-        // (i) there were uninterpreted functions in the solver query AND
-        // (ii) at least one input assignment exists for which the programs are EQ.
-        // Thus, the base programs without uninterpreted functions might actually
-        // be EQ rather than NEQ if the NEQ results only arise due to the
-        // introduction of uninterpreted functions.
-        return this.neqStatus == Status.SATISFIABLE && this.eqStatus == Status.SATISFIABLE;
+        return this.classification == Classification.MAYBE_NEQ;
     }
 
     @Override
     public boolean isMaybeEq() {
-        // MAYBE_EQ (or maybe UNREACHABLE):
-        // Equivalence checking found the two programs to be EQ, but there were
-        // uninterpreted functions in the path condition. Thus, the corresponding
-        // partition of the base program without uninterpreted functions might
-        // actually be UNREACHABLE rather than EQ.
-        return this.neqStatus == Status.UNSATISFIABLE && this.hasUifPc;
+        return this.classification == Classification.MAYBE_EQ;
     }
 
     @Override
     public boolean isNeq() {
-        return (this.neqStatus == Status.SATISFIABLE && !this.hasUif) || this.eqStatus == Status.UNSATISFIABLE;
+        return this.classification == Classification.NEQ;
     }
 
     @Override
     public boolean isEq() {
-        return this.neqStatus == Status.UNSATISFIABLE && !this.hasUifPc;
+        return this.classification == Classification.EQ;
     }
 }

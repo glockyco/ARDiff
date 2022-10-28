@@ -37,6 +37,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
     private int partitionId =  1;
     private Status partitionPcStatus = null;
+    private Status partitionNotPcStatus = null;
     private Status partitionNeqStatus = null;
     private Status partitionEqStatus = null;
     private boolean hasPartitionUifPc = false;
@@ -172,6 +173,10 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
             this.partitionPcStatus = this.satChecker.checkPc(pcModel);
 
+            this.partitionNotPcStatus = this.hasPartitionUifPc
+                ? this.satChecker.checkNotPc(pcModel)
+                : Status.UNSATISFIABLE;
+
             if (this.partitionPcStatus == Status.UNKNOWN) {
                 // If we don't know whether the partition is reachable,
                 // mark it as non-equivalent just to be safe.
@@ -242,12 +247,16 @@ public class DifferencingListener extends PropertyListenerAdapter {
             this.partitionPcStatus = this.satChecker.checkPc(pcModel);
             this.hasPartitionUifPc = HasUifVisitor.hasUif(pcModel);
             this.partitionPcConstraintCount = this.getConstraintCount(pcConstraint);
+
+            this.partitionNotPcStatus = this.hasPartitionUifPc
+                ? this.satChecker.checkNotPc(pcModel)
+                : Status.UNSATISFIABLE;
         }
 
         Classification classification = new PartitionClassifier(
             false, false, false, false, this.isPartitionDepthLimited,
-            this.partitionPcStatus, this.partitionNeqStatus, this.partitionEqStatus,
-            this.hasPartitionUifPc, this.hasPartitionUifV1, this.hasPartitionUifV2
+            this.partitionPcStatus, this.partitionNotPcStatus,
+            this.partitionNeqStatus, this.partitionEqStatus
         ).getClassification();
 
         Partition partition = new Partition(
@@ -267,6 +276,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
         this.partitions.add(partition);
         this.partitionId++;
         this.partitionPcStatus = null;
+        this.partitionNotPcStatus = null;
         this.partitionNeqStatus = null;
         this.partitionEqStatus = null;
         this.hasPartitionUifPc = false;
