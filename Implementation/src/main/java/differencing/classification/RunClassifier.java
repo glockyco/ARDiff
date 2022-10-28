@@ -67,10 +67,10 @@ public class RunClassifier implements Classifier {
                 // A run should be classified as NEQ if we've identified even
                 // just a single partition as definitely NEQ.
                 this.classification = Classification.NEQ;
-            } else if (!isTimeout && eqCount == partitionCount) {
+            } else if (!isTimeout && (eqCount + unreachableCount) == partitionCount) {
                 // A run should only be classified as EQ if it has run to
-                // completion without reaching the timeout and ALL partitions
-                // are definitely EQ.
+                // completion without reaching the timeout and ALL reachable
+                // partitions are definitely EQ.
                 this.classification = Classification.EQ;
             } else if (maybeNeqCount > 0) {
                 this.classification = Classification.MAYBE_NEQ;
