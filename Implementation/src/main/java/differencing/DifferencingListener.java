@@ -177,18 +177,13 @@ public class DifferencingListener extends PropertyListenerAdapter {
                 ? this.satChecker.checkNotPc(pcModel)
                 : Status.UNSATISFIABLE;
 
-            if (this.partitionPcStatus == Status.UNKNOWN) {
-                // If we don't know whether the partition is reachable,
-                // mark it as non-equivalent just to be safe.
-                stackFrame.setOperand(0, 0, false);
-                return;
-            } else if (this.partitionPcStatus == Status.UNSATISFIABLE) {
+            if (this.partitionPcStatus == Status.UNSATISFIABLE) {
                 // If we know that the partition is UNREACHABLE,
                 // mark it as equivalent.
                 stackFrame.setOperand(0, 1, false);
                 return;
-            } else if (this.partitionPcStatus == Status.SATISFIABLE) {
-                // If we know that the partition is REACHABLE,
+            } else if (this.partitionPcStatus == Status.SATISFIABLE || this.partitionPcStatus == Status.UNKNOWN) {
+                // If we don't know that the partition is unreachable,
                 // continue with the analysis to check whether
                 // both programs produce the same result.
             } else {

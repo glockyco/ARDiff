@@ -74,57 +74,68 @@ public class PartitionClassifier implements Classifier {
         } else if (this.isDepthLimited) {
             return Classification.DEPTH_LIMITED;
         } else {
-            if (this.pcStatus == Status.UNKNOWN
-                || this.notPcStatus == Status.UNKNOWN
-                || this.neqStatus == Status.UNKNOWN
-                || this.eqStatus == Status.UNKNOWN
-            ) {
+            // If we have not encountered any errors, timeouts, etc.,
+            // we must have some equivalence information about this partition.
+            assert this.neqStatus != null;
+
+            if (this.neqStatus == Status.UNKNOWN) {
+                // The equivalence information does NOT provide any indication
+                // about whether this partition is equivalent or not.
                 return Classification.UNKNOWN;
             } else {
-                // We have indication that this partition is reachable.
-                assert this.pcStatus == Status.SATISFIABLE;
-                if (this.notPcStatus == Status.UNSATISFIABLE) {
-                    // We're sure that this partition is reachable.
+                // The equivalence information DOES provide some indication
+                // about whether this partition is equivalent or not.
+                assert this.neqStatus == Status.SATISFIABLE || this.neqStatus == Status.UNSATISFIABLE;
+
+                if (this.pcStatus == Status.UNKNOWN || this.notPcStatus == Status.UNKNOWN) {
+                    // We're unsure whether this partition is reachable.
                     if (this.neqStatus == Status.SATISFIABLE) {
-                        // We have indication hat this partition is NEQ.
-                        if (this.eqStatus == Status.UNSATISFIABLE) {
-                            // We're sure that this partition is NEQ.
-                            return Classification.NEQ;
-                        } else {
-                            // We're unsure whether this partition is NEQ.
-                            assert this.eqStatus == Status.SATISFIABLE;
-                            return Classification.MAYBE_NEQ;
-                        }
+                        // We have indication that this partition is NEQ.
+                        return Classification.MAYBE_NEQ;
                     } else {
                         // We have no indication that this partition is NEQ.
                         assert this.neqStatus == Status.UNSATISFIABLE;
                         return Classification.EQ;
                     }
                 } else {
-                    // We're unsure whether this partition is reachable.
-                    assert this.notPcStatus == Status.SATISFIABLE;
-                    if (this.neqStatus == Status.SATISFIABLE) {
-                        // We have indication that this partition is NEQ. Since
-                        // we're unsure whether this partition is reachable,
-                        // we can only classify it as MAYBE_NEQ, irrespective
-                        // of whether we're sure or unsure about the partition
-                        // being NEQ, i.e.:
-                        // "maybe REACHABLE" +       NEQ = MAYBE_NEQ, and
-                        // "maybe REACHABLE" + MAYBE_NEQ = MAYBE_NEQ.
-                        // So the result is the same in both cases.
-                        return Classification.MAYBE_NEQ;
+                    // We have indication that this partition is reachable.
+                    assert this.pcStatus == Status.SATISFIABLE;
+                    if (this.notPcStatus == Status.UNSATISFIABLE) {
+                        // We're sure that this partition is reachable.
+                        if (this.neqStatus == Status.SATISFIABLE) {
+                            // We have indication hat this partition is NEQ.
+                            if (this.eqStatus == Status.UNSATISFIABLE) {
+                                // We're sure that this partition is NEQ.
+                                return Classification.NEQ;
+                            } else {
+                                // We're unsure whether this partition is NEQ.
+                                assert this.eqStatus == Status.SATISFIABLE || this.eqStatus == Status.UNKNOWN;
+                                return Classification.MAYBE_NEQ;
+                            }
+                        } else {
+                            // We have no indication that this partition is NEQ.
+                            assert this.neqStatus == Status.UNSATISFIABLE;
+                            return Classification.EQ;
+                        }
                     } else {
-                        // We have no indication that this partition is NEQ.
-                        assert this.neqStatus == Status.UNSATISFIABLE;
-                        return Classification.EQ;
-                        // Note that classifications on the partition level
-                        // never result in MAYBE_EQ. This is because MAYBE_EQ
-                        // results only arise if we have a *partial* result
-                        // without any indication of non-equivalence. Since we
-                        // only include partitions once we fully analyzed them
-                        // (or mark them as TIMEOUT, DEPTH_LIMITED, etc. if we
-                        // cannot (fully) analyze them) such partial results
-                        // cannot arise.
+                        // We're unsure whether this partition is reachable.
+                        assert this.notPcStatus == Status.SATISFIABLE;
+                        if (this.neqStatus == Status.SATISFIABLE) {
+                            // We have indication that this partition is NEQ.
+                            return Classification.MAYBE_NEQ;
+                        } else {
+                            // We have no indication that this partition is NEQ.
+                            assert this.neqStatus == Status.UNSATISFIABLE;
+                            return Classification.EQ;
+                            // Note that classifications on the partition level
+                            // never result in MAYBE_EQ. This is because MAYBE_EQ
+                            // results only arise if we have a *partial* result
+                            // without any indication of non-equivalence. Since we
+                            // only include partitions once we fully analyzed them
+                            // (or mark them as TIMEOUT, DEPTH_LIMITED, etc. if we
+                            // cannot (fully) analyze them) such partial results
+                            // cannot arise.
+                        }
                     }
                 }
             }
