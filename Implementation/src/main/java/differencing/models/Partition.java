@@ -1,5 +1,6 @@
 package differencing.models;
 
+import com.microsoft.z3.Status;
 import differencing.classification.Classification;
 
 import java.util.Objects;
@@ -12,6 +13,10 @@ public class Partition {
 
     // Non-Index
     public Classification result;
+    public Status pcStatus;
+    public Status notPcStatus;
+    public Status neqStatus;
+    public Status eqStatus;
     public Boolean hasUif;
     public Boolean hasUifPc;
     public Boolean hasUifV1;
@@ -20,7 +25,12 @@ public class Partition {
     public String errors;
 
     public Partition(String benchmark, String tool, int partition) {
-        this(benchmark, tool, partition, null, null, null, null, null, null);
+        this(
+            benchmark, tool, partition, null,
+            null, null, null, null,
+            null, null, null,
+            null, null
+        );
     }
 
     public Partition(
@@ -28,6 +38,10 @@ public class Partition {
         String tool,
         int partition,
         Classification result,
+        Status pcStatus,
+        Status notPcStatus,
+        Status neqStatus,
+        Status eqStatus,
         Boolean hasUifPc,
         Boolean hasUifV1,
         Boolean hasUifV2,
@@ -39,6 +53,10 @@ public class Partition {
         this.partition = partition;
 
         this.result = result;
+        this.pcStatus = pcStatus;
+        this.notPcStatus = notPcStatus;
+        this.neqStatus = neqStatus;
+        this.eqStatus = eqStatus;
         this.hasUifPc = hasUifPc;
         this.hasUifV1 = hasUifV1;
         this.hasUifV2 = hasUifV2;

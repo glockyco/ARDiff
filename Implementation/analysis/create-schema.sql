@@ -37,6 +37,10 @@ CREATE TABLE IF NOT EXISTS partition
     partition INTEGER NOT NULL,
 
     result TEXT,
+    pc_status INTEGER,
+    not_pc_status INTEGER,
+    neq_status INTEGER,
+    eq_status INTEGER,
     has_uif BOOLEAN,
     has_uif_pc BOOLEAN,
     has_uif_v1 BOOLEAN,
