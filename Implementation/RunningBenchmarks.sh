@@ -210,31 +210,37 @@ fi
 # Build the application JAR files
 
 if [ "$build" = true ] ; then
-  printf "Building JAR files ..."
+  if [ "$run_base" = true ] || [ "$run_diff" = true ] ; then
+    printf "Building JAR files ..."
 
-  # Build base JAR
-  command="gradle -PmainClass=Runner.Runner shadowJar"
+    if [ "$run_base" = true ] ; then
+      # Build base JAR
+      command="gradle -PmainClass=Runner.Runner shadowJar"
 
-  if [ "$print_commands" = true ] ; then
-    printf "\n%s" "${command}"
+      if [ "$print_commands" = true ] ; then
+        printf "\n%s" "${command}"
+      fi
+
+      if [ "$dry_run" = false ] ; then
+        eval "${command}"
+      fi
+    fi
+
+    if [ "$run_diff" = true ] ; then
+      # Build diff JAR
+      command="gradle -PmainClass=differencing.DifferencingRunner shadowJar"
+
+      if [ "$print_commands" = true ] ; then
+        printf "\n%s" "${command}"
+      fi
+
+      if [ "$dry_run" = false ] ; then
+        eval "${command}"
+      fi
+    fi
+
+    printf "\n"
   fi
-
-  if [ "$dry_run" = false ] ; then
-    eval "${command}"
-  fi
-
-  # Build diff JAR
-  command="gradle -PmainClass=differencing.DifferencingRunner shadowJar"
-
-  if [ "$print_commands" = true ] ; then
-    printf "\n%s" "${command}"
-  fi
-
-  if [ "$dry_run" = false ] ; then
-    eval "${command}"
-  fi
-
-  printf "\n"
 fi
 
 # Process the benchmark programs
