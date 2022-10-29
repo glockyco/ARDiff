@@ -224,6 +224,9 @@ public class DifferencingListener extends PropertyListenerAdapter {
                         // throw an exception to force us to fix this.
                         throw new RuntimeException("Unexpected EQ status '" + this.partitionEqStatus + "'.");
                     }
+                } else {
+                    assert this.satChecker.checkEq(pcModel, v1Model, v2Model) == Status.UNSATISFIABLE;
+                    this.partitionEqStatus = Status.UNSATISFIABLE;
                 }
             } else {
                 // If we encounter an unexpected status,
