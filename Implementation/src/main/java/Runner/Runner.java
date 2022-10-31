@@ -16,6 +16,7 @@ import GradDiff.GradDiff;
 import IMPs.ImpactedS;
 import SE.SE;
 import com.microsoft.z3.Context;
+import differencing.RunTimer;
 import differencing.classification.Classification;
 import differencing.classification.RunClassifier;
 import differencing.models.Benchmark;
@@ -115,7 +116,7 @@ public class Runner{
         BenchmarkRepository.insertOrUpdate(benchmark);
         RunRepository.insertOrUpdate(run);
 
-        long start = System.currentTimeMillis();
+        RunTimer.start();
 
         Thread shutdownHook = new Thread(() -> {
             Path benchmarkPath = Paths.get("../benchmarks/" + benchmark.benchmark);
@@ -149,7 +150,7 @@ public class Runner{
                 isDepthLimited,
                 hasUif,
                 iterationCount,
-                (System.currentTimeMillis() - start) / 1000f,
+                RunTimer.getTime(),
                 ""
             ));
         });
@@ -191,7 +192,7 @@ public class Runner{
             isDepthLimited,
             hasUif,
             iterationCount,
-            (System.currentTimeMillis() - start) / 1000f,
+            RunTimer.getTime(),
             errors
         ));
     }

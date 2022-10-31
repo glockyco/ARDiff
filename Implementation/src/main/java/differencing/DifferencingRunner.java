@@ -114,7 +114,7 @@ public class DifferencingRunner {
         PathConditionListener pcListener = new PathConditionListener(parameters);
         DifferencingListener diffListener = new DifferencingListener(run, parameters, solverTimeout);
 
-        long start = System.currentTimeMillis();
+        RunTimer.start();
 
         boolean hasSucceeded = false;
         String errors = "";
@@ -137,7 +137,7 @@ public class DifferencingRunner {
                     diffListener.isDepthLimited(),
                     diffListener.hasUif(),
                     1,
-                    (System.currentTimeMillis() - start) / 1000f,
+                    RunTimer.getTime(),
                     ""
                 ));
 
@@ -197,7 +197,7 @@ public class DifferencingRunner {
             diffListener.isDepthLimited(),
             diffListener.hasUif(),
             1,
-            (System.currentTimeMillis() - start) / 1000f,
+            RunTimer.getTime(),
             errors
         ));
 

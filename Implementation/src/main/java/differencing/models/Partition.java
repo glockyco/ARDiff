@@ -22,6 +22,7 @@ public class Partition {
     public Boolean hasUifV1;
     public Boolean hasUifV2;
     public Integer constraintCount;
+    public Float runtime;
     public String errors;
 
     public Partition(String benchmark, String tool, int partition) {
@@ -29,7 +30,7 @@ public class Partition {
             benchmark, tool, partition, null,
             null, null, null, null,
             null, null, null,
-            null, null
+            null, null, null
         );
     }
 
@@ -46,6 +47,7 @@ public class Partition {
         Boolean hasUifV1,
         Boolean hasUifV2,
         Integer constraintCount,
+        Float runtime,
         String errors
     ) {
         this.benchmark = benchmark;
@@ -61,6 +63,7 @@ public class Partition {
         this.hasUifV1 = hasUifV1;
         this.hasUifV2 = hasUifV2;
         this.constraintCount = constraintCount;
+        this.runtime = runtime;
         this.errors = errors;
 
         if (hasUifPc == null && hasUifV1 == null && hasUifV2 == null) {

@@ -36,9 +36,10 @@ public class PartitionRepository extends Repository {
         "has_uif_v1, " +
         "has_uif_v2, " +
         "constraint_count, " +
+        "runtime, " +
         "errors" +
         ") " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
         "ON CONFLICT DO UPDATE SET " +
         "result = excluded.result, " +
         "pc_status = excluded.pc_status, " +
@@ -50,6 +51,7 @@ public class PartitionRepository extends Repository {
         "has_uif_v1 = excluded.has_uif_v1, " +
         "has_uif_v2 = excluded.has_uif_v2, " +
         "constraint_count = excluded.constraint_count, " +
+        "runtime = excluded.runtime, " +
         "errors = excluded.errors";
 
     private static void insertOrUpdateFull(Partition partition) {
@@ -68,7 +70,8 @@ public class PartitionRepository extends Repository {
             ps.setObject(11, partition.hasUifV1);
             ps.setObject(12, partition.hasUifV2);
             ps.setObject(13, partition.constraintCount);
-            ps.setObject(14, partition.errors);
+            ps.setObject(14, partition.runtime);
+            ps.setObject(15, partition.errors);
             ps.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);

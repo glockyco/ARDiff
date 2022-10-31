@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS partition
     has_uif_v1 BOOLEAN,
     has_uif_v2 BOOLEAN,
     constraint_count INTEGER,
+    runtime REAL,
     errors TEXT,
 
     PRIMARY KEY (benchmark, tool, partition),

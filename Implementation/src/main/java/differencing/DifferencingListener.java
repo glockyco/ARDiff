@@ -270,6 +270,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
             this.hasPartitionUifV1,
             this.hasPartitionUifV2,
             this.partitionPcConstraintCount,
+            RunTimer.getTime(),
             ""
         );
 
