@@ -274,6 +274,13 @@ for d1 in ../benchmarks/* ; do
               printf "\n"
               mkdir -p "${d3}/instrumented/"
               eval "${base_command}"
+              # Kill any leftover z3 / RunJPF.jar processes
+              # that were started by the base tool.
+              # This is necessary in case the base tool was
+              # stopped by the timeout and the child processes
+              # were, therefore, not correctly terminated.
+              pkill z3
+              pkill -f RunJPF.jar
             fi
           fi
 
