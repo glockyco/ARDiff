@@ -1,0 +1,122 @@
+Classifications for PC/~PC solver queries:
+
+PC = t && ~PC = t => MAYBE_REACHABLE
+PC = t && ~PC = f => REACHABLE
+PC = t && ~PC = u => MAYBE_REACHABLE
+PC = f && ~PC = t => UNREACHABLE
+PC = f && ~PC = f => UNREACHABLE
+PC = f && ~PC = u => UNREACHABLE
+PC = u && ~PC = t => MAYBE_REACHABLE
+PC = u && ~PC = f => MAYBE_REACHABLE
+PC = u && ~PC = u => MAYBE_REACHABLE
+
+Classifications for NEQ/EQ solver queries:
+
+NEQ = t && EQ = t => MAYBE_NEQ
+NEQ = t && EQ = f => NEQ
+NEQ = t && EQ = u => MAYBE_NEQ
+NEQ = f && EQ = t => EQ
+NEQ = f && EQ = f => EQ
+NEQ = f && EQ = u => EQ
+NEQ = u && EQ = t => MAYBE_EQ
+NEQ = u && EQ = f => NEQ
+NEQ = u && EQ = u => UNKNOWN
+
+Overall classifications for PC/~PC and NEQ/EQ solver queries:
+
+UNREACHABLE     && <ANY>     = UNREACHABLE
+REACHABLE       && EQ        = EQ
+REACHABLE       && NEQ       = NEQ
+REACHABLE       && MAYBE_EQ  = MAYBE_EQ  (or maybe NEQ)
+REACHABLE       && MAYBE_NEQ = MAYBE_NEQ (or maybe EQ)
+REACHABLE       && UNKNOWN   = UNKNOWN
+MAYBE_REACHABLE && EQ        = EQ
+MAYBE_REACHABLE && NEQ       = MAYBE_NEQ (or maybe UNREACHABLE)
+MAYBE_REACHABLE && MAYBE_EQ  = MAYBE_EQ  (or maybe UNREACHABLE or maybe NEQ)
+MAYBE_REACHABLE && MAYBE_NEQ = MAYBE_NEQ (or maybe UNREACHABLE or maybe EQ)
+MAYBE_REACHABLE && UNKNOWN   = UNKNOWN
+
+Classifications for all possible PC/~PC/NEQ/EQ cases:
+
+    PC  ~PC NEQ  EQ
+ 1:  t   t   t   t  -> MAYBE_REACHABLE && MAYBE_NEQ => MAYBE_NEQ
+ 2:  t   t   t   f  -> MAYBE_REACHABLE && NEQ       => MAYBE_NEQ
+ 3:  t   t   t   u  -> MAYBE_REACHABLE && MAYBE_NEQ => MAYBE_NEQ
+ 4:  t   t   f   t  -> MAYBE_REACHABLE && EQ        => EQ
+ 5:  t   t   f   f  -> MAYBE_REACHABLE && EQ        => EQ
+ 6:  t   t   f   u  -> MAYBE_REACHABLE && EQ        => EQ
+ 7:  t   t   u   t  -> MAYBE_REACHABLE && MAYBE_EQ  => MAYBE_EQ
+ 8:  t   t   u   f  -> MAYBE_REACHABLE && NEQ       => MAYBE_NEQ
+ 9:  t   t   u   u  -> MAYBE_REACHABLE && UNKNOWN   => UNKNOWN
+10:  t   f   t   t  -> REACHABLE       && MAYBE_NEQ => MAYBE_NEQ
+11:  t   f   t   f  -> REACHABLE       && NEQ       => NEQ
+12:  t   f   t   u  -> REACHABLE       && MAYBE_NEQ => MAYBE_NEQ
+13:  t   f   f   t  -> REACHABLE       && EQ        => EQ
+14:  t   f   f   f  -> REACHABLE       && EQ        => EQ
+15:  t   f   f   u  -> REACHABLE       && EQ        => EQ
+16:  t   f   u   t  -> REACHABLE       && MAYBE_EQ  => MAYBE_EQ
+17:  t   f   u   f  -> REACHABLE       && NEQ       => NEQ
+18:  t   f   u   u  -> REACHABLE       && UNKNOWN   => UNKNOWN
+19:  t   u   t   t  -> MAYBE_REACHABLE && MAYBE_NEQ => MAYBE_NEQ
+20:  t   u   t   f  -> MAYBE_REACHABLE && NEQ       => MAYBE_NEQ
+21:  t   u   t   u  -> MAYBE_REACHABLE && MAYBE_NEQ => MAYBE_NEQ
+22:  t   u   f   t  -> MAYBE_REACHABLE && EQ        => EQ
+23:  t   u   f   f  -> MAYBE_REACHABLE && EQ        => EQ
+24:  t   u   f   u  -> MAYBE_REACHABLE && EQ        => EQ
+25:  t   u   u   t  -> MAYBE_REACHABLE && MAYBE_EQ  => MAYBE_EQ
+26:  t   u   u   f  -> MAYBE_REACHABLE && NEQ       => MAYBE_NEQ
+27:  t   u   u   u  -> MAYBE_REACHABLE && UNKNOWN   => UNKNOWN
+28:  f   t   t   t  -> UNREACHABLE     && MAYBE_NEQ => UNREACHABLE
+29:  f   t   t   f  -> UNREACHABLE     && NEQ       => UNREACHABLE
+30:  f   t   t   u  -> UNREACHABLE     && MAYBE_NEQ => UNREACHABLE
+31:  f   t   f   t  -> UNREACHABLE     && EQ        => UNREACHABLE
+32:  f   t   f   f  -> UNREACHABLE     && EQ        => UNREACHABLE
+33:  f   t   f   u  -> UNREACHABLE     && EQ        => UNREACHABLE
+34:  f   t   u   t  -> UNREACHABLE     && MAYBE_EQ  => UNREACHABLE
+35:  f   t   u   f  -> UNREACHABLE     && NEQ       => UNREACHABLE
+36:  f   t   u   u  -> UNREACHABLE     && UNKNOWN   => UNREACHABLE
+37:  f   f   t   t  -> UNREACHABLE     && MAYBE_NEQ => UNREACHABLE
+38:  f   f   t   f  -> UNREACHABLE     && NEQ       => UNREACHABLE
+39:  f   f   t   u  -> UNREACHABLE     && MAYBE_NEQ => UNREACHABLE
+40:  f   f   f   t  -> UNREACHABLE     && EQ        => UNREACHABLE
+41:  f   f   f   f  -> UNREACHABLE     && EQ        => UNREACHABLE
+42:  f   f   f   u  -> UNREACHABLE     && EQ        => UNREACHABLE
+43:  f   f   u   t  -> UNREACHABLE     && MAYBE_EQ  => UNREACHABLE
+44:  f   f   u   f  -> UNREACHABLE     && NEQ       => UNREACHABLE
+45:  f   f   u   u  -> UNREACHABLE     && UNKNOWN   => UNREACHABLE
+46:  f   u   t   t  -> UNREACHABLE     && MAYBE_NEQ => UNREACHABLE
+47:  f   u   t   f  -> UNREACHABLE     && NEQ       => UNREACHABLE
+48:  f   u   t   u  -> UNREACHABLE     && MAYBE_NEQ => UNREACHABLE
+49:  f   u   f   t  -> UNREACHABLE     && EQ        => UNREACHABLE
+50:  f   u   f   f  -> UNREACHABLE     && EQ        => UNREACHABLE
+51:  f   u   f   u  -> UNREACHABLE     && EQ        => UNREACHABLE
+52:  f   u   u   t  -> UNREACHABLE     && MAYBE_EQ  => UNREACHABLE
+53:  f   u   u   f  -> UNREACHABLE     && NEQ       => UNREACHABLE
+54:  f   u   u   u  -> UNREACHABLE     && UNKNOWN   => UNREACHABLE
+55:  u   t   t   t  -> MAYBE_REACHABLE && MAYBE_NEQ => MAYBE_NEQ
+56:  u   t   t   f  -> MAYBE_REACHABLE && NEQ       => MAYBE_NEQ
+57:  u   t   t   u  -> MAYBE_REACHABLE && MAYBE_NEQ => MAYBE_NEQ
+58:  u   t   f   t  -> MAYBE_REACHABLE && EQ        => EQ
+59:  u   t   f   f  -> MAYBE_REACHABLE && EQ        => EQ
+60:  u   t   f   u  -> MAYBE_REACHABLE && EQ        => EQ
+61:  u   t   u   t  -> MAYBE_REACHABLE && MAYBE_EQ  => MAYBE_EQ
+62:  u   t   u   f  -> MAYBE_REACHABLE && NEQ       => MAYBE_NEQ
+63:  u   t   u   u  -> MAYBE_REACHABLE && UNKNOWN   => UNKNOWN
+64:  u   f   t   t  -> MAYBE_REACHABLE && MAYBE_NEQ => MAYBE_NEQ
+65:  u   f   t   f  -> MAYBE_REACHABLE && NEQ       => MAYBE_NEQ
+66:  u   f   t   u  -> MAYBE_REACHABLE && MAYBE_NEQ => MAYBE_NEQ
+67:  u   f   f   t  -> MAYBE_REACHABLE && EQ        => EQ
+68:  u   f   f   f  -> MAYBE_REACHABLE && EQ        => EQ
+69:  u   f   f   u  -> MAYBE_REACHABLE && EQ        => EQ
+70:  u   f   u   t  -> MAYBE_REACHABLE && MAYBE_EQ  => MAYBE_EQ
+71:  u   f   u   f  -> MAYBE_REACHABLE && NEQ       => MAYBE_NEQ
+72:  u   f   u   u  -> MAYBE_REACHABLE && UNKNOWN   => UNKNOWN
+73:  u   u   t   t  -> MAYBE_REACHABLE && MAYBE_NEQ => MAYBE_NEQ
+74:  u   u   t   f  -> MAYBE_REACHABLE && NEQ       => MAYBE_NEQ
+75:  u   u   t   u  -> MAYBE_REACHABLE && MAYBE_NEQ => MAYBE_NEQ
+76:  u   u   f   t  -> MAYBE_REACHABLE && EQ        => EQ
+77:  u   u   f   f  -> MAYBE_REACHABLE && EQ        => EQ
+78:  u   u   f   u  -> MAYBE_REACHABLE && EQ        => EQ
+79:  u   u   u   t  -> MAYBE_REACHABLE && MAYBE_EQ  => MAYBE_EQ
+80:  u   u   u   f  -> MAYBE_REACHABLE && NEQ       => MAYBE_NEQ
+81:  u   u   u   u  -> MAYBE_REACHABLE && UNKNOWN   => UNKNOWN
