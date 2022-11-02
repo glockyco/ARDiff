@@ -9,9 +9,10 @@ public class PartitionClassifier implements Classifier {
     private final boolean isTimeout;
     private final boolean isDepthLimited;
     private final Status pcStatus;
-    private final Status notPcStatus;
     private final Status neqStatus;
     private final Status eqStatus;
+    private final boolean hasUifPc;
+    private final boolean hasUif;
 
     private final Classification classification;
 
@@ -22,9 +23,10 @@ public class PartitionClassifier implements Classifier {
         boolean isTimeout,
         boolean isDepthLimited,
         Status pcStatus,
-        Status notPcStatus,
         Status neqStatus,
-        Status eqStatus
+        Status eqStatus,
+        boolean hasUifPc,
+        boolean hasUif
     ) {
         // Partitions should never have a MISSING or BASE_TOOL_MISSING status.
         // This is because we don't know (and can't know) which partitions
@@ -38,9 +40,11 @@ public class PartitionClassifier implements Classifier {
         this.isTimeout = isTimeout;
         this.isDepthLimited = isDepthLimited;
         this.pcStatus = pcStatus;
-        this.notPcStatus = notPcStatus;
         this.neqStatus = neqStatus;
         this.eqStatus = eqStatus;
+
+        this.hasUifPc = hasUifPc;
+        this.hasUif = hasUif;
 
         this.classification = this.classify();
     }
@@ -50,12 +54,29 @@ public class PartitionClassifier implements Classifier {
         return this.classification;
     }
 
-    private Classification classify() {
-        // pcStatus and notPcStatus MUST be provided.
-        assert this.pcStatus != null;
-        assert this.notPcStatus != null;
+    private enum ReachabilityClassification {
+        REACHABLE,
+        UNREACHABLE,
+        MAYBE_REACHABLE,
+        ERROR
+    }
 
-        if (this.pcStatus == Status.UNSATISFIABLE) {
+    private enum EquivalenceClassification {
+        EQ,
+        NEQ,
+        MAYBE_EQ,
+        MAYBE_NEQ,
+        UNKNOWN,
+        ERROR
+    }
+
+    private Classification classify() {
+        // pcStatus  MUST be provided.
+        assert this.pcStatus != null;
+
+        ReachabilityClassification reachabilityClassification = this.classifyReachability();
+
+        if (reachabilityClassification == ReachabilityClassification.UNREACHABLE) {
             // If we know that the partition is unreachable,
             // we can just ignore the partition irrespective
             // of any other information we might have about it.
@@ -71,69 +92,150 @@ public class PartitionClassifier implements Classifier {
         } else if (this.isDepthLimited) {
             return Classification.DEPTH_LIMITED;
         } else {
-            // If we have not encountered any errors, timeouts, etc.,
-            // some (non-)equivalence information MUST also be provided.
             assert this.neqStatus != null;
+            assert this.eqStatus != null;
 
-            // If neqStatus is SAT or UNKNOWN, eqStatus MUST also be provided.
-            assert this.neqStatus == Status.UNSATISFIABLE || this.eqStatus != null;
+            EquivalenceClassification equivalenceClassification = this.classifyEquivalence();
 
-            // This partition is either REACHABLE or MAYBE_REACHABLE.
-            // If it is REACHABLE, NEQ results stay NEQ.
-            // If it is MAYBE_REACHABLE, NEQ results become MAYBE_NEQ.
-            boolean isReachable = pcStatus == Status.SATISFIABLE && notPcStatus == Status.UNSATISFIABLE;
+            return classifyOverall(reachabilityClassification, equivalenceClassification);
+        }
+    }
 
-            if (neqStatus == Status.UNSATISFIABLE) {
-                // We have no indication that this partition is NEQ.
-                return Classification.EQ;
-            } else if (neqStatus == Status.SATISFIABLE) {
-                // We have indication that this partition is NEQ.
-                if (eqStatus == Status.UNSATISFIABLE) {
-                    // We have no indication that this partition is EQ.
-                    // NEQ = t && EQ = f => NEQ.
-                    if (isReachable) {
-                        // We know that this partition is reachable.
-                        // NEQ && REACHABLE => NEQ
-                        return Classification.NEQ;
-                    } else {
-                        // We're unsure whether this partition is reachable.
-                        // NEQ && MAYBE_REACHABLE => MAYBE_NEQ
-                        return Classification.MAYBE_NEQ;
-                    }
-                } else {
-                    // We have indication that this partition is EQ,
-                    // or we're unsure whether this partition is EQ.
-                    // NEQ = t && (EQ = t || EQ = u) => MAYBE_NEQ
-                    assert eqStatus == Status.SATISFIABLE || eqStatus == Status.UNKNOWN;
-                    return Classification.MAYBE_NEQ;
-                }
+    private ReachabilityClassification classifyReachability() {
+        return this.hasUifPc
+            ? this.classifyReachabilityUif()
+            : this.classifyReachabilityNoUif();
+    }
+
+    private ReachabilityClassification classifyReachabilityNoUif() {
+        if (this.pcStatus == Status.SATISFIABLE) {
+            return ReachabilityClassification.REACHABLE;
+        } else if (this.pcStatus == Status.UNSATISFIABLE) {
+            return ReachabilityClassification.UNREACHABLE;
+        } else {
+            assert this.pcStatus == Status.UNKNOWN;
+            return ReachabilityClassification.MAYBE_REACHABLE;
+        }
+    }
+
+    private ReachabilityClassification classifyReachabilityUif() {
+        if (this.pcStatus == Status.SATISFIABLE) {
+            return ReachabilityClassification.MAYBE_REACHABLE;
+        } else if (this.pcStatus == Status.UNSATISFIABLE) {
+            return ReachabilityClassification.UNREACHABLE;
+        } else {
+            assert this.pcStatus == Status.UNKNOWN;
+            return ReachabilityClassification.MAYBE_REACHABLE;
+        }
+    }
+
+    private EquivalenceClassification classifyEquivalence() {
+        return this.hasUif
+            ? this.classifyEquivalenceUif()
+            : this.classifyEquivalenceNoUif();
+    }
+
+    private EquivalenceClassification classifyEquivalenceNoUif() {
+        if (this.neqStatus == Status.SATISFIABLE) {
+            if (this.eqStatus == Status.SATISFIABLE) {
+                return EquivalenceClassification.NEQ;
+            } else if (this.eqStatus == Status.UNSATISFIABLE) {
+                return EquivalenceClassification.NEQ;
             } else {
-                // We're unsure whether this partition is NEQ.
-                assert this.neqStatus == Status.UNKNOWN;
-                if (eqStatus == Status.UNSATISFIABLE) {
-                    // We have no indication that this partition is EQ.
-                    // NEQ = u && EQ = f => NEQ.
-                    if (isReachable) {
-                        // We know that this partition is reachable.
-                        // NEQ && REACHABLE => NEQ
-                        return Classification.NEQ;
-                    } else {
-                        // We're unsure whether this partition is reachable.
-                        // NEQ && MAYBE_REACHABLE => MAYBE_NEQ
-                        return Classification.MAYBE_NEQ;
-                    }
-                } else if (eqStatus == Status.SATISFIABLE) {
-                    // We have indication that this partition is EQ.
-                    // NEQ = u && EQ = t => MAYBE_EQ
-                    return Classification.MAYBE_EQ;
-                } else {
-                    // We're unsure whether this partition is EQ.
-                    // NEQ = u && EQ = u => UNKNOWN
-                    assert eqStatus == Status.UNKNOWN;
-                    return Classification.UNKNOWN;
-                }
+                assert this.eqStatus == Status.UNKNOWN;
+                return EquivalenceClassification.NEQ;
+            }
+        } else if (this.neqStatus == Status.UNSATISFIABLE) {
+            if (this.eqStatus == Status.SATISFIABLE) {
+                return EquivalenceClassification.EQ;
+            } else if (this.eqStatus == Status.UNSATISFIABLE) {
+                return EquivalenceClassification.ERROR;
+            } else {
+                assert this.eqStatus == Status.UNKNOWN;
+                return EquivalenceClassification.EQ;
+            }
+        } else {
+            assert this.neqStatus == Status.UNKNOWN;
+            if (this.eqStatus == Status.SATISFIABLE) {
+                return EquivalenceClassification.MAYBE_EQ;
+            } else if (this.eqStatus == Status.UNSATISFIABLE) {
+                return EquivalenceClassification.NEQ;
+            } else {
+                assert this.eqStatus == Status.UNKNOWN;
+                return EquivalenceClassification.UNKNOWN;
             }
         }
+    }
+
+    private EquivalenceClassification classifyEquivalenceUif() {
+        if (this.neqStatus == Status.SATISFIABLE) {
+            if (this.eqStatus == Status.SATISFIABLE) {
+                return EquivalenceClassification.MAYBE_NEQ;
+            } else if (this.eqStatus == Status.UNSATISFIABLE) {
+                return EquivalenceClassification.NEQ;
+            } else {
+                assert this.eqStatus == Status.UNKNOWN;
+                return EquivalenceClassification.MAYBE_NEQ;
+            }
+        } else if (this.neqStatus == Status.UNSATISFIABLE) {
+            if (this.eqStatus == Status.SATISFIABLE) {
+                return EquivalenceClassification.EQ;
+            } else if (this.eqStatus == Status.UNSATISFIABLE) {
+                return EquivalenceClassification.ERROR;
+            } else {
+                assert this.eqStatus == Status.UNKNOWN;
+                return EquivalenceClassification.EQ;
+            }
+        } else {
+            assert this.neqStatus == Status.UNKNOWN;
+            if (this.eqStatus == Status.SATISFIABLE) {
+                return EquivalenceClassification.MAYBE_EQ;
+            } else if (this.eqStatus == Status.UNSATISFIABLE) {
+                return EquivalenceClassification.NEQ;
+            } else {
+                assert this.eqStatus == Status.UNKNOWN;
+                return EquivalenceClassification.UNKNOWN;
+            }
+        }
+    }
+
+    private Classification classifyOverall(ReachabilityClassification rc, EquivalenceClassification ec) {
+        if (rc == ReachabilityClassification.ERROR || ec == EquivalenceClassification.ERROR) {
+            return Classification.ERROR;
+        } else if (rc == ReachabilityClassification.UNREACHABLE) {
+            return Classification.UNREACHABLE;
+        } else if (rc == ReachabilityClassification.REACHABLE) {
+            switch (ec) {
+                case EQ:
+                    return Classification.EQ;
+                case NEQ:
+                    return Classification.NEQ;
+                case MAYBE_EQ:
+                    return Classification.MAYBE_EQ;
+                case MAYBE_NEQ:
+                    return Classification.MAYBE_NEQ;
+                case UNKNOWN:
+                    return Classification.UNKNOWN;
+                default:
+                    assert false;
+            }
+        } else {
+            assert rc == ReachabilityClassification.MAYBE_REACHABLE;
+            switch (ec) {
+                case EQ:
+                    return Classification.EQ;
+                case MAYBE_EQ:
+                    return Classification.MAYBE_EQ;
+                case NEQ:
+                case MAYBE_NEQ:
+                    return Classification.MAYBE_NEQ;
+                case UNKNOWN:
+                    return Classification.UNKNOWN;
+                default:
+                    assert false;
+            }
+        }
+        throw new RuntimeException("Unable to classify partition.");
     }
 
     @Override

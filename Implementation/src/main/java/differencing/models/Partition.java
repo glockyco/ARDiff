@@ -14,7 +14,6 @@ public class Partition {
     // Non-Index
     public Classification result;
     public Status pcStatus;
-    public Status notPcStatus;
     public Status neqStatus;
     public Status eqStatus;
     public Boolean hasUif;
@@ -28,7 +27,7 @@ public class Partition {
     public Partition(String benchmark, String tool, int partition) {
         this(
             benchmark, tool, partition, null,
-            null, null, null, null,
+            null, null, null,
             null, null, null,
             null, null, null
         );
@@ -40,7 +39,6 @@ public class Partition {
         int partition,
         Classification result,
         Status pcStatus,
-        Status notPcStatus,
         Status neqStatus,
         Status eqStatus,
         Boolean hasUifPc,
@@ -56,7 +54,6 @@ public class Partition {
 
         this.result = result;
         this.pcStatus = pcStatus;
-        this.notPcStatus = notPcStatus;
         this.neqStatus = neqStatus;
         this.eqStatus = eqStatus;
         this.hasUifPc = hasUifPc;

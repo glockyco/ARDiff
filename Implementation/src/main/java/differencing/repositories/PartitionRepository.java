@@ -28,7 +28,6 @@ public class PartitionRepository extends Repository {
         "partition, " +
         "result, " +
         "pc_status, " +
-        "not_pc_status, " +
         "neq_status, " +
         "eq_status, " +
         "has_uif, " +
@@ -39,11 +38,10 @@ public class PartitionRepository extends Repository {
         "runtime, " +
         "errors" +
         ") " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
         "ON CONFLICT DO UPDATE SET " +
         "result = excluded.result, " +
         "pc_status = excluded.pc_status, " +
-        "not_pc_status = excluded.not_pc_status, " +
         "neq_status = excluded.neq_status, " +
         "eq_status = excluded.eq_status, " +
         "has_uif = excluded.has_uif, " +
@@ -62,16 +60,15 @@ public class PartitionRepository extends Repository {
             ps.setObject(3, partition.partition);
             ps.setObject(4, partition.result.toString());
             ps.setObject(5, partition.pcStatus == null ? null : partition.pcStatus.toInt());
-            ps.setObject(6, partition.notPcStatus == null ? null : partition.notPcStatus.toInt());
-            ps.setObject(7, partition.neqStatus == null ? null : partition.neqStatus.toInt());
-            ps.setObject(8, partition.eqStatus == null ? null : partition.eqStatus.toInt());
-            ps.setObject(9, partition.hasUif);
-            ps.setObject(10, partition.hasUifPc);
-            ps.setObject(11, partition.hasUifV1);
-            ps.setObject(12, partition.hasUifV2);
-            ps.setObject(13, partition.constraintCount);
-            ps.setObject(14, partition.runtime);
-            ps.setObject(15, partition.errors);
+            ps.setObject(6, partition.neqStatus == null ? null : partition.neqStatus.toInt());
+            ps.setObject(7, partition.eqStatus == null ? null : partition.eqStatus.toInt());
+            ps.setObject(8, partition.hasUif);
+            ps.setObject(9, partition.hasUifPc);
+            ps.setObject(10, partition.hasUifV1);
+            ps.setObject(11, partition.hasUifV2);
+            ps.setObject(12, partition.constraintCount);
+            ps.setObject(13, partition.runtime);
+            ps.setObject(14, partition.errors);
             ps.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);

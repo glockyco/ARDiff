@@ -25,17 +25,6 @@ public class SatisfiabilityChecker {
         }
     }
 
-    public Status checkNotPc(Model pcModel) {
-        try (Context context = new Context(this.settings)) {
-            ModelToZ3Transformer modelToZ3 = new ModelToZ3Transformer(context);
-            Expr<BoolSort> pcExpr = (Expr<BoolSort>) modelToZ3.transform(pcModel);
-
-            Solver pcSolver = context.mkSolver();
-            pcSolver.add(context.mkNot(pcExpr));
-            return this.check(pcSolver);
-        }
-    }
-
     public Status checkNeq(Model pcModel, Model v1Model, Model v2Model) {
         try (Context context = new Context(this.settings)) {
             ModelToZ3Transformer modelToZ3 = new ModelToZ3Transformer(context);
