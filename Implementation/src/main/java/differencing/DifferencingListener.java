@@ -36,6 +36,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
     private final Set<Partition> partitions = new HashSet<>();
 
     private int partitionId =  1;
+    private Classification partitionClassification = null;
     private Status partitionPcStatus = null;
     private Status partitionNotPcStatus = null;
     private Status partitionNeqStatus = null;
@@ -172,91 +173,54 @@ public class DifferencingListener extends PropertyListenerAdapter {
             boolean hasUif = this.hasPartitionUifPc || this.hasPartitionUifV1 || this.hasPartitionUifV2;
 
             this.partitionPcStatus = this.satChecker.checkPc(pcModel);
-
-            if (this.hasPartitionUifPc) {
-                this.partitionNotPcStatus = this.satChecker.checkNotPc(pcModel);
-            } else {
-                assert this.satChecker.checkNotPc(pcModel) == Status.UNSATISFIABLE;
-                this.partitionNotPcStatus = Status.UNSATISFIABLE;
-            }
-
-            if (this.partitionPcStatus == Status.UNSATISFIABLE) {
-                // If we know that the partition is UNREACHABLE,
-                // mark it as equivalent.
-                stackFrame.setOperand(0, 1, false);
-                return;
-            }
-
-            // If the partition is NOT UNREACHABLE
-            // (i.e., either REACHABLE or MAYBE_REACHABLE),
-            // continue with the analysis to check whether
-            // both programs produce the same result.
-
+            this.partitionNotPcStatus = this.satChecker.checkNotPc(pcModel);
             this.partitionNeqStatus = this.satChecker.checkNeq(pcModel, v1Model, v2Model);
+            this.partitionEqStatus = this.satChecker.checkEq(pcModel, v1Model, v2Model);
 
-            if (this.partitionNeqStatus == Status.UNSATISFIABLE) {
-                // If we know that the partition can NEVER be NEQ,
-                // mark it as equivalent.
+            this.partitionClassification = new PartitionClassifier(
+                false, false, false, false, this.isPartitionDepthLimited,
+                this.partitionPcStatus, this.partitionNotPcStatus,
+                this.partitionNeqStatus, this.partitionEqStatus
+            ).getClassification();
+
+            if (this.partitionClassification == Classification.EQ ||
+                this.partitionClassification == Classification.UNREACHABLE
+            ) {
+                // If we are sure that the partition is
+                // EQ or UNREACHABLE, mark it as EQ.
                 stackFrame.setOperand(0, 1, false);
-                return;
-            }
-
-            // If we know that the partition is NEQ,
-            // or are at least unsure about it being EQ,
-            // mark it as not equivalent, just to be safe.
-            stackFrame.setOperand(0, 0, false);
-
-            // Check partitionNeqStatus to better distinguish
-            // between NEQ, MAYBE_NEQ, and UNKNOWN cases.
-            if (this.partitionNeqStatus == Status.UNKNOWN) {
-                this.partitionEqStatus = this.satChecker.checkEq(pcModel, v1Model, v2Model);
-            } else if (this.partitionNeqStatus == Status.UNSATISFIABLE) {
-                if (hasUif) {
-                    this.partitionEqStatus = this.satChecker.checkEq(pcModel, v1Model, v2Model);
-                } else {
-                    assert this.satChecker.checkEq(pcModel, v1Model, v2Model) == Status.SATISFIABLE;
-                    this.partitionEqStatus = Status.SATISFIABLE;
-                }
-            } else if (this.partitionNeqStatus == Status.SATISFIABLE) {
-                if (hasUif) {
-                    this.partitionEqStatus = this.satChecker.checkEq(pcModel, v1Model, v2Model);
-                } else {
-                    assert this.satChecker.checkEq(pcModel, v1Model, v2Model) == Status.UNSATISFIABLE;
-                    this.partitionEqStatus = Status.UNSATISFIABLE;
-                }
+            } else {
+                // If we aren't 100% sure that the partition is EQ,
+                // mark it as NEQ, just to be safe.
+                stackFrame.setOperand(0, 0, false);
             }
         }
     }
 
     private void startNextPartition() {
-        if (this.partitionPcStatus == null) {
+        if (this.partitionClassification == null) {
             PathCondition pathCondition = PathCondition.getPC(VM.getVM());
             Constraint pcConstraint = pathCondition.header;
             Model pcModel = this.spfToModel.transform(pcConstraint);
 
-            this.partitionPcStatus = this.satChecker.checkPc(pcModel);
-            this.hasPartitionUifPc = HasUifVisitor.hasUif(pcModel);
             this.partitionPcConstraintCount = this.getConstraintCount(pcConstraint);
+            this.hasPartitionUifPc = HasUifVisitor.hasUif(pcModel);
 
-            if (this.hasPartitionUifPc) {
-                this.partitionNotPcStatus = this.satChecker.checkNotPc(pcModel);
-            } else {
-                assert this.satChecker.checkNotPc(pcModel) == Status.UNSATISFIABLE;
-                this.partitionNotPcStatus = Status.UNSATISFIABLE;
-            }
+            this.partitionPcStatus = this.satChecker.checkPc(pcModel);
+            this.partitionNotPcStatus = this.satChecker.checkNotPc(pcModel);
+
+            this.partitionClassification = new PartitionClassifier(
+                false, false, false, false, this.isPartitionDepthLimited,
+                this.partitionPcStatus, this.partitionNotPcStatus,
+                this.partitionNeqStatus, this.partitionEqStatus
+            ).getClassification();
         }
-
-        Classification classification = new PartitionClassifier(
-            false, false, false, false, this.isPartitionDepthLimited,
-            this.partitionPcStatus, this.partitionNotPcStatus,
-            this.partitionNeqStatus, this.partitionEqStatus
-        ).getClassification();
 
         Partition partition = new Partition(
             this.run.benchmark,
             this.run.tool,
             this.partitionId,
-            classification,
+            this.partitionClassification,
             this.partitionPcStatus,
             this.partitionNotPcStatus,
             this.partitionNeqStatus,
@@ -273,6 +237,7 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
         this.partitions.add(partition);
         this.partitionId++;
+        this.partitionClassification = null;
         this.partitionPcStatus = null;
         this.partitionNotPcStatus = null;
         this.partitionNeqStatus = null;
