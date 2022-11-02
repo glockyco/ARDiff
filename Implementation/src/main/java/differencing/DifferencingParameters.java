@@ -89,28 +89,8 @@ public class DifferencingParameters implements Serializable {
         return Paths.get(this.directory, "IDiff" + this.toolName + "-Error.txt").toString();
     }
 
-    public String getResultFile() {
-        return Paths.get(this.directory, "IDiff" + this.toolName + "-Result.txt").toString();
-    }
-
     public String getBaseToolOutputFile() {
         return Paths.get(this.directory, "..", "outputs", this.toolName + ".txt").toString();
-    }
-
-    public String[] getZ3QueryFiles() throws IOException {
-        return this.getFiles("glob:**/IDiff" + this.toolName + "-P*-ToSolve*.txt");
-    }
-
-    public String[] getZ3AnswerFiles() throws IOException {
-        return this.getFiles("glob:**/IDiff" + this.toolName + "-P*-Answer*.txt");
-    }
-
-    public String[] getZ3ModelFiles() throws IOException {
-        return this.getFiles("glob:**/IDiff" + this.toolName + "-P*-Model*.txt");
-    }
-
-    public String[] getHasUifFiles() throws IOException {
-        return this.getFiles("glob:**/IDiff" + this.toolName + "-P*-HasUIF*.txt");
     }
 
     public String[] getJsonFiles() throws IOException {
@@ -139,14 +119,9 @@ public class DifferencingParameters implements Serializable {
 
         generatedFiles.add(this.getJavaFile());
         generatedFiles.add(this.getJpfFile());
-        generatedFiles.addAll(Arrays.asList(this.getZ3QueryFiles()));
-        generatedFiles.addAll(Arrays.asList(this.getZ3AnswerFiles()));
-        generatedFiles.addAll(Arrays.asList(this.getZ3ModelFiles()));
-        generatedFiles.addAll(Arrays.asList(this.getHasUifFiles()));
         generatedFiles.addAll(Arrays.asList(this.getJsonFiles()));
         generatedFiles.add(this.getOutputFile());
         generatedFiles.add(this.getErrorFile());
-        generatedFiles.add(this.getResultFile());
 
         return generatedFiles.toArray(new String[0]);
     }
