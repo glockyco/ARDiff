@@ -19,6 +19,8 @@ public class DifferencingParameters implements Serializable {
     private final MethodDescription newMethodDescription;
     private final MethodDescription diffMethodDescription;
 
+    private int iteration = 1;
+
     public DifferencingParameters(
         String directory,
         String toolName,
@@ -31,6 +33,14 @@ public class DifferencingParameters implements Serializable {
         this.oldMethodDescription = oldMethodDescription;
         this.newMethodDescription = newMethodDescription;
         this.diffMethodDescription = diffMethodDescription;
+    }
+
+    public int getIteration() {
+        return this.iteration;
+    }
+
+    public void incrementIteration() {
+        this.iteration++;
     }
 
     public String getToolName() {
@@ -73,14 +83,6 @@ public class DifferencingParameters implements Serializable {
         return Paths.get(this.directory, "IDiff" + this.toolName + "-Parameters.txt").toString();
     }
 
-    public String getJavaFile() {
-        return Paths.get(this.directory, "IDiff" + this.toolName + ".java").toString();
-    }
-
-    public String getJpfFile() {
-        return Paths.get(this.directory, "IDiff" + this.toolName + ".jpf").toString();
-    }
-
     public String getOutputFile() {
         return Paths.get(this.directory, "IDiff" + this.toolName + "-Output.txt").toString();
     }
@@ -93,8 +95,16 @@ public class DifferencingParameters implements Serializable {
         return Paths.get(this.directory, "..", "outputs", this.toolName + ".txt").toString();
     }
 
+    public String[] getJavaFiles() throws IOException {
+        return this.getFiles("glob:**/IDiff" + this.toolName + "*.java");
+    }
+
+    public String[] getJpfFiles() throws IOException {
+        return this.getFiles("glob:**/IDiff" + this.toolName + "*.jpf");
+    }
+
     public String[] getJsonFiles() throws IOException {
-        return this.getFiles("glob:**/IDiff" + this.toolName + "-*-JSON*.json");
+        return this.getFiles("glob:**/IDiff" + this.toolName + "*-JSON*.json");
     }
 
     private String[] getFiles(String glob) throws IOException {
@@ -117,8 +127,8 @@ public class DifferencingParameters implements Serializable {
     public String[] getGeneratedFiles() throws IOException {
         List<String> generatedFiles = new ArrayList<>();
 
-        generatedFiles.add(this.getJavaFile());
-        generatedFiles.add(this.getJpfFile());
+        generatedFiles.addAll(Arrays.asList(this.getJavaFiles()));
+        generatedFiles.addAll(Arrays.asList(this.getJpfFiles()));
         generatedFiles.addAll(Arrays.asList(this.getJsonFiles()));
         generatedFiles.add(this.getOutputFile());
         generatedFiles.add(this.getErrorFile());
@@ -131,7 +141,7 @@ public class DifferencingParameters implements Serializable {
     }
 
     public String getTargetClassName() {
-        return this.diffMethodDescription.getClassName();
+        return this.diffMethodDescription.getClassName() + this.iteration;
     }
 
     public String getSymbolicParameters() {
@@ -162,7 +172,7 @@ public class DifferencingParameters implements Serializable {
     }
 
     public String getOldClassName() {
-        return this.oldMethodDescription.getClassName();
+        return this.oldMethodDescription.getClassName() + this.iteration;
     }
 
     public String getOldReturnType() {
@@ -178,7 +188,7 @@ public class DifferencingParameters implements Serializable {
     }
 
     public String getNewClassName() {
-        return this.newMethodDescription.getClassName();
+        return this.newMethodDescription.getClassName() + this.iteration;
     }
 
     public String getNewReturnType() {

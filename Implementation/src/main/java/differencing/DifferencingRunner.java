@@ -109,8 +109,8 @@ public class DifferencingRunner {
         BenchmarkRepository.insertOrUpdate(benchmark);
         RunRepository.insertOrUpdate(run);
 
-        ExecutionListener v1ExecListener = new ExecutionListener(run, parameters, "*.IoldV" + parameters.getToolName() + ".snippet");
-        ExecutionListener v2ExecListener = new ExecutionListener(run, parameters, "*.InewV" + parameters.getToolName() + ".snippet");
+        ExecutionListener v1ExecListener = new ExecutionListener(run, parameters, "*.IoldV" + parameters.getToolName() + parameters.getIteration() + ".snippet");
+        ExecutionListener v2ExecListener = new ExecutionListener(run, parameters, "*.InewV" + parameters.getToolName() + parameters.getIteration() + ".snippet");
         PathConditionListener pcListener = new PathConditionListener(parameters);
         DifferencingListener diffListener = new DifferencingListener(run, parameters, solverTimeout);
 

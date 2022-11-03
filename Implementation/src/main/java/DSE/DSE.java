@@ -157,6 +157,7 @@ public class DSE {
         boolean gumTreePassed = false;
         Path benchmarkPath = Paths.get(this.path);
         try {
+            int iteration = 1;
             ChangeExtractor changeExtractor = new ChangeExtractor();
             if(ranByUser) {
                 String path = this.path +"instrumented";
@@ -165,7 +166,7 @@ public class DSE {
             else this.changes = changeExtractor.obtainChanges(MethodPath1, MethodPath2, ranByUser, path);
             setPathToDummy(changeExtractor.getClasspath());
             gumTreePassed = true;
-            SMTSummary summary= runEquivalenceChecking();
+            SMTSummary summary= runEquivalenceChecking(iteration);
             String result = equivalenceResult(summary);
             System.out.println(result);
             String outputs = path.split("instrumented")[0];
@@ -186,8 +187,8 @@ public class DSE {
             br.write(summary.toWrite);
             br.close();
 
-            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName);
-            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName);
+            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName, iteration);
+            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName, iteration);
 
             return summary;
         } catch (Exception e) {
@@ -210,7 +211,7 @@ public class DSE {
      * @return A SMT summary object corresponding to the information and results obtained while running JPF + Z3
      * @throws Exception
      */
-    public SMTSummary runEquivalenceChecking() throws Exception{
+    public SMTSummary runEquivalenceChecking(int iteration) throws Exception{
             //Think about which one to do defUse on
             long start = System.nanoTime();
             ClassNode ClassNode1 = new ClassNode();
@@ -267,7 +268,7 @@ public class DSE {
             statementInfoPerBlock2 = def.getStatementInfoPerBlock();
             /**********************************************************/
             if(DEBUG) System.out.println(blockResults);
-            Instrumentation instrument = new Instrumentation(path, toolName);
+            Instrumentation instrument = new Instrumentation(path, toolName, iteration);
             instrument.setBlocks(common.blocks);
             blocks = common.blocks;
             /*************Mapping each block index to a list of actual variable names ***********/
@@ -307,7 +308,7 @@ public class DSE {
 
             /**********************Running the symbolic execution ******************/
             start = System.nanoTime();
-            SymbolicExecutionRunner symbEx = new SymbolicExecutionRunner( path,instrument.packageName(),v1ClassName+toolName,v2ClassName+toolName, method2.name, methodParams.length,this.bound, this.timeout, this.SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong,parseFromSMTLib,Z3_TERMINAL);
+            SymbolicExecutionRunner symbEx = new SymbolicExecutionRunner( path,instrument.packageName(),v1ClassName+toolName+iteration,v2ClassName+toolName+iteration, method2.name, methodParams.length,this.bound, this.timeout, this.SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong,parseFromSMTLib,Z3_TERMINAL);
             symbEx.creatingJpfFiles();
             symbEx.runningJavaPathFinder();
             end = System.nanoTime();
@@ -461,7 +462,7 @@ public class DSE {
         //Overwrite the files instead of creating new files or adjust the paths given to commonBlockExtractor
         try {
             dse.changes = new ChangeExtractor().obtainChanges(dse.MethodPath1, dse.MethodPath2,dse.ranByUser,dse.path);
-            if(DEBUG) System.out.println(dse.equivalenceResult(dse.runEquivalenceChecking()));
+            if(DEBUG) System.out.println(dse.equivalenceResult(dse.runEquivalenceChecking(1)));
         } catch (Exception e) {
             e.printStackTrace();
         }

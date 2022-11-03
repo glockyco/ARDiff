@@ -33,7 +33,7 @@ public class PathConditionListener extends PropertyListenerAdapter {
 
     public PathConditionListener(DifferencingParameters parameters) {
         this.parameters = parameters;
-        this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + ".run");
+        this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + parameters.getIteration() + ".run");
 
         this.spfToModelTransformer = new SpfToModelTransformer();
         this.modelToJsonTransformer = new ModelToJsonTransformer();

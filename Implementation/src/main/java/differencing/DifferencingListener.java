@@ -24,7 +24,6 @@ import java.util.Set;
 
 public class DifferencingListener extends PropertyListenerAdapter {
     private final Run run;
-    private final DifferencingParameters parameters;
     private final MethodSpec areErrorsEquivalentSpec;
     private final MethodSpec areResultsEquivalentSpec;
     private final MethodSpec runSpec;
@@ -48,10 +47,9 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
     public DifferencingListener(Run run, DifferencingParameters parameters, int solverTimeout) {
         this.run = run;
-        this.parameters = parameters;
-        this.areErrorsEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + ".areErrorsEquivalent");
-        this.areResultsEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + ".areResultsEquivalent");
-        this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + ".run");
+        this.areErrorsEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + parameters.getIteration() + ".areErrorsEquivalent");
+        this.areResultsEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + parameters.getIteration() + ".areResultsEquivalent");
+        this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + parameters.getIteration() + ".run");
         this.satChecker = new SatisfiabilityChecker(solverTimeout);
     }
 

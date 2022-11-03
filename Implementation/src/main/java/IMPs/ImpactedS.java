@@ -142,6 +142,7 @@ public class ImpactedS {
         boolean gumTreePassed = false;
         Path benchmarkPath = Paths.get(this.path);
         try {
+            int iteration = 1;
             ChangeExtractor changeExtractor = new ChangeExtractor();
             if(ranByUser) {
                 String path = this.path +"instrumented";
@@ -150,7 +151,7 @@ public class ImpactedS {
             else changes = changeExtractor.obtainChanges(MethodPath1, MethodPath2,ranByUser,path);
             setPathToDummy(changeExtractor.getClasspath());
             gumTreePassed = true;
-            SMTSummary summary= runEquivalenceChecking();
+            SMTSummary summary= runEquivalenceChecking(iteration);
             String result = equivalenceResult(summary);
             System.out.println(result);
             String outputs = path.split("instrumented")[0];
@@ -164,8 +165,8 @@ public class ImpactedS {
             writer.close();
             fwNew.close();;
 
-            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName);
-            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName);
+            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName, iteration);
+            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName, iteration);
 
             return summary;
         } catch (Exception e) {
@@ -188,7 +189,7 @@ public class ImpactedS {
      * @return A SMT summary object corresponding to the information and results obtained while running JPF + Z3
      * @throws Exception
      */
-    public SMTSummary runEquivalenceChecking() throws Exception {
+    public SMTSummary runEquivalenceChecking(int iteration) throws Exception {
             long start,end;
             start = System.nanoTime();
 
@@ -239,7 +240,7 @@ public class ImpactedS {
 
             /******End ******/
 
-            Instrumentation instrument = new Instrumentation(path, toolName);
+            Instrumentation instrument = new Instrumentation(path, toolName, iteration);
            // instrument.setBlocks(common.blocks);
 
             /*****Generating the main methods of each class ******/
@@ -257,7 +258,7 @@ public class ImpactedS {
             times[1] = end - start;
             /**********************Running the symbolic execution ******************/
             start = System.nanoTime();
-            ImpactedSummariesRunner symbEx = new ImpactedSummariesRunner(path,instrument.packageName(),v1ClassName+toolName, v2ClassName+toolName, method2.name, methodParams.length,programSlicer.getImpactedStatements(),null,bound, timeout, SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong,parseFromSMTLib,Z3_TERMINAL);
+            ImpactedSummariesRunner symbEx = new ImpactedSummariesRunner(path,instrument.packageName(),v1ClassName+toolName+iteration, v2ClassName+toolName+iteration, method2.name, methodParams.length,programSlicer.getImpactedStatements(),null,bound, timeout, SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong,parseFromSMTLib,Z3_TERMINAL);
             symbEx.creatingJpfFiles();
             symbEx.runningJavaPathFinder();
             end = System.nanoTime();
@@ -313,6 +314,6 @@ public class ImpactedS {
         impactedS.changes = changeExtractor.obtainChanges(impactedS.MethodPath1, impactedS.MethodPath2,impactedS.ranByUser,impactedS.path);
         impactedS.setPathToDummy(changeExtractor.getClasspath());
         System.out.println(impactedS.MethodPath1+"  "+impactedS.MethodPath2);
-        System.out.println(impactedS.equivalenceResult(impactedS.runEquivalenceChecking()));
+        System.out.println(impactedS.equivalenceResult(impactedS.runEquivalenceChecking(1)));
     }
 }

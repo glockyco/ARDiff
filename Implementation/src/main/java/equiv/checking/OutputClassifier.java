@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class OutputClassifier {
-    public static Classification classify(Path benchmarkPath, String tool) throws IOException {
+    public static Classification classify(Path benchmarkPath, String tool, Integer iteration) throws IOException {
         Path outputFilePath = benchmarkPath.resolve("outputs").resolve(tool + ".txt");
 
         if (!outputFilePath.toFile().exists()) {
@@ -24,7 +24,8 @@ public class OutputClassifier {
 
         String lastOutput = output.substring(index);
         if (lastOutput.startsWith("Output : EQUIVALENT")) {
-            if (OutputClassifier.isDepthLimited(benchmarkPath, tool)) {
+            Boolean isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, tool, iteration);
+            if (isDepthLimited == null || isDepthLimited) {
                 return Classification.MAYBE_EQ;
             } else {
                 return Classification.EQ;
@@ -42,13 +43,17 @@ public class OutputClassifier {
         throw new RuntimeException("Unable to classify output '" + output + "'.");
     }
 
-    public static Boolean isDepthLimited(Path benchmarkPath, String tool) throws IOException {
+    public static Boolean isDepthLimited(Path benchmarkPath, String tool, Integer iteration) throws IOException {
+        if (iteration == null) {
+            return true;
+        }
+
         Path instrumentedPath = benchmarkPath.resolve("instrumented");
         String depthLimitReached = "depth limit reached";
 
-        String oldOutputFileName = "IoldV" + tool + "JPFOutput.txt";
+        String oldOutputFileName = "IoldV" + tool + iteration + "JPFOutput.txt";
         Path oldOutputFilePath = instrumentedPath.resolve(oldOutputFileName);
-        String newOutputFileName = "InewV" + tool + "JPFOutput.txt";
+        String newOutputFileName = "InewV" + tool + iteration + "JPFOutput.txt";
         Path newOutputFilePath = instrumentedPath.resolve(newOutputFileName);
 
         if (!oldOutputFilePath.toFile().exists() || !newOutputFilePath.toFile().exists()) {
@@ -63,8 +68,8 @@ public class OutputClassifier {
         return isOldVDepthLimited || isNewVDepthLimited;
     }
 
-    public static Boolean hasUif(Path benchmarkPath, String tool) throws IOException {
-        Path toSolvePath = benchmarkPath.resolve("instrumented").resolve("InewV" + tool + "ToSolve.txt");
+    public static Boolean hasUif(Path benchmarkPath, String tool, int iteration) throws IOException {
+        Path toSolvePath = benchmarkPath.resolve("instrumented").resolve("InewV" + tool + iteration + "ToSolve.txt");
         if (!toSolvePath.toFile().exists()) {
             return null;
         }
@@ -72,10 +77,10 @@ public class OutputClassifier {
         return toSolve.contains("(declare-fun UF_");
     }
 
-    public static Integer getIterationCount(Path benchmarkPath, String tool) throws IOException {
+    public static int getIterationCount(Path benchmarkPath, String tool) throws IOException {
         Path outputFilePath = benchmarkPath.resolve("outputs").resolve(tool + ".txt");
         if (!outputFilePath.toFile().exists()) {
-            return null;
+            return 1;
         }
         String output = new String(Files.readAllBytes(outputFilePath));
         int iterationCount = StringUtils.countMatches(output, "Iteration : ");

@@ -57,7 +57,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
         this.run = run;
         this.parameters = parameters;
         this.methodToCoverSpec = MethodSpec.createMethodSpec(methodToCover);
-        this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + ".run");
+        this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + parameters.getIteration() + ".run");
 
         this.currentPartition = new Partition(this.run.benchmark, this.run.tool, this.partitionId);
 

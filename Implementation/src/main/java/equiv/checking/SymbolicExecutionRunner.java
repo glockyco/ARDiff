@@ -98,7 +98,7 @@ public class SymbolicExecutionRunner {
 		public boolean noUFunctions;
 
 		public Classification classification = null;
-		public boolean isDepthLimited = false;
+		public Boolean isDepthLimited = false;
 		public int iterationCount = 1;
 
 		public SMTSummary() {
@@ -238,7 +238,7 @@ public class SymbolicExecutionRunner {
 			declarations = parser.declarations()+((SymParserSMTLib)parser).functionsDefinitions();
 			this.firstSummary = SymbolicExecutionRunner.this.firstSummary;
 			this.secondSummary = SymbolicExecutionRunner.this.secondSummary;
-			File expr = new File(path+newFileName+"ToSolve.txt");
+			File expr = new File(path+newFileName+this.iterationCount+"ToSolve.txt");
 			if(!expr.exists())
 				expr.createNewFile();
 			BufferedWriter bw2 = new BufferedWriter(new FileWriter(expr));
@@ -246,7 +246,7 @@ public class SymbolicExecutionRunner {
 					+secondSummary+"))))\n(check-sat-using (then smt (par-or simplify aig solve-eqs qfnra-nlsat)))\n(get-info:reason-unknown)\n(get-model)";
 			bw2.write(toSolve);
 			bw2.close();
-			String mainCommand = ProjectPaths.z3+" -smt2 " + path+newFileName+"ToSolve.txt -T:"+timeout/1000;
+			String mainCommand = ProjectPaths.z3+" -smt2 " + path+newFileName+this.iterationCount+"ToSolve.txt -T:"+timeout/1000;
 			if (DEBUG) System.out.println(mainCommand);
 			long start = System.nanoTime();
 			Process p1 = Runtime.getRuntime().exec(mainCommand);

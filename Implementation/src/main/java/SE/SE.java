@@ -100,12 +100,13 @@ public class SE {
     public SMTSummary runTool() throws Exception {
         Path benchmarkPath = Paths.get(this.path);
         try {
+            int iteration = 1;
             ChangeExtractor changeExtractor = new ChangeExtractor();
             String path = this.ranByUser ? this.path + "instrumented" : this.path;
             changeExtractor.obtainChanges(this.methodPath1, this.methodPath2, ranByUser, path);
             this.setPathToDummy(changeExtractor.getClasspath());
 
-            SMTSummary summary = this.runEquivalenceChecking();
+            SMTSummary summary = this.runEquivalenceChecking(iteration);
             String result = this.equivalenceResult(summary);
 
             System.out.println(result);
@@ -120,8 +121,8 @@ public class SE {
             modelsPath.getParent().toFile().mkdirs();
             Files.write(modelsPath, summary.toWrite.getBytes());
 
-            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName);
-            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName);
+            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName, iteration);
+            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName, iteration);
 
             return summary;
         } catch (Exception e) {
@@ -131,7 +132,7 @@ public class SE {
         }
     }
 
-    public SMTSummary runEquivalenceChecking() throws Exception {
+    public SMTSummary runEquivalenceChecking(int iteration) throws Exception {
         long start = System.nanoTime();
 
         ClassNode classNode1 = new ClassNode();
@@ -161,7 +162,7 @@ public class SE {
         String[] constructorParams = def.extractParamsConstructor(methods1.get(0));
         Map<String, String> variablesNamesTypesMapping = def.getVariableTypesMapping();
 
-        Instrumentation instrument = new Instrumentation(this.path, this.toolName);
+        Instrumentation instrument = new Instrumentation(this.path, this.toolName, iteration);
 
         String mainMethod1 = instrument.getMainProcedure(v1ClassName, method1.name, methodParams, constructorParams, variablesNamesTypesMapping);
         String mainMethod2 = instrument.getMainProcedure(v2ClassName, method2.name, methodParams, constructorParams, variablesNamesTypesMapping);
@@ -202,8 +203,8 @@ public class SE {
         SymbolicExecutionRunner symbEx = new SymbolicExecutionRunner(
             this.path,
             instrument.packageName(),
-            v1ClassName + this.toolName,
-            v2ClassName + this.toolName,
+            v1ClassName + this.toolName + iteration,
+            v2ClassName + this.toolName + iteration,
             method2.name,
             methodParams.length,
             this.bound,

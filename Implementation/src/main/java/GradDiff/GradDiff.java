@@ -80,14 +80,14 @@ public class GradDiff extends DSE {
             gumTreePassed = true;
             SMTSummary summary = null;
             String result = "";
-            int index =0;
+            int iteration =0;
             String finalRes = "";
             while(onGoing){
-               result +="-----------------------Iteration : "+ index + " -------------------------------------------\n";
-               summary = runEquivalenceChecking();
+               iteration++;
+               result +="-----------------------Iteration : "+ iteration + " -------------------------------------------\n";
+               summary = runEquivalenceChecking(iteration);
                finalRes = equivalenceResult(summary);
                result += finalRes;
-               index ++;
 
                 String outputs = path.split("instrumented")[0];
                 File newFile = new File(outputs+"outputs/" + this.toolName + ".txt");
@@ -111,9 +111,10 @@ public class GradDiff extends DSE {
 
             System.out.println(updateUserOutput(finalRes));
 
-            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName);
-            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName);
-            summary.iterationCount = index;
+            assert summary != null;
+            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName, iteration);
+            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName, iteration);
+            summary.iterationCount = iteration;
 
             return summary;
         } catch (Exception e) {
@@ -753,10 +754,11 @@ public class GradDiff extends DSE {
             gradDiff.changes = new ChangeExtractor().obtainChanges(gradDiff.MethodPath1, gradDiff.MethodPath2,gradDiff.ranByUser,gradDiff.path);
             if(DEBUG)System.out.println(gradDiff.changes);
             long start = System.nanoTime();
-            //int i =0;
+            int i =0;
             while(gradDiff.onGoing){
+                i++;
                 //add a return somehow
-                if(DEBUG)System.out.println(gradDiff.equivalenceResult(gradDiff.runEquivalenceChecking()));
+                if(DEBUG)System.out.println(gradDiff.equivalenceResult(gradDiff.runEquivalenceChecking(i)));
             }
             long end = System.nanoTime() - start;
             if(DEBUG)System.out.println(end);

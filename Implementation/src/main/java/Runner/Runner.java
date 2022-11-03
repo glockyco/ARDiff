@@ -33,8 +33,8 @@ import org.apache.commons.lang3.SystemUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -112,11 +112,11 @@ public class Runner{
         Benchmark benchmark = new Benchmark(getBenchmarkName(p1), getBenchmarkExpected(p1));
         Run run = new Run(benchmark.benchmark, getToolVariant(tool, strategy));
 
+        RunTimer.start();
+
         RunRepository.delete(run);
         BenchmarkRepository.insertOrUpdate(benchmark);
         RunRepository.insertOrUpdate(run);
-
-        RunTimer.start();
 
         Thread shutdownHook = new Thread(() -> {
             Path benchmarkPath = Paths.get("../benchmarks/" + benchmark.benchmark);
@@ -126,19 +126,21 @@ public class Runner{
             Boolean hasUif = null;
             Integer iterationCount = null;
 
+            String errors = "";
             try {
-                Classification classification = OutputClassifier.classify(benchmarkPath, toolName);
-                classifications = classification != null ? Collections.singletonList(classification) : Collections.emptyList();
-                isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, toolName);
-                hasUif = OutputClassifier.hasUif(benchmarkPath, toolName);
                 iterationCount = OutputClassifier.getIterationCount(benchmarkPath, toolName);
+                Classification classification = OutputClassifier.classify(benchmarkPath, toolName, iterationCount);
+                classifications = classification != null ? Collections.singletonList(classification) : Collections.emptyList();
+                isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, toolName, iterationCount);
+                hasUif = OutputClassifier.hasUif(benchmarkPath, toolName, iterationCount);
             } catch (IOException e) {
                 e.printStackTrace(System.err);
-                classifications = Collections.emptyList();
+                classifications = Collections.singletonList(Classification.ERROR);
+                errors = ExceptionUtils.getStackTrace(e);
             }
 
             Classification result = new RunClassifier(
-                false, false, false, true,
+                false, false, !errors.isEmpty(), true,
                 classifications
             ).getClassification();
 
@@ -151,23 +153,21 @@ public class Runner{
                 hasUif,
                 iterationCount,
                 RunTimer.getTime(),
-                ""
+                errors
             ));
         });
 
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
-        boolean hasSucceeded = false;
         String errors = "";
 
         Classification classification;
-        boolean isDepthLimited = false;
+        Boolean isDepthLimited = false;
         boolean hasUif = false;
         int iterationCount = 1;
 
         try {
             SMTSummary summary = runToolInternal(tool, p1, p2, solver, b, t, minInt, maxInt, minDouble, maxDouble, strategy, z3Terminal);
-            hasSucceeded = true;
             classification = summary.classification;
             isDepthLimited = summary.isDepthLimited;
             hasUif = !summary.noUFunctions;
@@ -180,7 +180,7 @@ public class Runner{
         Runtime.getRuntime().removeShutdownHook(shutdownHook);
 
         Classification result = new RunClassifier(
-            false, false, !hasSucceeded, false,
+            false, false, !errors.isEmpty(), false,
             Collections.singletonList(classification)
         ).getClassification();
 
@@ -474,11 +474,11 @@ public class Runner{
         runTool(tool,path1,path2,solver,bound,timeout,minint,maxint,mindouble,maxdouble,strategy,z3Terminal);
     }
 
-    public static void deleteGeneratedFiles(String tool, String directory) {
+    public static void deleteGeneratedFiles(String tool, String directory) throws IOException {
         getGeneratedFiles(tool, directory).forEach(path -> path.toFile().delete());
     }
 
-    public static List<Path> getGeneratedFiles(String tool, String directory) {
+    public static List<Path> getGeneratedFiles(String tool, String directory) throws IOException {
         List<Path> generatedFiles = new ArrayList<>();
 
         Path benchmarkPath = Paths.get(directory);
@@ -490,22 +490,37 @@ public class Runner{
         generatedFiles.add(instrumentedPath.resolve("gumtree.txt"));
         generatedFiles.add(instrumentedPath.resolve("H1Checking.smt2"));
 
-        generatedFiles.add(instrumentedPath.resolve("InewV" + tool + ".java"));
-        generatedFiles.add(instrumentedPath.resolve("InewV" + tool + ".jpf"));
-        generatedFiles.add(instrumentedPath.resolve("InewV" + tool + "JPFError.txt"));
-        generatedFiles.add(instrumentedPath.resolve("InewV" + tool + "JPFOutput.txt"));
-        generatedFiles.add(instrumentedPath.resolve("InewV" + tool + "Terminal.txt"));
-        generatedFiles.add(instrumentedPath.resolve("InewV" + tool + "ToSolve.txt"));
-
-        generatedFiles.add(instrumentedPath.resolve("IoldV" + tool + ".java"));
-        generatedFiles.add(instrumentedPath.resolve("IoldV" + tool + ".jpf"));
-        generatedFiles.add(instrumentedPath.resolve("IoldV" + tool + "JPFError.txt"));
-        generatedFiles.add(instrumentedPath.resolve("IoldV" + tool + "JPFOutput.txt"));
-        generatedFiles.add(instrumentedPath.resolve("IoldV" + tool + "Terminal.txt"));
+        generatedFiles.addAll(getOldVFiles(tool, instrumentedPath));
+        generatedFiles.addAll(getNewVFiles(tool, instrumentedPath));
 
         generatedFiles.add(outputsPath.resolve(tool + ".txt"));
         generatedFiles.add(modelsPath.resolve(tool + ".txt"));
 
         return generatedFiles;
+    }
+
+    public static List<Path> getOldVFiles(String tool, Path directory) throws IOException {
+        return getFiles("glob:**/IoldV" + tool + "*", directory);
+    }
+
+    public static List<Path> getNewVFiles(String tool, Path directory) throws IOException {
+        return getFiles("glob:**/InewV" + tool + "*", directory);
+    }
+
+    private static List<Path> getFiles(String glob, Path directory) throws IOException {
+        List<Path> answerFiles = new ArrayList<>();
+
+        PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(glob);
+        Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+                if (pathMatcher.matches(path)) {
+                    answerFiles.add(path);
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        return answerFiles;
     }
 }

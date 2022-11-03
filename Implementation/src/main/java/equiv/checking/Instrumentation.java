@@ -28,8 +28,9 @@ public class Instrumentation implements Utils{
 	private String sourcePath;
 	private String packageName;
 	private String toolName;
+	private int iteration;
 
-	public Instrumentation(String sourcePath, String tool){
+	public Instrumentation(String sourcePath, String tool, int iteration){
 		this.sourcePath = sourcePath;
 		typesMapping= new HashMap<>();
 		typesMapping.put("I", "int");
@@ -42,6 +43,7 @@ public class Instrumentation implements Utils{
 		typesMapping.put("[I", "int[]");
 		typesMapping.put("Ljava/lang/String;", "String");//not handled
 		this.toolName = tool;
+		this.iteration = iteration;
 	}
 
 	public Instrumentation(){
@@ -54,6 +56,7 @@ public class Instrumentation implements Utils{
 		typesMapping.put("J", "long");
 		this.sourcePath = "src/examples/demo/instrumented";
 		this.toolName = "";
+		this.iteration = 1;
 	}
 
 	/**Getters**/
@@ -187,7 +190,7 @@ public class Instrumentation implements Utils{
 	 */
 	public String getMainProcedure(String newClassName,String methodName,String[] methodParams, String[] constructorParams,Map<String, String> variablesTypesMapping){
 		String mainProcedure="public static void main(String[] args){\n" +
-				newClassName+toolName+" temp = new "+newClassName+toolName+"(";
+				newClassName+toolName+iteration+" temp = new "+newClassName+toolName+iteration+"(";
 		if(DEBUG) System.out.println("Parameters : "+Arrays.toString(methodParams) +"  "+Arrays.toString(constructorParams));
 		for(String type : constructorParams){
 			String paramType = typesMapping.get(type);
@@ -242,13 +245,13 @@ public class Instrumentation implements Utils{
 		if(line==null) throw new IllegalArgumentException();
 		String[] aroundClass=line.split("class ");
 		String [] beforeBrace = aroundClass[aroundClass.length - 1].split("\\s*\\{");
-		newProgram+=aroundClass[0]+"class "+"I"+beforeBrace[0]+toolName+"{\n";
+		newProgram+=aroundClass[0]+"class "+"I"+beforeBrace[0]+toolName+iteration+"{\n";
 		last ++;
 		if(blocks != null) {
 			for (int i = 0; i < blocks.size(); i++) {
 				for (int j = last; j < blocks.get(i).get(0); j++) {
 					String st = br.readLine();
-					st = st.replace(oldClassName,newClassName+toolName);
+					st = st.replace(oldClassName,newClassName+toolName+iteration);
 					newProgram += st + "\n";
 				}
 				int replacementSize = 0;
@@ -292,14 +295,14 @@ public class Instrumentation implements Utils{
 			}
 			line=nextLine;
 		}
-		remainingProgram = remainingProgram.replace(oldClassName,newClassName+toolName);
+		remainingProgram = remainingProgram.replace(oldClassName,newClassName+toolName+iteration);
 		newProgram+=remainingProgram;
 		if(uFunctions != null) {
 			for (String func : uFunctions)
 				newProgram += func;
 		}
 		newProgram+=mainMethod+"}\n";
-		File newFile = new File(sourcePath+"/"+newClassName+toolName+".java");
+		File newFile = new File(sourcePath+"/"+newClassName+toolName+iteration+".java");
 		newFile.getParentFile().mkdir();
 		if(!newFile.exists())
 			newFile.createNewFile();
