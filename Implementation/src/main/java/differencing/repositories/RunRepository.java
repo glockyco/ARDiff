@@ -16,16 +16,18 @@ public class RunRepository extends Repository {
         "is_depth_limited, " +
         "has_uif, " +
         "iteration_count, " +
+        "can_iterate, " +
         "runtime, " +
         "errors" +
         ") " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
         "ON CONFLICT DO UPDATE SET " +
         "result = excluded.result, " +
         "has_timed_out = excluded.has_timed_out, " +
         "is_depth_limited = excluded.is_depth_limited, " +
         "has_uif = excluded.has_uif, " +
         "iteration_count = excluded.iteration_count, " +
+        "can_iterate = excluded.can_iterate, " +
         "runtime = excluded.runtime, " +
         "errors = excluded.errors";
 
@@ -38,8 +40,9 @@ public class RunRepository extends Repository {
             ps.setObject(5, run.isDepthLimited);
             ps.setObject(6, run.hasUif);
             ps.setObject(7, run.iterationCount);
-            ps.setObject(8, run.runtime);
-            ps.setObject(9, run.errors);
+            ps.setObject(8, run.canIterate);
+            ps.setObject(9, run.runtime);
+            ps.setObject(10, run.errors);
             ps.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);

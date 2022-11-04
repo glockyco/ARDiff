@@ -152,6 +152,7 @@ public class Runner{
                 isDepthLimited,
                 hasUif,
                 iterationCount,
+                null,
                 RunTimer.getTime(),
                 errors
             ));
@@ -192,6 +193,7 @@ public class Runner{
             isDepthLimited,
             hasUif,
             iterationCount,
+            false,
             RunTimer.getTime(),
             errors
         ));

@@ -74,6 +74,7 @@ public class DifferencingRunner {
                 null,
                 null,
                 null,
+                null,
                 error
             );
 
@@ -105,107 +106,129 @@ public class DifferencingRunner {
         Benchmark benchmark = new Benchmark(parameters.getBenchmarkName(), parameters.getExpectedResult());
         Run run = new Run(parameters.getBenchmarkName(), parameters.getToolVariant());
 
-        RunRepository.delete(run);
-        BenchmarkRepository.insertOrUpdate(benchmark);
-        RunRepository.insertOrUpdate(run);
-
-        ExecutionListener v1ExecListener = new ExecutionListener(run, parameters, "*.IoldV" + parameters.getToolName() + parameters.getIteration() + ".snippet");
-        ExecutionListener v2ExecListener = new ExecutionListener(run, parameters, "*.InewV" + parameters.getToolName() + parameters.getIteration() + ".snippet");
-        PathConditionListener pcListener = new PathConditionListener(parameters);
-        DifferencingListener diffListener = new DifferencingListener(run, parameters, solverTimeout);
-
         RunTimer.start();
 
-        boolean hasSucceeded = false;
-        String errors = "";
+        boolean shouldKeepIterating;
 
-        try (
-            PrintWriter outputWriter = new PrintWriter(outputPath, "UTF-8");
-            PrintWriter errorWriter = new PrintWriter(errorPath, "UTF-8")
-        ) {
-            Thread shutdownHook = new Thread(() -> {
-                Classification result = new RunClassifier(
-                    false, false, false, true,
-                    diffListener.getPartitions()
-                ).getClassification();
+        do { // while (shouldKeepIterating) {
+            RunRepository.delete(run);
+            BenchmarkRepository.insertOrUpdate(benchmark);
+            RunRepository.insertOrUpdate(run);
 
-                RunRepository.insertOrUpdate(new Run(
-                    run.benchmark,
-                    run.tool,
-                    result,
-                    true,
-                    diffListener.isDepthLimited(),
-                    diffListener.hasUif(),
-                    1,
-                    RunTimer.getTime(),
-                    ""
-                ));
+            ExecutionListener v1ExecListener = new ExecutionListener(run, parameters, "*.IoldV" + parameters.getToolName() + parameters.getIteration() + ".snippet");
+            ExecutionListener v2ExecListener = new ExecutionListener(run, parameters, "*.InewV" + parameters.getToolName() + parameters.getIteration() + ".snippet");
+            PathConditionListener pcListener = new PathConditionListener(parameters);
+            DifferencingListener diffListener = new DifferencingListener(run, parameters, solverTimeout);
 
-                outputWriter.println(driverOutputBuffer);
-                outputWriter.println("Forced program shutdown.");
-                outputWriter.flush();
+            boolean hasSucceeded = false;
+            String errors = "";
 
-                systemError.println("TIMEOUT: " + parameters.getTargetDirectory() + " -> " + result);
-                systemError.flush();
-            });
+            try (
+                PrintWriter outputWriter = new PrintWriter(outputPath, "UTF-8");
+                PrintWriter errorWriter = new PrintWriter(errorPath, "UTF-8")
+            ) {
+                Thread shutdownHook = new Thread(() -> {
+                    Classification result = new RunClassifier(
+                        false, false, false, true,
+                        diffListener.getPartitions()
+                    ).getClassification();
 
-            try {
-                System.setOut(driverOutput);
-                System.setErr(driverError);
+                    RunRepository.insertOrUpdate(new Run(
+                        parameters.getBenchmarkName(),
+                        parameters.getToolVariant(),
+                        result,
+                        true,
+                        diffListener.isDepthLimited(),
+                        diffListener.hasUif(),
+                        parameters.getIteration(),
+                        null,
+                        RunTimer.getTime(),
+                        ""
+                    ));
 
-                Runtime.getRuntime().addShutdownHook(shutdownHook);
+                    outputWriter.println(driverOutputBuffer);
+                    outputWriter.println("Forced program shutdown.");
+                    outputWriter.flush();
 
-                File javaFile = this.createDifferencingDriverClass(parameters);
-                this.compile(ProjectPaths.classpath, javaFile);
-                File configFile = this.createDifferencingJpfConfiguration(parameters, solverTimeout);
+                    systemError.println("TIMEOUT: " + parameters.getTargetDirectory() + " -> " + result);
+                    systemError.flush();
+                });
 
-                Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
-                JPF jpf = new JPF(config);
-                jpf.addListener(v1ExecListener);
-                jpf.addListener(v2ExecListener);
-                jpf.addListener(pcListener);
-                jpf.addListener(diffListener);
-                jpf.run();
+                try {
+                    System.setOut(driverOutput);
+                    System.setErr(driverError);
 
-                hasSucceeded = true;
-            } catch (Exception e) {
-                errors = ExceptionUtils.getStackTrace(e);
+                    Runtime.getRuntime().addShutdownHook(shutdownHook);
 
-                e.printStackTrace(driverError);
+                    File javaFile = this.createDifferencingDriverClass(parameters);
+                    this.compile(ProjectPaths.classpath, javaFile);
+                    File configFile = this.createDifferencingJpfConfiguration(parameters, solverTimeout);
 
-                errorWriter.println("Differencing failed due to error.\n");
-                errorWriter.println(driverErrorBuffer);
-                errorWriter.flush();
-            } finally {
-                outputWriter.println(driverOutputBuffer);
-                outputWriter.flush();
+                    Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
+                    JPF jpf = new JPF(config);
+                    jpf.addListener(v1ExecListener);
+                    jpf.addListener(v2ExecListener);
+                    jpf.addListener(pcListener);
+                    jpf.addListener(diffListener);
+                    jpf.run();
 
-                Runtime.getRuntime().removeShutdownHook(shutdownHook);
+                    hasSucceeded = true;
+                } catch (Exception e) {
+                    errors = ExceptionUtils.getStackTrace(e);
+
+                    e.printStackTrace(driverError);
+
+                    errorWriter.println("Differencing failed due to error.\n");
+                    errorWriter.println(driverErrorBuffer);
+                    errorWriter.flush();
+                } finally {
+                    outputWriter.println(driverOutputBuffer);
+                    outputWriter.flush();
+
+                    Runtime.getRuntime().removeShutdownHook(shutdownHook);
+                }
             }
-        }
 
-        Classification result = new RunClassifier(
-            false, false, !hasSucceeded, false,
-            diffListener.getPartitions()
-        ).getClassification();;
+            Classification result = new RunClassifier(
+                false, false, !hasSucceeded, false,
+                diffListener.getPartitions()
+            ).getClassification();
 
-        RunRepository.insertOrUpdate(new Run(
-            run.benchmark,
-            run.tool,
-            result,
-            false,
-            diffListener.isDepthLimited(),
-            diffListener.hasUif(),
-            1,
-            RunTimer.getTime(),
-            errors
-        ));
+            if (hasSucceeded) {
+                systemOutput.print("Iteration " + parameters.getIteration() + " - SUCCESS: ");
+                systemOutput.println(parameters.getTargetDirectory() + " -> " + result);
+            } else {
+                systemError.println("Iteration " + parameters.getIteration() + " - ERROR: ");
+                systemError.println(parameters.getTargetDirectory() + " -> " + result);
+            }
 
-        if (hasSucceeded) {
-            systemOutput.println("SUCCESS:" + parameters.getTargetDirectory() + " -> " + result);
-        } else {
-            systemError.println("ERROR: " + parameters.getTargetDirectory() + " -> " + result);
-        }
+            boolean isFinalResult = result == Classification.EQ || result == Classification.NEQ || result == Classification.ERROR;
+
+            shouldKeepIterating = !isFinalResult && parameters.hasNextIteration();
+
+            if (!shouldKeepIterating) {
+                driverOutput.println("isFinalResult: " + isFinalResult + ", hasNextIteration: " + parameters.hasNextIteration());
+                systemOutput.println("isFinalResult: " + isFinalResult + ", hasNextIteration: " + parameters.hasNextIteration());
+            }
+
+            // Creating a new run to ensure we provide all necessary data.
+            run = new Run(
+                parameters.getBenchmarkName(),
+                parameters.getToolVariant(),
+                result,
+                false,
+                diffListener.isDepthLimited(),
+                diffListener.hasUif(),
+                parameters.getIteration(),
+                parameters.hasNextIteration(),
+                RunTimer.getTime(),
+                errors
+            );
+
+            RunRepository.insertOrUpdate(run);
+
+            parameters.startNextIteration();
+        } while (shouldKeepIterating);
     }
 
     public File createDifferencingDriverClass(DifferencingParameters parameters) throws IOException, TemplateException {

@@ -2,6 +2,7 @@ package differencing;
 
 import differencing.classification.Classification;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.*;
@@ -39,8 +40,14 @@ public class DifferencingParameters implements Serializable {
         return this.iteration;
     }
 
-    public void incrementIteration() {
+    public void startNextIteration() {
         this.iteration++;
+    }
+
+    public boolean hasNextIteration() {
+        boolean nextOldVJavaFileExists = new File(this.getOldVJavaFile(this.iteration + 1)).exists();
+        boolean nextNewVJavaFileExists = new File(this.getNewVJavaFile(this.iteration + 1)).exists();
+        return nextOldVJavaFileExists && nextNewVJavaFileExists;
     }
 
     public String getToolName() {
@@ -93,6 +100,14 @@ public class DifferencingParameters implements Serializable {
 
     public String getBaseToolOutputFile() {
         return Paths.get(this.directory, "..", "outputs", this.toolName + ".txt").toString();
+    }
+
+    public String getOldVJavaFile(int iteration) {
+        return Paths.get(this.directory, "IoldV" + this.toolName + iteration + ".java").toString();
+    }
+
+    public String getNewVJavaFile(int iteration) {
+        return Paths.get(this.directory, "InewV" + this.toolName + iteration + ".java").toString();
     }
 
     public String[] getJavaFiles() throws IOException {
