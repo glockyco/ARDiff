@@ -25,7 +25,7 @@ import differencing.repositories.BenchmarkRepository;
 import differencing.repositories.RunRepository;
 import equiv.checking.OutputClassifier;
 import equiv.checking.ProjectPaths;
-import equiv.checking.SymbolicExecutionRunner.SMTSummary;
+import equiv.checking.SMTSummary;
 import equiv.checking.Utils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -106,7 +106,7 @@ public class Runner{
             System.out.println("[WARNING] If you want to have a complete summary (exercise all behaviors), make sure your bound is big enough.");
     }
 
-    public static void runTool(String tool, String p1, String p2, String solver,int b,int t, int minInt,int maxInt,double minDouble,double maxDouble,String strategy,boolean z3Terminal) throws Exception {
+    public static void runTool(String tool, String p1, String p2, String solver,int b,int t, int minInt,int maxInt,double minDouble,double maxDouble,String strategy) {
         String toolName = getToolName(tool, strategy);
 
         Benchmark benchmark = new Benchmark(getBenchmarkName(p1), getBenchmarkExpected(p1));
@@ -168,7 +168,7 @@ public class Runner{
         int iterationCount = 1;
 
         try {
-            SMTSummary summary = runToolInternal(tool, p1, p2, solver, b, t, minInt, maxInt, minDouble, maxDouble, strategy, z3Terminal);
+            SMTSummary summary = runToolInternal(tool, p1, p2, solver, b, t, minInt, maxInt, minDouble, maxDouble, strategy);
             classification = summary.classification;
             isDepthLimited = summary.isDepthLimited;
             hasUif = !summary.noUFunctions;
@@ -242,7 +242,7 @@ public class Runner{
         throw new RuntimeException("Cannot determine expected result for " + path1 + ".");
     }
 
-    private static SMTSummary runToolInternal(String tool, String p1, String p2, String solver, int b, int t, int minInt, int maxInt, double minDouble, double maxDouble, String strategy, boolean z3Terminal) {
+    private static SMTSummary runToolInternal(String tool, String p1, String p2, String solver, int b, int t, int minInt, int maxInt, double minDouble, double maxDouble, String strategy) {
         try {
             //the path to two target versions
             ////************************************************************************+////
@@ -274,9 +274,8 @@ public class Runner{
                 System.out.println("*****************************************************************************");
                 System.out.println("------------------------------------SE-----------------------------------");
                 System.out.println("*****************************************************************************");
-                boolean parseFromSMTLib = true;// to parse the jpf output into a string similar to the terminal version of Z3 (true for the terminal version when you have Math.XXXX)
                 deleteGeneratedFiles("SE", runner.path);
-                SE se = new SE(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "SE", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib,true,z3Terminal);
+                SE se = new SE(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "SE", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong);
                 return se.runTool();
             }
             ////*******************************************************************************************************************************************+////
@@ -286,9 +285,8 @@ public class Runner{
                 System.out.println("*****************************************************************************");
                 System.out.println("------------------------------------DSE-----------------------------------");
                 System.out.println("*****************************************************************************");
-                boolean parseFromSMTLib = true;// to parse the jpf output into a string similar to the terminal version of Z3 (true for the terminal version when you have Math.XXXX)
                 deleteGeneratedFiles("DSE", runner.path);
-                DSE dse = new DSE(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "DSE", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib,true,z3Terminal);
+                DSE dse = new DSE(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "DSE", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong);
                 return dse.runTool();
             }
             ////*******************************************************************************************************************************************+////
@@ -314,9 +312,8 @@ public class Runner{
                 else
                     System.out.println("------------------------------------ARDIFF-----------------------------------");
                 System.out.println("*****************************************************************************");
-                boolean parseFromSMTLib = true ;
                 deleteGeneratedFiles(toolName, runner.path);
-                GradDiff gradDiff = new GradDiff(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, toolName, SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib, H1, H2, H31, H32, strategy, true,z3Terminal);
+                GradDiff gradDiff = new GradDiff(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, toolName, SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, H1, H2, H31, H32, strategy);
                 return gradDiff.runTool();
             }
             ////*******************************************************************************************************************************************+////
@@ -326,9 +323,8 @@ public class Runner{
                 System.out.println("*****************************************************************************");
                 System.out.println("------------------------------------IMP-S-----------------------------------");
                 System.out.println("*****************************************************************************");
-                boolean parseFromSMTLib = true ;
                 deleteGeneratedFiles("Imp", runner.path);
-                ImpactedS impactedS = new ImpactedS(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "Imp", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong, parseFromSMTLib, true,z3Terminal);
+                ImpactedS impactedS = new ImpactedS(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "Imp", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong);
                 return impactedS.runTool();
             }
         } catch (Exception e) {
@@ -384,7 +380,6 @@ public class Runner{
         int maxint = 100;
         double mindouble = -100.0;
         double maxdouble = 100.0;
-        boolean z3Terminal = true;
         /**************/
 
         for(int i = 0; i < 23; i+=2) {
@@ -459,13 +454,6 @@ public class Runner{
                     }
                     strategy = args[i+1];
                 }
-                 if(args[i].equals("--z3Terminal")){
-                    if(args.length < i+2){
-                        System.out.println("You need to specify if you want to run z3 from the terminal or not.If not, remove the argument --z3Terminal");
-                        System.exit(1);
-                    }
-                    z3Terminal = Boolean.parseBoolean(args[i+1]);
-                }
             }
         }
         if(path1.isEmpty() || path2.isEmpty()){
@@ -473,7 +461,7 @@ public class Runner{
             System.exit(1);
         }
 
-        runTool(tool,path1,path2,solver,bound,timeout,minint,maxint,mindouble,maxdouble,strategy,z3Terminal);
+        runTool(tool,path1,path2,solver,bound,timeout,minint,maxint,mindouble,maxdouble,strategy);
     }
 
     public static void deleteGeneratedFiles(String tool, String directory) throws IOException {

@@ -12,15 +12,12 @@
 package equiv.checking;
 
 import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithBody;
 import com.github.javaparser.ast.stmt.*;
-import javafx.util.Pair;
 import org.apache.commons.lang.SystemUtils;
 
 import javax.tools.*;
@@ -33,10 +30,9 @@ import java.util.List;
 public interface Utils {
     /** This is an helper interface with global variables and helper methods **/
     boolean DEBUG = false;
-    boolean Z3_TERMINAL = true;
     String ANSI_GREEN = "\u001B[32m", ANSI_RESET="\u001B[0m";
     String ANSI_RED = "\u001B[31m";
-    HashSet<String> mathFunctions = new HashSet<String>(Arrays.asList("cos","sin","pow","exp","sqrt","pow","sqrt","asin","acos","atan","atan2","abs","log","tan"));
+    HashSet<String> mathFunctions = new HashSet<>(Arrays.asList("cos", "sin", "pow", "exp", "sqrt", "pow", "sqrt", "asin", "acos", "atan", "atan2", "abs", "log", "tan"));
 
     /**
      * To compile a java program

@@ -12,23 +12,24 @@
 package equiv.checking.symparser;
 
 import com.microsoft.z3.*;
-import equiv.checking.SymbolicExecutionRunner;
+import equiv.checking.Utils;
 import javafx.util.Pair;
 
 import java.util.*;
-import java.util.regex.Pattern;
-
-import static equiv.checking.Utils.DEBUG;
 
 
-public class SymParserSMTLib extends AbstractSymParser{
-    //Needed to reuse the same variables throughout the formulas
-    protected HashMap<String,FuncDecl> variablesDeclaration;
+public class SymParserSMTLib {
+    protected final HashSet<String> mathFunctions;
+    protected final Context context;
+
+    protected String declarations;
     protected String functionsDefinitions;
-    //The list of all observed uFunctions, we reset it for each program summary (sames as uIFunctions.keySet()).
-    // We need it for functions that are defined only in this program since uIFunctions is kept across all programs
-    //All the uninterpreted functions mapped to their declaration
-    //probably to be changed since not needed anymore
+    protected HashMap<String,FuncDecl<?>> variablesDeclaration;
+    protected SymLexer reader;
+    protected String spfOutput;
+    protected final Map<String, Expr<?>> variables;
+
+    protected boolean noUFunctions;
 
     /**
      * Add parsing arrays in parseElem
@@ -36,15 +37,14 @@ public class SymParserSMTLib extends AbstractSymParser{
      * We have that val[i] is mapped to (select val i)
      * We have that val[i] <- a is mapped to (store val i a) which returns a new array with a at the pos i
      * If it is an array than [i] could be an index instead of just the addtional data added to every variable
-     * @param context
      */
-
-
     public SymParserSMTLib(Context context) {
-        super(context);
-        variablesDeclaration = new HashMap<>();
-        allInstances = new HashMap<>();
-        interprocCalls = new HashSet<>();
+        this.context = context;
+        this.declarations = "";
+        this.variables = new HashMap<>();
+        this.mathFunctions = Utils.mathFunctions;
+        this.noUFunctions = true;
+        this.variablesDeclaration = new HashMap<>();
         initFunctionDefinitions();
     }
 
@@ -58,13 +58,20 @@ public class SymParserSMTLib extends AbstractSymParser{
                 "(define-fun sqrt ((x Real)) Real (^ 0.5 x)) \n";*/
     }
 
+    public boolean noUFunctions() {
+        return this.noUFunctions;
+    }
+
     public String functionsDefinitions(){
         return functionsDefinitions;
     }
+    public String declarations(){
+        return this.declarations;
+    }
 
-    // I can give a list of function declarations and of symbol to the parse lib functions
-    //To be checked
-
+    public Map<String, Expr<?>> varNames() {
+        return this.variables;
+    }
 
     //Grammar
     //F :=  E (=|<=|>=|<|>) E
@@ -76,51 +83,46 @@ public class SymParserSMTLib extends AbstractSymParser{
     //args := empty | F(,F)*
 
     public Context context() {
-        return context;
+        return this.context;
     }
 
-    public Set<String> variableNames() {
-        return variables.keySet();
-    }
-
-    public HashMap<String,FuncDecl> varDecl(){
-        return variablesDeclaration;
+    public HashMap<String,FuncDecl<?>> varDecl(){
+        return this.variablesDeclaration;
     }
 
     public String parseConstraint(String spf) throws Exception {
-        spfOutput = spf;
-        if(spfOutput == null)
+        this.spfOutput = spf;
+        if (this.spfOutput == null) {
             return null;
-        reader = new SymLexer(spf);
-        reader.nextChar();
+        }
+        this.reader = new SymLexer(spf);
+        this.reader.nextChar();
         //each line is a formula
-        String formula = parseFormula();
-            //Check that the formula is Empty, not necessary
-            // if(reader.current != -1) throw new Exception("Syntax error end");
-            if(DEBUG) System.out.println("Parsed formula !");
-            return formula;
+        return parseFormula();
     }
 
     public String parseFormula() throws Exception {
-        Pair<String,String> left = parseArithm();
-        // ArithExpr left=parseFactor();
-        if (reader.eat('='))
-            return "= "+left.getValue()+" "+parseArithm().getValue()+"";
-        if (reader.eat('!')) {
-            if (reader.eat('='))
-                return "not ( = "+left.getValue()+" "+parseArithm().getValue()+")";;
+        Pair<String, String> left = parseArithm();
+        if (this.reader.eat('=')) {
+            return "= " + left.getValue() + " " + parseArithm().getValue() + "";
+        }
+        if (this.reader.eat('!')) {
+            if (this.reader.eat('=')) {
+                return "not ( = " + left.getValue() + " " + parseArithm().getValue() + ")";
+            }
             throw new Exception("Syntax error");
         }
-        if (reader.eat('<')) {
-            if (reader.eat('='))
-                return "<= "+left.getValue()+" "+parseArithm().getValue()+"";;
-            return "< "+left.getValue()+" "+parseArithm().getValue()+"";
-
+        if (this.reader.eat('<')) {
+            if (this.reader.eat('=')) {
+                return "<= " + left.getValue() + " " + parseArithm().getValue() + "";
+            }
+            return "< " + left.getValue() + " " + parseArithm().getValue() + "";
         }
-        if (reader.eat('>')) {
-            if (reader.eat('='))
-                return ">= "+left.getValue()+" "+parseArithm().getValue()+"";;
-            return "> "+left.getValue()+" "+parseArithm().getValue()+"";
+        if (this.reader.eat('>')) {
+            if (this.reader.eat('=')) {
+                return ">= " + left.getValue() + " " + parseArithm().getValue() + "";
+            }
+            return "> " + left.getValue() + " " + parseArithm().getValue() + "";
         }
         throw new Exception("Syntax error");
     }
@@ -128,9 +130,9 @@ public class SymParserSMTLib extends AbstractSymParser{
     public Pair<String,String> parseArithm() throws Exception {
         Pair<String,String> left = parseTerm();
         if (reader.eat('+')) {
-            left = new Pair(left.getKey(),"+ "+left.getValue()+" "+parseArithm().getValue()+"");
+            left = new Pair<>(left.getKey(),"+ "+left.getValue()+" "+parseArithm().getValue()+"");
         } else if (reader.eat('-')) {
-            left = new Pair(left.getKey(),"- "+left.getValue()+" "+parseArithm().getValue()+"");
+            left = new Pair<>(left.getKey(),"- "+left.getValue()+" "+parseArithm().getValue()+"");
         }
         return left;
     }
@@ -139,40 +141,39 @@ public class SymParserSMTLib extends AbstractSymParser{
         Pair<String,String> left = parseFactor();
         String integer = "Int";//to check
         if (reader.eat('*')) {
-            return new Pair(left.getKey(),"* "+left.getValue()+" "+parseTerm().getValue()+"");
+            return new Pair<>(left.getKey(),"* "+left.getValue()+" "+parseTerm().getValue()+"");
         }
         if (reader.eat('/')) {
             Pair<String,String> right = parseTerm();
             String div = "/";
             if(left.getKey().equals(integer) && right.getKey().equals(left.getKey())) { //int division
                 div = "div";
-                return new Pair(integer,div+" "+left.getValue()+" "+right.getValue()+"");
+                return new Pair<>(integer,div+" "+left.getValue()+" "+right.getValue()+"");
             }
-            return new Pair("Real",div+" "+left.getValue()+" "+right.getValue()+"");
+            return new Pair<>("Real",div+" "+left.getValue()+" "+right.getValue()+"");
         }
         if (reader.eat('%')) {
             //does not accept arithmetic expressions, only integer expressions
-            return new Pair("Int","mod "+left.getValue()+" "+parseTerm().getValue()+"");
+            return new Pair<>("Int","mod "+left.getValue()+" "+parseTerm().getValue()+"");
         }
         if(reader.eat('^')){
-            return new Pair(left.getKey(),"^ "+left.getValue()+" "+parseTerm().getValue()+"");
+            return new Pair<>(left.getKey(),"^ "+left.getValue()+" "+parseTerm().getValue()+"");
 
         }
         return left;
         //else throw new Exception("Syntax error");
     }
 
-
-    public Pair<String,String> parseFactor() throws Exception {
+    public Pair<String, String> parseFactor() throws Exception {
         if (reader.eat('-'))
             return parseFactor();
-        String e ="";
+        String e = "";
         int start = reader.index;
         if (reader.eat('(')) {
             Pair<String, String> info = parseArithm();
-            e = "( "+info.getValue()+" )";
+            e = "( " + info.getValue() + " )";
             reader.eat(')');
-            return new Pair(info.getKey(),e);
+            return new Pair<>(info.getKey(), e);
         }
         //check for the closing brace maybe not the best way to do it
         while (reader.current != ' ' && reader.current != -1 && reader.current != '(' && reader.current != ',' && reader.current != ')')
@@ -182,8 +183,7 @@ public class SymParserSMTLib extends AbstractSymParser{
         return parseElem(var);
     }
 
-
-    public Pair<String,String> parseElem(String var) throws Exception {
+    public Pair<String, String> parseElem(String var) throws Exception {
         if (var.startsWith("CONST")) {
             //maybe make real or make double instead !!
 
@@ -191,67 +191,68 @@ public class SymParserSMTLib extends AbstractSymParser{
             if (num.contains("E")) {// num 2.49958057E13
                 String base = num.split("E")[0]; //base = 2.49958057
                 String num2 = num.split("E")[1]; // num2 = 13
-                num = "(* " +base +" (^ 10 (* -1 "+num2+")))";
+                num = "(* " + base + " (^ 10 (* -1 " + num2 + ")))";
             }
-            if(var.contains("REAL"))
-                return new Pair("Real",num);
-            else
-                return new Pair("Int",num);
-        }
-        else if (var.startsWith("UF_") || var.startsWith("AF_")) {
+            if (var.contains("REAL")) {
+                return new Pair<>("Real", num);
+            } else {
+                return new Pair<>("Int", num);
+            }
+        } else if (var.startsWith("UF_") || var.startsWith("AF_")) {
             //function
             return parseFunc(var);
-        }
-        else if (mathFunctions.contains(var)){
+        } else if (this.mathFunctions.contains(var)) {
             return parseMathFunc(var);
-        }
-        else{
+        } else {
             //  (currentTime_1_SYMINT[-100]
             return parseVar(var);
         }
     }
 
-    protected Pair<String,String> parseMathFunc(String funcName) throws Exception{
+    protected Pair<String, String> parseMathFunc(String funcName) throws Exception {
         //TODO
-        reader.eat('(');
-        ArrayList<Pair<String,String>> arguments = parseArgs();
-        reader.eat(')');
+        this.reader.eat('(');
+        ArrayList<Pair<String, String>> arguments = parseArgs();
+        this.reader.eat(')');
         String formula = " ( ";
-        if(funcName.equals("pow")){
-            formula+= "^ ";
+        if (funcName.equals("pow")) {
+            formula += "^ ";
+        } else {
+            formula += funcName + " ";
         }
-        else formula+= funcName+" ";
-        if(arguments != null && arguments.size()>0) {
+        if (arguments != null && arguments.size() > 0) {
             for (Pair<String, String> s : arguments) { //here I might need to add (to_real ?), to check
-                if(s.getKey().equals("Int"))
-                    formula += "(to_real "+s.getValue()+")";
-                else formula += s.getValue() + " ";
+                if (s.getKey().equals("Int")) {
+                    formula += "(to_real " + s.getValue() + ")";
+                } else {
+                    formula += s.getValue() + " ";
+                }
             }
         }
         formula += ")";
-        return new Pair("Real",formula);
+        return new Pair<>("Real", formula);
     }
 
-    protected Pair<String,String> parseFunc(String funcName) throws Exception {
-        //I could store in the list all of the inputs from here using arguments and just take the uf_ thing
+    protected Pair<String, String> parseFunc(String funcName) throws Exception {
+        //I could store in the list all the inputs from here using arguments and just take the uf_ thing
         String[] name = funcName.split("_SYM");
         String func = name[0];
         String formula = "";
         //here I need to check if the number of arguments of the list matches
         String sort = "(";
         if (name.length == 2) {
-            if(func.startsWith("UF"))
+            if (func.startsWith("UF")) {
                 noUFunctions = false;
-            ArrayList<Pair<String,String>> arguments;
+            }
+            ArrayList<Pair<String, String>> arguments;
             reader.eat('(');
             if (reader.eat(')')) {
                 arguments = new ArrayList<>();
-            }
-            else {
+            } else {
                 arguments = parseArgs();
-                for(Pair<String,String> s : arguments) {
-                    formula += s.getValue()+" ";
-                    sort += s.getKey()+" ";
+                for (Pair<String, String> s : arguments) {
+                    formula += s.getValue() + " ";
+                    sort += s.getKey() + " ";
                 }
                 //formula = formula.substring(0,formula.length() - 1);
                 reader.eat(')');
@@ -261,47 +262,46 @@ public class SymParserSMTLib extends AbstractSymParser{
             Sort retS = null;
             if (name[1].equals("INT")) {
                 ret = "Int";
-                retS = context.mkIntSort();
-            }
-            else{
+                retS = this.context.mkIntSort();
+            } else {
                 ret = "Real";
-                retS = context.mkRealSort();
+                retS = this.context.mkRealSort();
             }
-            FuncDecl f = null, funcDecl = variablesDeclaration.get(func);
-            if(funcDecl != null){
+            FuncDecl<?> f = null, funcDecl = this.variablesDeclaration.get(func);
+            if (funcDecl != null) {
                 int size = funcDecl.getDomainSize();
-                if(size == arguments.size()){
+                if (size == arguments.size()) {
                     f = funcDecl;
-                }
-                else{
-                    func+="*";
+                } else {
+                    func += "*";
                 }
             }
-            if(arguments.size() > 0){
-                formula = " ( "+func+" "+formula+")";
-            }
-            else{
-                formula = func+" "+formula;
+            if (arguments.size() > 0) {
+                formula = " ( " + func + " " + formula + ")";
+            } else {
+                formula = func + " " + formula;
             }
 
-            if(f == null){
+            if (f == null) {
                 Sort[] typeArgs = new Sort[arguments.size()];
                 for (int i = 0; i < arguments.size(); i++) {
                     String type = arguments.get(i).getKey();
-                    typeArgs[i] = (type.equals("Int"))?context.mkIntSort():context.mkRealSort();
+                    typeArgs[i] = (type.equals("Int"))
+                        ? this.context.mkIntSort()
+                        : this.context.mkRealSort();
                 }
-                f = context.mkFuncDecl(func,typeArgs,retS);
-                declarations += "(declare-fun "+func+" "+sort+" "+ret + ")\n";
-                variablesDeclaration.put(func,f);
+                f = this.context.mkFuncDecl(func, typeArgs, retS);
+                this.declarations += "(declare-fun " + func + " " + sort + " " + ret + ")\n";
+                this.variablesDeclaration.put(func, f);
 
             }
-            return new Pair(ret,formula);
+            return new Pair<>(ret, formula);
         }
         return null;
     }
 
-    public ArrayList<Pair<String,String>> parseArgs() throws Exception {
-        ArrayList<Pair<String,String>> args = new ArrayList<>();
+    public ArrayList<Pair<String, String>> parseArgs() throws Exception {
+        ArrayList<Pair<String, String>> args = new ArrayList<>();
         args.add(parseFactor());
         if (reader.eat(',')) {
             args.addAll(parseArgs());
@@ -309,73 +309,68 @@ public class SymParserSMTLib extends AbstractSymParser{
         return args;
     }
 
-
-
-
-    public Pair<String,String> parseVar(String var) {
+    public Pair<String, String> parseVar(String var) {
         String regex = "_[0-9]+_SYM";
-        if(!var.contains("SYM"))
+        if (!var.contains("SYM")) {
             return parseCast(var);
+        }
         String[] name = var.split(regex);
         return parseVariable(name);
     }
 
-    public Pair<String,String> parseCast(String string){
+    public Pair<String, String> parseCast(String string) {
         String var = string.split("\\[")[0];
-        if(var.contains("REAL")){
+        if (var.contains("REAL")) {
             //To be checked
-            if (!variables.containsKey(var)) {
-                declarations += "(declare-fun " + var + " () Real)\n";
-                Expr e = context.mkRealConst(var);
-                variables.put(var,e);
-                variablesDeclaration.put(var,e.getFuncDecl());
+            if (!this.variables.containsKey(var)) {
+                this.declarations += "(declare-fun " + var + " () Real)\n";
+                Expr<RealSort> e = context.mkRealConst(var);
+                this.variables.put(var, e);
+                this.variablesDeclaration.put(var, e.getFuncDecl());
             }
-            return new Pair("Real",var);
+            return new Pair<>("Real", var);
         }
-        if (!variables.containsKey(var)) {
-            declarations += "(declare-fun " + var + " () Int)\n";
-            Expr e = context.mkIntConst(var);
-            variables.put(var,e);
-            variablesDeclaration.put(var,e.getFuncDecl());
+        if (!this.variables.containsKey(var)) {
+            this.declarations += "(declare-fun " + var + " () Int)\n";
+            Expr<IntSort> e = this.context.mkIntConst(var);
+            this.variables.put(var, e);
+            this.variablesDeclaration.put(var, e.getFuncDecl());
         }
-        return new Pair("Int",var);
+        return new Pair<>("Int", var);
     }
 
-    public Pair<String,String> parseVariable(String[] name) {
+    public Pair<String, String> parseVariable(String[] name) {
         String ret = "Int";
         if (name[1].contains("REAL")) {
-            if (!variables.containsKey(name[0])) {
-                declarations+="(declare-fun "+name[0]+" () Real)\n";
-                Expr e = context.mkRealConst(name[0]);
-                variables.put(name[0],e);
-                variablesDeclaration.put(e.toString(),e.getFuncDecl());
+            if (!this.variables.containsKey(name[0])) {
+                this.declarations += "(declare-fun " + name[0] + " () Real)\n";
+                Expr<RealSort> e = this.context.mkRealConst(name[0]);
+                this.variables.put(name[0], e);
+                this.variablesDeclaration.put(e.toString(), e.getFuncDecl());
             }
             ret = "Real";
         } else {
-            if (!variables.containsKey(name[0])) {
-                declarations+="(declare-fun "+name[0]+" () Int)\n";
-                Expr e = context.mkIntConst(name[0]);
-                variables.put(name[0],e);
-                variablesDeclaration.put(e.toString(),e.getFuncDecl());
+            if (!this.variables.containsKey(name[0])) {
+                this.declarations += "(declare-fun " + name[0] + " () Int)\n";
+                Expr<IntSort> e = context.mkIntConst(name[0]);
+                this.variables.put(name[0], e);
+                this.variablesDeclaration.put(e.toString(), e.getFuncDecl());
             }
         }
-        return new Pair(ret,name[0]);
+        return new Pair<>(ret, name[0]);
     }
-
 
     public void createDecl(String name, String type) {
-        if (!variables.containsKey(name)) {
-            if (type.equals("int")){
-                Expr e = context.mkIntConst(name);
-                variables.put(name,e);
-                variablesDeclaration.put(e.toString(),e.getFuncDecl());
-            }
-            else{
-                Expr e = context.mkRealConst(name);
-                variables.put(name,e);
-                variablesDeclaration.put(e.toString(),e.getFuncDecl());
+        if (!this.variables.containsKey(name)) {
+            if (type.equals("int")) {
+                Expr<IntSort> e = this.context.mkIntConst(name);
+                this.variables.put(name, e);
+                this.variablesDeclaration.put(e.toString(), e.getFuncDecl());
+            } else {
+                Expr<RealSort> e = this.context.mkRealConst(name);
+                this.variables.put(name, e);
+                this.variablesDeclaration.put(e.toString(), e.getFuncDecl());
             }
         }
     }
-
 }

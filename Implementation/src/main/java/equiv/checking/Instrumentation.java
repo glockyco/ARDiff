@@ -46,19 +46,6 @@ public class Instrumentation implements Utils{
 		this.iteration = iteration;
 	}
 
-	public Instrumentation(){
-		typesMapping= new HashMap<>();
-		typesMapping.put("I", "int");
-		typesMapping.put("Z", "boolean");
-		typesMapping.put("C", "char");
-		typesMapping.put("F", "float");
-		typesMapping.put("D", "double");
-		typesMapping.put("J", "long");
-		this.sourcePath = "src/examples/demo/instrumented";
-		this.toolName = "";
-		this.iteration = 1;
-	}
-
 	/**Getters**/
 	public int getNumParameters(){
 		return numParameters;
