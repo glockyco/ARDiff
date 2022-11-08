@@ -1,12 +1,13 @@
 package differencing;
 
-import com.microsoft.z3.Status;
+import com.microsoft.z3.*;
 import differencing.classification.Classification;
 import differencing.classification.PartitionClassifier;
 import differencing.domain.Model;
 import differencing.models.Partition;
 import differencing.models.Run;
 import differencing.repositories.PartitionRepository;
+import differencing.transformer.ModelToZ3Transformer;
 import differencing.transformer.SpfToModelTransformer;
 import differencing.transformer.ValueToModelTransformer;
 import gov.nasa.jpf.PropertyListenerAdapter;
@@ -18,11 +19,9 @@ import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.util.MethodSpec;
 import gov.nasa.jpf.vm.*;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
-public class DifferencingListener extends PropertyListenerAdapter {
+public class DifferencingListener extends PropertyListenerAdapter implements AutoCloseable {
     private final Run run;
     private final MethodSpec areErrorsEquivalentSpec;
     private final MethodSpec areResultsEquivalentSpec;
@@ -45,12 +44,40 @@ public class DifferencingListener extends PropertyListenerAdapter {
     private Integer partitionPcConstraintCount = null;
     private boolean isPartitionDepthLimited = false;
 
+    private final Context context = new Context();
+    private final ModelToZ3Transformer modelToZ3 = new ModelToZ3Transformer(this.context);
+
+    private BoolExpr v1Summary = null;
+    private BoolExpr v2Summary = null;
+    private Map<String, Expr<?>> variables = new HashMap<>();
+
     public DifferencingListener(Run run, DifferencingParameters parameters, int solverTimeout) {
         this.run = run;
         this.areErrorsEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + parameters.getIteration() + ".areErrorsEquivalent");
         this.areResultsEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + parameters.getIteration() + ".areResultsEquivalent");
         this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + parameters.getIteration() + ".run");
         this.satChecker = new SatisfiabilityChecker(solverTimeout);
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.context.close();
+    }
+
+    public Context getContext() {
+        return this.context;
+    }
+
+    public BoolExpr getV1Summary() {
+        return this.v1Summary;
+    }
+
+    public BoolExpr getV2Summary() {
+        return this.v2Summary;
+    }
+
+    public Map<String ,Expr<?>> getVariables() {
+        return this.variables;
     }
 
     public Set<Partition> getPartitions() {
@@ -63,6 +90,30 @@ public class DifferencingListener extends PropertyListenerAdapter {
 
     public boolean hasUif() {
         return this.partitions.stream().anyMatch(p -> p.hasUif);
+    }
+
+    @Override
+    public void searchFinished(Search search) {
+        this.variables.putAll(this.collectVariables(this.v1Summary));
+        this.variables.putAll(this.collectVariables(this.v2Summary));
+    }
+
+    private Map<String, Expr<?>> collectVariables(Expr<?> expr) {
+        if (expr == null) {
+            return Collections.emptyMap();
+        } else if (expr.isConst()) {
+            String name = expr.getFuncDecl().getName().toString();
+            if (name.startsWith("UF_") || name.startsWith("AF_")) {
+                return Collections.emptyMap();
+            }
+            return Collections.singletonMap(name, expr);
+        } else {
+            Map<String, Expr<?>> vars = new HashMap<>();
+            for (Expr<?> arg : expr.getArgs()) {
+                vars.putAll(this.collectVariables(arg));
+            }
+            return vars;
+        }
     }
 
     @Override
@@ -161,6 +212,9 @@ public class DifferencingListener extends PropertyListenerAdapter {
             Model v1Model = v1IsConcrete ? this.valToModel.transform(v1Value) : this.spfToModel.transform(v1Expression);
             Model v2Model = v2IsConcrete ? this.valToModel.transform(v2Value) : this.spfToModel.transform(v2Expression);
 
+            this.v1Summary = this.addPartitionResultToSummary(this.v1Summary, pcModel, v1Model);
+            this.v2Summary = this.addPartitionResultToSummary(this.v2Summary, pcModel, v2Model);
+
             this.partitionPcConstraintCount = this.getConstraintCount(pcConstraint);
 
             this.hasPartitionUifPc = HasUifVisitor.hasUif(pcModel);
@@ -191,6 +245,14 @@ public class DifferencingListener extends PropertyListenerAdapter {
                 stackFrame.setOperand(0, 0, false);
             }
         }
+    }
+
+    private BoolExpr addPartitionResultToSummary(BoolExpr summary, Model pcModel, Model resultModel) {
+        BoolExpr pcExpr = (BoolExpr) this.modelToZ3.transform(pcModel);
+        Expr<?> v1Expr = this.modelToZ3.transform(resultModel);
+        BoolExpr retExpr = this.context.mkEq(this.context.mkConst("Ret", v1Expr.getSort()), v1Expr);
+        BoolExpr partitionExpr = pcModel == null ? retExpr : this.context.mkAnd(pcExpr, retExpr);
+        return summary == null ? partitionExpr : this.context.mkOr(summary, partitionExpr);
     }
 
     private void startNextPartition() {

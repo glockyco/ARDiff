@@ -2,7 +2,6 @@ package differencing;
 
 import differencing.classification.Classification;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.*;
@@ -11,8 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class DifferencingParameters implements Serializable {
-    private static final String BENCHMARKS_DIR = "../benchmarks/";
-    private static final Path BENCHMARKS_PATH = Paths.get(BENCHMARKS_DIR);
+    private static final Path BENCHMARKS_PATH = Paths.get("..", "benchmarks");
 
     private final String directory;
     private final String toolName;
@@ -42,12 +40,6 @@ public class DifferencingParameters implements Serializable {
 
     public void startNextIteration() {
         this.iteration++;
-    }
-
-    public boolean hasNextIteration() {
-        boolean nextOldVJavaFileExists = new File(this.getOldVJavaFile(this.iteration + 1)).exists();
-        boolean nextNewVJavaFileExists = new File(this.getNewVJavaFile(this.iteration + 1)).exists();
-        return nextOldVJavaFileExists && nextNewVJavaFileExists;
     }
 
     public String getToolName() {
@@ -102,12 +94,12 @@ public class DifferencingParameters implements Serializable {
         return Paths.get(this.directory, "..", "outputs", this.toolName + ".txt").toString();
     }
 
-    public String getOldVJavaFile(int iteration) {
-        return Paths.get(this.directory, "IoldV" + this.toolName + iteration + ".java").toString();
+    public String getOldVJavaFile() {
+        return Paths.get(this.directory).getParent().resolve("oldV.java").toString();
     }
 
-    public String getNewVJavaFile(int iteration) {
-        return Paths.get(this.directory, "InewV" + this.toolName + iteration + ".java").toString();
+    public String getNewVJavaFile() {
+        return Paths.get(this.directory).getParent().resolve("newV.java").toString();
     }
 
     public String[] getJavaFiles() throws IOException {

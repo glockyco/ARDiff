@@ -13,14 +13,13 @@ public class Run {
     public Classification result;
     public Boolean hasTimedOut;
     public Boolean isDepthLimited;
-    public Boolean canIterate;
     public Boolean hasUif;
     public Integer iterationCount;
     public Float runtime;
     public String errors;
 
     public Run(String benchmark, String tool) {
-        this(benchmark, tool, null, null, null, null, null, null, null, null);
+        this(benchmark, tool, null, null, null, null, null, null, null);
     }
 
     public Run(
@@ -31,7 +30,6 @@ public class Run {
         Boolean isDepthLimited,
         Boolean hasUif,
         Integer iterationCount,
-        Boolean canIterate,
         Float runtime,
         String errors
     ) {
@@ -42,7 +40,6 @@ public class Run {
         this.isDepthLimited = isDepthLimited;
         this.hasUif = hasUif;
         this.iterationCount = iterationCount;
-        this.canIterate = canIterate;
         this.runtime = runtime;
         this.errors = errors;
     }

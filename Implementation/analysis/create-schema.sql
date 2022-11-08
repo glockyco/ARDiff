@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS run
     is_depth_limited BOOLEAN,
     has_uif BOOLEAN,
     iteration_count INTEGER,
-    can_iterate BOOLEAN,
     runtime REAL,
     errors TEXT,
 

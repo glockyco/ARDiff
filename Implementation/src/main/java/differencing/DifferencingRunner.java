@@ -7,7 +7,9 @@ import differencing.models.Partition;
 import differencing.models.Run;
 import differencing.repositories.BenchmarkRepository;
 import differencing.repositories.RunRepository;
+import equiv.checking.ChangeExtractor;
 import equiv.checking.ProjectPaths;
+import equiv.checking.SourceInstrumentation;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -26,7 +28,7 @@ import java.util.*;
 public class DifferencingRunner {
     private final Configuration freeMarkerConfiguration;
 
-    public static void main(String[] args) throws IOException, TemplateException {
+    public static void main(String[] args) throws Exception {
         // Arguments: [benchmark] [tool] [solver-timeout]
         // - [benchmark]: Path to the benchmark directory, e.g., ../benchmarks/.
         // - [tool]: SE, DSEs, Imp, ARDiffs, ARDiffR, or ARDiffH3.
@@ -46,7 +48,7 @@ public class DifferencingRunner {
         this.freeMarkerConfiguration.setFallbackOnNullLoopVariable(false);
     }
 
-    public void run(String benchmarkDir, String toolName, int solverTimeout) throws IOException {
+    public void run(String benchmarkDir, String toolName, int solverTimeout) throws Exception {
         // Read the differencing configuration:
         Path parameterFilePath = Paths.get(benchmarkDir, "instrumented", "IDiff" + toolName + "-Parameters.txt");
 
@@ -69,7 +71,6 @@ public class DifferencingRunner {
                 parameters.getBenchmarkName(),
                 parameters.getToolVariant(),
                 result,
-                null,
                 null,
                 null,
                 null,
@@ -108,6 +109,19 @@ public class DifferencingRunner {
 
         RunTimer.start();
 
+        ChangeExtractor changeExtractor = new ChangeExtractor();
+        ArrayList<Integer> changes = changeExtractor.obtainChanges(
+            parameters.getOldVJavaFile(),
+            parameters.getNewVJavaFile(),
+            parameters.getTargetDirectory()
+        );
+
+        SourceInstrumentation instrumentation = InstrumentationFactory.create(
+            toolName,
+            solverTimeout,
+            changeExtractor
+        );
+
         boolean shouldKeepIterating;
 
         do { // while (shouldKeepIterating) {
@@ -141,7 +155,6 @@ public class DifferencingRunner {
                         diffListener.isDepthLimited(),
                         diffListener.hasUif(),
                         parameters.getIteration(),
-                        null,
                         RunTimer.getTime(),
                         ""
                     ));
@@ -159,6 +172,8 @@ public class DifferencingRunner {
                     System.setErr(driverError);
 
                     Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+                    instrumentation.runInstrumentation(parameters.getIteration(), changes);
 
                     File javaFile = this.createDifferencingDriverClass(parameters);
                     this.compile(ProjectPaths.classpath, javaFile);
@@ -185,6 +200,9 @@ public class DifferencingRunner {
                     outputWriter.println(driverOutputBuffer);
                     outputWriter.flush();
 
+                    System.setOut(systemOutput);
+                    System.setErr(systemError);
+
                     Runtime.getRuntime().removeShutdownHook(shutdownHook);
                 }
             }
@@ -204,11 +222,21 @@ public class DifferencingRunner {
 
             boolean isFinalResult = result == Classification.EQ || result == Classification.NEQ || result == Classification.ERROR;
 
-            shouldKeepIterating = !isFinalResult && parameters.hasNextIteration();
+            shouldKeepIterating = false;
+            if (!isFinalResult) {
+                String nextToRefine = instrumentation.getNextToRefine(
+                    diffListener.getContext(),
+                    diffListener.getV1Summary(),
+                    diffListener.getV2Summary(),
+                    diffListener.getVariables()
+                );
 
-            if (!shouldKeepIterating) {
-                driverOutput.println("isFinalResult: " + isFinalResult + ", hasNextIteration: " + parameters.hasNextIteration());
-                systemOutput.println("isFinalResult: " + isFinalResult + ", hasNextIteration: " + parameters.hasNextIteration());
+                if (!nextToRefine.isEmpty()) {
+                    instrumentation.expandFunction(nextToRefine, changes);
+                    shouldKeepIterating = true;
+                } else {
+                    systemOutput.println("Nothing left to refine.");
+                }
             }
 
             // Creating a new run to ensure we provide all necessary data.
@@ -220,7 +248,6 @@ public class DifferencingRunner {
                 diffListener.isDepthLimited(),
                 diffListener.hasUif(),
                 parameters.getIteration(),
-                parameters.hasNextIteration(),
                 RunTimer.getTime(),
                 errors
             );
@@ -228,6 +255,7 @@ public class DifferencingRunner {
             RunRepository.insertOrUpdate(run);
 
             parameters.startNextIteration();
+            diffListener.close();
         } while (shouldKeepIterating);
     }
 
