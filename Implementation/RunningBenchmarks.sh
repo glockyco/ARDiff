@@ -264,7 +264,7 @@ for d1 in ../benchmarks/* ; do
             oldV="${d3}/oldV.java"
             newV="${d3}/newV.java"
 
-            base_command="timeout --verbose --foreground ${timeout}s java -jar '${BASE_JAR_PATH}' --path1 ${oldV} --path2 ${newV} ${configurations[$i]} --b 10"
+            base_command="timeout --verbose --foreground ${timeout}s java -jar '${BASE_JAR_PATH}' --path1 ${oldV} --path2 ${newV} ${configurations[$i]} --b 10 --t $((${timeout} / 4))"
 
             if [ "$print_commands" = true ] ; then
               printf "\n%s" "${base_command}"
@@ -286,7 +286,7 @@ for d1 in ../benchmarks/* ; do
 
           # Run diff tool(s)
           if [ "$run_diff" = true ] ; then
-            diff_command="timeout --verbose --foreground ${timeout}s java -jar '${DIFF_JAR_PATH}' ${d3} ${tool_names[$i]} 30"
+            diff_command="timeout --verbose --foreground ${timeout}s java -jar '${DIFF_JAR_PATH}' ${d3} ${tool_names[$i]} $((${timeout} / 10))"
 
             if [ "$print_commands" = true ] ; then
               printf "\n%s" "${diff_command}"
