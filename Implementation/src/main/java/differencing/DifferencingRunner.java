@@ -108,7 +108,7 @@ public class DifferencingRunner {
         Benchmark benchmark = new Benchmark(parameters.getBenchmarkName(), parameters.getExpectedResult());
         Run run = new Run(parameters.getBenchmarkName(), parameters.getToolVariant());
 
-        RunTimer.start();
+        StopWatches.start("run");
 
         ChangeExtractor changeExtractor = new ChangeExtractor();
         ArrayList<Integer> changes = changeExtractor.obtainChanges(
@@ -157,7 +157,7 @@ public class DifferencingRunner {
                         diffListener.isDepthLimited(),
                         diffListener.hasUif(),
                         parameters.getIteration(),
-                        RunTimer.getTime(),
+                        StopWatches.getTime("run"),
                         ""
                     ));
 
@@ -254,7 +254,7 @@ public class DifferencingRunner {
                 diffListener.isDepthLimited(),
                 diffListener.hasUif(),
                 parameters.getIteration(),
-                RunTimer.getTime(),
+                StopWatches.getTime("run"),
                 errors
             );
 

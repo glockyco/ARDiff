@@ -285,7 +285,7 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
             this.hasPartitionUifV1,
             this.hasPartitionUifV2,
             this.partitionPcConstraintCount,
-            RunTimer.getTime(),
+            StopWatches.getTime("run"),
             ""
         );
 

@@ -16,7 +16,7 @@ import GradDiff.GradDiff;
 import IMPs.ImpactedS;
 import SE.SE;
 import com.microsoft.z3.Context;
-import differencing.RunTimer;
+import differencing.StopWatches;
 import differencing.classification.Classification;
 import differencing.classification.RunClassifier;
 import differencing.models.Benchmark;
@@ -112,7 +112,7 @@ public class Runner{
         Benchmark benchmark = new Benchmark(getBenchmarkName(p1), getBenchmarkExpected(p1));
         Run run = new Run(benchmark.benchmark, getToolVariant(tool, strategy));
 
-        RunTimer.start();
+        StopWatches.start("run");
 
         RunRepository.delete(run);
         BenchmarkRepository.insertOrUpdate(benchmark);
@@ -152,7 +152,7 @@ public class Runner{
                 isDepthLimited,
                 hasUif,
                 iterationCount,
-                RunTimer.getTime(),
+                StopWatches.getTime("run"),
                 errors
             ));
         });
@@ -192,7 +192,7 @@ public class Runner{
             isDepthLimited,
             hasUif,
             iterationCount,
-            RunTimer.getTime(),
+            StopWatches.getTime("run"),
             errors
         ));
     }
