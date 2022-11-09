@@ -1,6 +1,7 @@
 -- DROP TABLE IF EXISTS partition_instruction;
 -- DROP TABLE IF EXISTS instruction;
 -- DROP TABLE IF EXISTS partition;
+-- DROP TABLE IF EXISTS iteration;
 -- DROP TABLE IF EXISTS run;
 -- DROP TABLE IF EXISTS benchmark;
 
@@ -30,10 +31,28 @@ CREATE TABLE IF NOT EXISTS run
     FOREIGN KEY (benchmark) REFERENCES benchmark(benchmark) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS iteration
+(
+    benchmark TEXT NOT NULL,
+    tool TEXT NOT NULL,
+    iteration INTEGER NOT NULL,
+
+    result TEXT,
+    has_timed_out BOOLEAN,
+    is_depth_limited BOOLEAN,
+    has_uif BOOLEAN,
+    runtime REAL,
+    errors TEXT,
+
+    PRIMARY KEY (benchmark, tool, iteration),
+    FOREIGN KEY (benchmark, tool) REFERENCES run(benchmark, tool) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS partition
 (
     benchmark TEXT NOT NULL,
     tool TEXT NOT NULL,
+    iteration INTEGER NOT NULL,
     partition INTEGER NOT NULL,
 
     result TEXT,
@@ -48,8 +67,8 @@ CREATE TABLE IF NOT EXISTS partition
     runtime REAL,
     errors TEXT,
 
-    PRIMARY KEY (benchmark, tool, partition),
-    FOREIGN KEY (benchmark, tool) REFERENCES run(benchmark, tool) ON DELETE CASCADE
+    PRIMARY KEY (benchmark, tool, iteration, partition),
+    FOREIGN KEY (benchmark, tool, iteration) REFERENCES iteration(benchmark, tool, iteration) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS instruction
@@ -71,6 +90,7 @@ CREATE TABLE IF NOT EXISTS partition_instruction
 (
     benchmark TEXT NOT NULL,
     tool TEXT NOT NULL,
+    iteration INTEGER NOT NULL,
     partition INTEGER NOT NULL,
     version INTEGER NOT NULL,
     method TEXT NOT NULL,
@@ -80,7 +100,7 @@ CREATE TABLE IF NOT EXISTS partition_instruction
     state INTEGER,
     choice INTEGER,
 
-    PRIMARY KEY (benchmark, tool, partition, version, method, instruction_index, execution_index),
-    FOREIGN KEY (benchmark, tool, partition) REFERENCES partition(benchmark, tool, partition) ON DELETE CASCADE,
+    PRIMARY KEY (benchmark, tool, iteration, partition, version, method, instruction_index, execution_index),
+    FOREIGN KEY (benchmark, tool, iteration, partition) REFERENCES partition(benchmark, tool, iteration, partition) ON DELETE CASCADE,
     FOREIGN KEY (benchmark, method, instruction_index) REFERENCES instruction(benchmark, method, instruction_index) ON DELETE CASCADE
 );

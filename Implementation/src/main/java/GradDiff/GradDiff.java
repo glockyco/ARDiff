@@ -13,8 +13,9 @@ package GradDiff;
 
 import DSE.DSE;
 import com.microsoft.z3.Status;
+import differencing.StopWatches;
 import equiv.checking.ChangeExtractor;
-import equiv.checking.OutputClassifier;
+import equiv.checking.OutputParser;
 import equiv.checking.SMTSummary;
 import equiv.checking.Utils;
 
@@ -67,7 +68,6 @@ public class GradDiff extends DSE {
      */
     public SMTSummary runTool() throws Exception {
         boolean gumTreePassed = false;
-        Path benchmarkPath = Paths.get(this.path);
         try {
             ChangeExtractor changeExtractor = new ChangeExtractor();
             ArrayList<Integer> changes = changeExtractor.obtainChanges(this.methodPathOld, this.methodPathNew, this.path + "instrumented");
@@ -90,6 +90,8 @@ public class GradDiff extends DSE {
                 iteration++;
                 result += "-----------------------Iteration : " + iteration + " -------------------------------------------\n";
 
+                StopWatches.start("iteration-" + iteration);
+
                 instrumentation.runInstrumentation(iteration, changes);
                 this.times[0] = instrumentation.getInitializationRuntime();
                 this.totalTimes[0] = instrumentation.getTotalInitializationRuntime();
@@ -107,14 +109,13 @@ public class GradDiff extends DSE {
                 Path modelPath = Paths.get(this.path, "..", "z3models", this.toolName + ".txt");
                 modelPath.toFile().getParentFile().mkdirs();
                 Files.write(modelPath, summary.toWrite.getBytes());
+
+                StopWatches.stop("iteration-" + iteration);
             }
 
             System.out.println(updateUserOutput(finalRes));
 
             assert summary != null;
-            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName, iteration);
-            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName, iteration);
-            summary.iterationCount = iteration;
 
             return summary;
         } catch (Exception e) {

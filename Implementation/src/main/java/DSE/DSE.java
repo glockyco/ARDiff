@@ -90,7 +90,6 @@ public class DSE {
      * The main method to run DSE
      */
     public SMTSummary runTool() throws Exception {
-        Path benchmarkPath = Paths.get(this.path);
         try {
             int iteration = 1;
 
@@ -123,9 +122,6 @@ public class DSE {
             Path modelPath = Paths.get(this.path, "..", "z3models", this.toolName + ".txt");
             modelPath.toFile().getParentFile().mkdirs();
             Files.write(modelPath, summary.toWrite.getBytes());
-
-            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName, iteration);
-            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName, iteration);
 
             return summary;
         } catch (Exception e) {

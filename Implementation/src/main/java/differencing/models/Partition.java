@@ -9,6 +9,7 @@ public class Partition {
     // Index
     public String benchmark;
     public String tool;
+    public int iteration;
     public int partition;
 
     // Non-Index
@@ -24,9 +25,9 @@ public class Partition {
     public Float runtime;
     public String errors;
 
-    public Partition(String benchmark, String tool, int partition) {
+    public Partition(String benchmark, String tool, int iteration, int partition) {
         this(
-            benchmark, tool, partition, null,
+            benchmark, tool, iteration, partition, null,
             null, null, null,
             null, null, null,
             null, null, null
@@ -36,6 +37,7 @@ public class Partition {
     public Partition(
         String benchmark,
         String tool,
+        int iteration,
         int partition,
         Classification result,
         Status pcStatus,
@@ -50,6 +52,7 @@ public class Partition {
     ) {
         this.benchmark = benchmark;
         this.tool = tool;
+        this.iteration = iteration;
         this.partition = partition;
 
         this.result = result;
@@ -77,13 +80,14 @@ public class Partition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Partition partition1 = (Partition) o;
-        return partition == partition1.partition
+        return iteration == partition1.iteration
+            && partition == partition1.partition
             && benchmark.equals(partition1.benchmark)
             && tool.equals(partition1.tool);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(benchmark, tool, partition);
+        return Objects.hash(benchmark, tool, iteration, partition);
     }
 }

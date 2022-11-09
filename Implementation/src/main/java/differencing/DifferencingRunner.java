@@ -1,11 +1,13 @@
 package differencing;
 
 import differencing.classification.Classification;
+import differencing.classification.IterationClassifier;
 import differencing.classification.RunClassifier;
 import differencing.models.Benchmark;
-import differencing.models.Partition;
+import differencing.models.Iteration;
 import differencing.models.Run;
 import differencing.repositories.BenchmarkRepository;
+import differencing.repositories.IterationRepository;
 import differencing.repositories.RunRepository;
 import equiv.checking.ChangeExtractor;
 import equiv.checking.ProjectPaths;
@@ -55,23 +57,22 @@ public class DifferencingRunner {
 
         DifferencingParameterFactory parameterFactory = new DifferencingParameterFactory();
 
+        //------------------------------------------------------------------------------------------
+        // Check whether the necessary "configuration" file exists.
+        // If not, terminate the program with a BASE_TOOL_MISSING result.
+
         if (!parameterFilePath.toFile().exists()) {
             String error = "Error: '" + parameterFilePath + "' does not exist.";
 
             DifferencingParameters parameters = parameterFactory.create(toolName, benchmarkDir);
             Arrays.stream(parameters.getGeneratedFiles()).forEach(file -> new File(file).delete());
 
-            Classification result = new RunClassifier(
-                false, true, false, false,
-                Collections.<Partition>emptySet()
-            ).getClassification();
-
             Benchmark benchmark = new Benchmark(parameters.getBenchmarkName(), parameters.getExpectedResult());
 
             Run run = new Run(
                 parameters.getBenchmarkName(),
                 parameters.getToolVariant(),
-                result,
+                Classification.BASE_TOOL_MISSING,
                 null,
                 null,
                 null,
@@ -88,12 +89,14 @@ public class DifferencingRunner {
             return;
         }
 
+        //------------------------------------------------------------------------------------------
+
         DifferencingParameters parameters = parameterFactory.load(parameterFilePath.toFile());
 
-        // Delete generated files from previous run(s):
         Arrays.stream(parameters.getGeneratedFiles()).forEach(file -> new File(file).delete());
 
-        // Run the differencing:
+        StopWatches.start("run");
+
         PrintStream systemOutput = System.out;
         PrintStream systemError = System.err;
 
@@ -102,13 +105,12 @@ public class DifferencingRunner {
         ByteArrayOutputStream driverErrorBuffer = new ByteArrayOutputStream();
         PrintStream driverError = new PrintStream(driverErrorBuffer);
 
-        String outputPath = parameters.getOutputFile();
-        String errorPath = parameters.getErrorFile();
-
         Benchmark benchmark = new Benchmark(parameters.getBenchmarkName(), parameters.getExpectedResult());
-        Run run = new Run(parameters.getBenchmarkName(), parameters.getToolVariant());
+        BenchmarkRepository.insertOrUpdate(benchmark);
 
-        StopWatches.start("run");
+        Run run = new Run(parameters.getBenchmarkName(), parameters.getToolVariant());
+        RunRepository.delete(run);
+        RunRepository.insertOrUpdate(run);
 
         ChangeExtractor changeExtractor = new ChangeExtractor();
         ArrayList<Integer> changes = changeExtractor.obtainChanges(
@@ -125,49 +127,83 @@ public class DifferencingRunner {
 
         boolean shouldKeepIterating;
 
+        Map<Integer, Iteration> iterations = new HashMap<>();
         do { // while (shouldKeepIterating) {
-            RunRepository.delete(run);
-            BenchmarkRepository.insertOrUpdate(benchmark);
-            RunRepository.insertOrUpdate(run);
+            StopWatches.start("iteration-" + (iterations.size() + 1));
+
+            Iteration iteration = new Iteration(run.benchmark, run.tool, iterations.size() + 1);
+            iterations.put(iteration.iteration, iteration);
+            IterationRepository.insertOrUpdate(iteration);
+
+            parameters.setIteration(iteration.iteration);
 
             IgnoreUnreachablePathsListener unreachableListener = new IgnoreUnreachablePathsListener(solverTimeout);
-            ExecutionListener v1ExecListener = new ExecutionListener(run, parameters, "*.IoldV" + parameters.getToolName() + parameters.getIteration() + ".snippet");
-            ExecutionListener v2ExecListener = new ExecutionListener(run, parameters, "*.InewV" + parameters.getToolName() + parameters.getIteration() + ".snippet");
-            PathConditionListener pcListener = new PathConditionListener(parameters);
-            DifferencingListener diffListener = new DifferencingListener(run, parameters, solverTimeout);
+            ExecutionListener v1ExecListener = new ExecutionListener(iteration, parameters, "*.IoldV" + parameters.getToolName() + iteration.iteration + ".snippet");
+            ExecutionListener v2ExecListener = new ExecutionListener(iteration, parameters, "*.InewV" + parameters.getToolName() + iteration.iteration + ".snippet");
+            PathConditionListener pcListener = new PathConditionListener(iteration, parameters);
+            DifferencingListener diffListener = new DifferencingListener(iteration, parameters, solverTimeout);
 
             boolean hasSucceeded = false;
             String errors = "";
 
             try (
-                PrintWriter outputWriter = new PrintWriter(outputPath, "UTF-8");
-                PrintWriter errorWriter = new PrintWriter(errorPath, "UTF-8")
+                PrintWriter outputWriter = new PrintWriter(parameters.getOutputFile(), "UTF-8");
+                PrintWriter errorWriter = new PrintWriter(parameters.getErrorFile(), "UTF-8")
             ) {
+                //--------------------------------------------------------------
+                // Create a shutdown handler in case the run / iteration is
+                // forcefully stopped because it exceeds the timeout.
+
                 Thread shutdownHook = new Thread(() -> {
-                    Classification result = new RunClassifier(
-                        false, false, false, true,
+                    boolean hasTimedOut = true;
+                    Iteration currentIteration = iterations.get(iterations.size());
+
+                    Classification iterationResult = new IterationClassifier(
+                        false, false, false, hasTimedOut,
                         diffListener.getPartitions()
                     ).getClassification();
 
-                    RunRepository.insertOrUpdate(new Run(
-                        parameters.getBenchmarkName(),
-                        parameters.getToolVariant(),
-                        result,
-                        true,
+                    currentIteration = new Iteration(
+                        currentIteration.benchmark,
+                        currentIteration.tool,
+                        currentIteration.iteration,
+                        iterationResult,
+                        hasTimedOut,
                         diffListener.isDepthLimited(),
                         diffListener.hasUif(),
-                        parameters.getIteration(),
-                        StopWatches.getTime("run"),
+                        StopWatches.stopAndGetTime("iteration-" + currentIteration.iteration),
                         ""
+                    );
+
+                    iterations.put(currentIteration.iteration, currentIteration);
+                    IterationRepository.insertOrUpdate(currentIteration);
+
+                    Classification runResult = new RunClassifier(iterations).getClassification();
+
+                    RunRepository.insertOrUpdate(new Run(
+                        currentIteration.benchmark,
+                        currentIteration.tool,
+                        runResult,
+                        currentIteration.hasTimedOut,
+                        currentIteration.isDepthLimited,
+                        currentIteration.hasUif,
+                        currentIteration.iteration,
+                        StopWatches.stopAndGetTime("run"),
+                        currentIteration.errors
                     ));
 
                     outputWriter.println(driverOutputBuffer);
                     outputWriter.println("Forced program shutdown.");
                     outputWriter.flush();
 
-                    systemError.println("TIMEOUT: " + parameters.getTargetDirectory() + " -> " + result);
+                    systemError.println("TIMEOUT: " + parameters.getTargetDirectory() + " -> " + runResult);
                     systemError.flush();
                 });
+
+                //--------------------------------------------------------------
+                // Execute the actual equivalence checking / differencing.
+                // Each iteration consists of a source code instrumentation
+                // step and a symbolic execution step.
 
                 try {
                     System.setOut(driverOutput);
@@ -175,7 +211,7 @@ public class DifferencingRunner {
 
                     Runtime.getRuntime().addShutdownHook(shutdownHook);
 
-                    instrumentation.runInstrumentation(parameters.getIteration(), changes);
+                    instrumentation.runInstrumentation(iteration.iteration, changes);
 
                     File javaFile = this.createDifferencingDriverClass(parameters);
                     this.compile(ProjectPaths.classpath, javaFile);
@@ -213,20 +249,47 @@ public class DifferencingRunner {
                 }
             }
 
-            Classification result = new RunClassifier(
+            //------------------------------------------------------------------
+            // Write the results of this iteration to the DB + console.
+
+            Classification result = new IterationClassifier(
                 false, false, !hasSucceeded, false,
                 diffListener.getPartitions()
             ).getClassification();
 
+            iteration = new Iteration(
+                iteration.benchmark,
+                iteration.tool,
+                iteration.iteration,
+                result,
+                false,
+                diffListener.isDepthLimited(),
+                diffListener.hasUif(),
+                StopWatches.stopAndGetTime("iteration-" + iteration.iteration),
+                errors
+            );
+
+            iterations.put(iteration.iteration, iteration);
+            IterationRepository.insertOrUpdate(iteration);
+
             if (hasSucceeded) {
-                systemOutput.print("Iteration " + parameters.getIteration() + " - SUCCESS: ");
+                systemOutput.print("Iteration " + iteration.iteration + " - SUCCESS: ");
                 systemOutput.println(parameters.getTargetDirectory() + " -> " + result);
             } else {
-                systemError.println("Iteration " + parameters.getIteration() + " - ERROR: ");
+                systemError.println("Iteration " + iteration.iteration + " - ERROR: ");
                 systemError.println(parameters.getTargetDirectory() + " -> " + result);
             }
 
-            boolean isFinalResult = result == Classification.EQ || result == Classification.NEQ || result == Classification.ERROR;
+            //------------------------------------------------------------------
+            // Check if we should do another iteration.
+            // If yes, update the instrumentation object accordingly so a
+            // more concretized version of the source code is generated by
+            // the instrumentation step of the next iteration.
+
+            boolean isFinalResult =
+                result == Classification.EQ
+                || result == Classification.NEQ
+                || result == Classification.ERROR;
 
             shouldKeepIterating = false;
             if (!isFinalResult) {
@@ -245,24 +308,26 @@ public class DifferencingRunner {
                 }
             }
 
-            // Creating a new run to ensure we provide all necessary data.
-            run = new Run(
-                parameters.getBenchmarkName(),
-                parameters.getToolVariant(),
-                result,
-                false,
-                diffListener.isDepthLimited(),
-                diffListener.hasUif(),
-                parameters.getIteration(),
-                StopWatches.getTime("run"),
-                errors
-            );
-
-            RunRepository.insertOrUpdate(run);
-
-            parameters.startNextIteration();
             diffListener.close();
         } while (shouldKeepIterating);
+
+        //----------------------------------------------------------------------
+        // Write the overall run results to the DB.
+
+        Classification runResult = new RunClassifier(iterations).getClassification();
+        Iteration lastIteration = iterations.get(iterations.size());
+
+        RunRepository.insertOrUpdate(new Run(
+            lastIteration.benchmark,
+            lastIteration.tool,
+            runResult,
+            lastIteration.hasTimedOut,
+            lastIteration.isDepthLimited,
+            lastIteration.hasUif,
+            lastIteration.iteration,
+            StopWatches.stopAndGetTime("run"),
+            lastIteration.errors
+        ));
     }
 
     public File createDifferencingDriverClass(DifferencingParameters parameters) throws IOException, TemplateException {

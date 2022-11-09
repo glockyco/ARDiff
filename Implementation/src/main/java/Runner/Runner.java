@@ -18,12 +18,15 @@ import SE.SE;
 import com.microsoft.z3.Context;
 import differencing.StopWatches;
 import differencing.classification.Classification;
+import differencing.classification.IterationClassifier;
 import differencing.classification.RunClassifier;
 import differencing.models.Benchmark;
+import differencing.models.Iteration;
 import differencing.models.Run;
 import differencing.repositories.BenchmarkRepository;
+import differencing.repositories.IterationRepository;
 import differencing.repositories.RunRepository;
-import equiv.checking.OutputClassifier;
+import equiv.checking.OutputParser;
 import equiv.checking.ProjectPaths;
 import equiv.checking.SMTSummary;
 import equiv.checking.Utils;
@@ -35,9 +38,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static equiv.checking.Utils.*;
 
@@ -107,93 +108,79 @@ public class Runner{
     }
 
     public static void runTool(String tool, String p1, String p2, String solver,int b,int t, int minInt,int maxInt,double minDouble,double maxDouble,String strategy) {
+        StopWatches.start("run");
+
         String toolName = getToolName(tool, strategy);
 
         Benchmark benchmark = new Benchmark(getBenchmarkName(p1), getBenchmarkExpected(p1));
-        Run run = new Run(benchmark.benchmark, getToolVariant(tool, strategy));
-
-        StopWatches.start("run");
-
-        RunRepository.delete(run);
         BenchmarkRepository.insertOrUpdate(benchmark);
+
+        Run run = new Run(benchmark.benchmark, getToolVariant(tool, strategy));
+        RunRepository.delete(run);
         RunRepository.insertOrUpdate(run);
 
         Thread shutdownHook = new Thread(() -> {
-            Path benchmarkPath = Paths.get("../benchmarks/" + benchmark.benchmark);
-
-            List<Classification> classifications;
-            Boolean isDepthLimited = null;
-            Boolean hasUif = null;
-            Integer iterationCount = null;
-
+            Map<Integer, Iteration> iterations;
+            Classification runResult;
             String errors = "";
+
             try {
-                iterationCount = OutputClassifier.getIterationCount(benchmarkPath, toolName);
-                Classification classification = OutputClassifier.classify(benchmarkPath, toolName, iterationCount);
-                classifications = classification != null ? Collections.singletonList(classification) : Collections.emptyList();
-                isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, toolName, iterationCount);
-                hasUif = OutputClassifier.hasUif(benchmarkPath, toolName, iterationCount);
+                iterations = OutputParser.readIterations(run, toolName, errors, true);
+                runResult = new RunClassifier(iterations).getClassification();
             } catch (IOException e) {
                 e.printStackTrace(System.err);
-                classifications = Collections.singletonList(Classification.ERROR);
+                iterations = Collections.emptyMap();
+                runResult = Classification.ERROR;
                 errors = ExceptionUtils.getStackTrace(e);
             }
 
-            Classification result = new RunClassifier(
-                false, false, !errors.isEmpty(), true,
-                classifications
-            ).getClassification();
+            Iteration lastIteration = iterations.get(iterations.size());
 
             RunRepository.insertOrUpdate(new Run(
-                run.benchmark,
-                run.tool,
-                result,
-                true,
-                isDepthLimited,
-                hasUif,
-                iterationCount,
+                lastIteration.benchmark,
+                lastIteration.tool,
+                runResult,
+                lastIteration.hasTimedOut,
+                lastIteration.isDepthLimited,
+                lastIteration.hasUif,
+                iterations.size(),
                 StopWatches.getTime("run"),
                 errors
             ));
         });
 
-        Runtime.getRuntime().addShutdownHook(shutdownHook);
-
+        Map<Integer, Iteration> iterations;
+        Classification runResult;
         String errors = "";
 
-        Classification classification;
-        Boolean isDepthLimited = false;
-        boolean hasUif = false;
-        int iterationCount = 1;
-
         try {
-            SMTSummary summary = runToolInternal(tool, p1, p2, solver, b, t, minInt, maxInt, minDouble, maxDouble, strategy);
-            classification = summary.classification;
-            isDepthLimited = summary.isDepthLimited;
-            hasUif = !summary.noUFunctions;
-            iterationCount = summary.iterationCount;
+            Runtime.getRuntime().addShutdownHook(shutdownHook);
+            runToolInternal(tool, p1, p2, solver, b, t, minInt, maxInt, minDouble, maxDouble, strategy);
+            iterations = OutputParser.readIterations(run, toolName, errors, false);
+            runResult = new RunClassifier(iterations).getClassification();
         } catch (Exception e) {
-            classification = Classification.ERROR;
+            e.printStackTrace(System.err);
+            iterations = Collections.emptyMap();
+            runResult = Classification.ERROR;
             errors = ExceptionUtils.getStackTrace(e);
+        } finally {
+            Runtime.getRuntime().removeShutdownHook(shutdownHook);
         }
 
-        Runtime.getRuntime().removeShutdownHook(shutdownHook);
+        IterationRepository.insertOrUpdate(iterations.values());
 
-        Classification result = new RunClassifier(
-            false, false, !errors.isEmpty(), false,
-            Collections.singletonList(classification)
-        ).getClassification();
+        Iteration lastIteration = iterations.get(iterations.size());
 
         RunRepository.insertOrUpdate(new Run(
-            run.benchmark,
-            run.tool,
-            result,
-            false,
-            isDepthLimited,
-            hasUif,
-            iterationCount,
-            StopWatches.getTime("run"),
-            errors
+            lastIteration.benchmark,
+            lastIteration.tool,
+            runResult,
+            lastIteration.hasTimedOut,
+            lastIteration.isDepthLimited,
+            lastIteration.hasUif,
+            iterations.size(),
+            StopWatches.stopAndGetTime("run"),
+            lastIteration.errors + errors
         ));
     }
 

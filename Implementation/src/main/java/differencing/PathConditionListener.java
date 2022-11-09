@@ -1,6 +1,7 @@
 package differencing;
 
 import differencing.domain.Model;
+import differencing.models.Iteration;
 import differencing.transformer.ModelToJsonTransformer;
 import differencing.transformer.SpfToModelTransformer;
 import gov.nasa.jpf.PropertyListenerAdapter;
@@ -31,9 +32,9 @@ public class PathConditionListener extends PropertyListenerAdapter {
 
     private int partitionId = 1;
 
-    public PathConditionListener(DifferencingParameters parameters) {
+    public PathConditionListener(Iteration iteration, DifferencingParameters parameters) {
         this.parameters = parameters;
-        this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + parameters.getIteration() + ".run");
+        this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + iteration.iteration + ".run");
 
         this.spfToModelTransformer = new SpfToModelTransformer();
         this.modelToJsonTransformer = new ModelToJsonTransformer();

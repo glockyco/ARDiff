@@ -96,7 +96,6 @@ public class ImpactedS {
      */
     public SMTSummary runTool() throws Exception {
         boolean gumTreePassed = false;
-        Path benchmarkPath = Paths.get(this.path);
         try {
             int iteration = 1;
 
@@ -113,9 +112,6 @@ public class ImpactedS {
             Path outputPath = Paths.get(this.path, "..", "outputs", this.toolName + ".txt");
             outputPath.toFile().getParentFile().mkdirs();
             Files.write(outputPath, result.getBytes());
-
-            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName, iteration);
-            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName, iteration);
 
             return summary;
         } catch (Exception e) {

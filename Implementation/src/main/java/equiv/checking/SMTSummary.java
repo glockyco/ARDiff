@@ -12,7 +12,6 @@
 package equiv.checking;
 
 import com.microsoft.z3.*;
-import differencing.classification.Classification;
 import equiv.checking.symparser.SymParserSMTLib;
 
 import java.io.*;
@@ -42,10 +41,6 @@ public class SMTSummary {
     public String declarations;
     public String firstSummary = "";
     public String secondSummary = "";
-
-    public Classification classification = null;
-    public Boolean isDepthLimited = false;
-    public int iterationCount = 1;
 
     protected final String path;
     protected final String oldFileName;
@@ -319,7 +314,7 @@ public class SMTSummary {
             return summary;
         } catch (Exception e) {
             this.hasError = true;
-            return null;
+            throw new RuntimeException(e);
         }
     }
 

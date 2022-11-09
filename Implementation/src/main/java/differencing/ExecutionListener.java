@@ -1,9 +1,9 @@
 package differencing;
 
 import differencing.models.Instruction;
+import differencing.models.Iteration;
 import differencing.models.Partition;
 import differencing.models.PartitionInstruction;
-import differencing.models.Run;
 import differencing.repositories.InstructionRepository;
 import differencing.repositories.PartitionInstructionRepository;
 import differencing.repositories.PartitionRepository;
@@ -31,14 +31,15 @@ public class ExecutionListener extends PropertyListenerAdapter {
     // debugging easier by providing a tree view of all instructions executed
     // during the symbolic execution. Look at `roots` in `searchFinished` to
     // see the full execution tree. The actual data that we're collecting is
-    // stored in the `benchmark`, `run`, `partitions`, `partitionInstructions`,
-    // and `instructions` fields.
+    // stored in the fields `currentPartition`, `currentInstructions`, and
+    // `currentPartitionInstructions`, which are persisted to the DB after
+    // every partition.
 
     private final List<ExecutionNode> roots = new ArrayList<>();
     private final Map<Integer, ExecutionNode> nodeMap = new HashMap<>();
     private final Map<Integer, Integer> indexMap = new HashMap<>();
 
-    private final Run run;
+    private final Iteration iteration;
     private final int version;
     private final Set<Partition> partitions = new HashSet<>();
     private final Set<PartitionInstruction> currentPartitionInstructions = new HashSet<>();
@@ -53,13 +54,18 @@ public class ExecutionListener extends PropertyListenerAdapter {
 
     protected int partitionId =  1;
 
-    public ExecutionListener(Run run, DifferencingParameters parameters, String methodToCover) {
-        this.run = run;
+    public ExecutionListener(Iteration iteration, DifferencingParameters parameters, String methodToCover) {
+        this.iteration = iteration;
         this.parameters = parameters;
         this.methodToCoverSpec = MethodSpec.createMethodSpec(methodToCover);
-        this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + parameters.getIteration() + ".run");
+        this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + iteration.iteration + ".run");
 
-        this.currentPartition = new Partition(this.run.benchmark, this.run.tool, this.partitionId);
+        this.currentPartition = new Partition(
+            this.iteration.benchmark,
+            this.iteration.tool,
+            this.iteration.iteration,
+            this.partitionId
+        );
 
         assert methodToCover.contains("IoldV") || methodToCover.contains("InewV");
         this.version = methodToCover.contains("IoldV") ? 1 : 2;
@@ -159,6 +165,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
                 PartitionInstruction partitionInstruction = new PartitionInstruction(
                     this.currentPartition.benchmark,
                     this.currentPartition.tool,
+                    this.currentPartition.iteration,
                     this.currentPartition.partition,
                     this.version,
                     instruction.method,
@@ -182,7 +189,13 @@ public class ExecutionListener extends PropertyListenerAdapter {
         this.partitions.add(this.currentPartition);
         this.partitionId++;
 
-        this.currentPartition = new Partition(this.run.benchmark, this.run.tool, this.partitionId);
+        this.currentPartition = new Partition(
+            this.iteration.benchmark,
+            this.iteration.tool,
+            this.iteration.iteration,
+            this.partitionId
+        );
+
         this.currentInstructions.clear();
         this.currentPartitionInstructions.clear();
     }

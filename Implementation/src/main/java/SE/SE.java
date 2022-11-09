@@ -13,7 +13,7 @@ package SE;
 
 import com.microsoft.z3.Status;
 import equiv.checking.ChangeExtractor;
-import equiv.checking.OutputClassifier;
+import equiv.checking.OutputParser;
 import equiv.checking.SMTSummary;
 import equiv.checking.SymbolicExecutionRunner;
 
@@ -83,7 +83,6 @@ public class SE {
     }
 
     public SMTSummary runTool() throws Exception {
-        Path benchmarkPath = Paths.get(this.path);
         try {
             int iteration = 1;
 
@@ -114,9 +113,6 @@ public class SE {
             Path modelsPath = Paths.get(this.path, "..", "z3models", this.toolName + ".txt");
             modelsPath.getParent().toFile().mkdirs();
             Files.write(modelsPath, summary.toWrite.getBytes());
-
-            summary.isDepthLimited = OutputClassifier.isDepthLimited(benchmarkPath, this.toolName, iteration);
-            summary.classification = OutputClassifier.classify(benchmarkPath, this.toolName, iteration);
 
             return summary;
         } catch (Exception e) {

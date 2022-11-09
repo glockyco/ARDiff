@@ -6,6 +6,7 @@ public class PartitionInstruction {
     // Index
     public String benchmark;
     public String tool;
+    public int iteration;
     public int partition;
     public int version;
     public String method;
@@ -19,6 +20,7 @@ public class PartitionInstruction {
     public PartitionInstruction(
         String benchmark,
         String tool,
+        int iteration,
         int partition,
         int version,
         String method,
@@ -29,6 +31,7 @@ public class PartitionInstruction {
     ) {
         this.benchmark = benchmark;
         this.tool = tool;
+        this.iteration = iteration;
         this.partition = partition;
         this.version = version;
         this.method = method;
@@ -43,7 +46,8 @@ public class PartitionInstruction {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PartitionInstruction that = (PartitionInstruction) o;
-        return partition == that.partition
+        return iteration == that.iteration
+            && partition == that.partition
             && version == that.version
             && instructionIndex == that.instructionIndex
             && executionIndex == that.executionIndex
@@ -54,6 +58,6 @@ public class PartitionInstruction {
 
     @Override
     public int hashCode() {
-        return Objects.hash(benchmark, tool, partition, version, method, instructionIndex, executionIndex);
+        return Objects.hash(benchmark, tool, iteration, partition, version, method, instructionIndex, executionIndex);
     }
 }

@@ -4,8 +4,8 @@ import com.microsoft.z3.*;
 import differencing.classification.Classification;
 import differencing.classification.PartitionClassifier;
 import differencing.domain.Model;
+import differencing.models.Iteration;
 import differencing.models.Partition;
-import differencing.models.Run;
 import differencing.repositories.PartitionRepository;
 import differencing.transformer.ModelToZ3Transformer;
 import differencing.transformer.SpfToModelTransformer;
@@ -22,7 +22,7 @@ import gov.nasa.jpf.vm.*;
 import java.util.*;
 
 public class DifferencingListener extends PropertyListenerAdapter implements AutoCloseable {
-    private final Run run;
+    private final Iteration iteration;
     private final MethodSpec areErrorsEquivalentSpec;
     private final MethodSpec areResultsEquivalentSpec;
     private final MethodSpec runSpec;
@@ -51,11 +51,11 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
     private BoolExpr v2Summary = null;
     private Map<String, Expr<?>> variables = new HashMap<>();
 
-    public DifferencingListener(Run run, DifferencingParameters parameters, int solverTimeout) {
-        this.run = run;
-        this.areErrorsEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + parameters.getIteration() + ".areErrorsEquivalent");
-        this.areResultsEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + parameters.getIteration() + ".areResultsEquivalent");
-        this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + parameters.getIteration() + ".run");
+    public DifferencingListener(Iteration iteration, DifferencingParameters parameters, int solverTimeout) {
+        this.iteration = iteration;
+        this.areErrorsEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + iteration.iteration + ".areErrorsEquivalent");
+        this.areResultsEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + iteration.iteration + ".areResultsEquivalent");
+        this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + iteration.iteration + ".run");
         this.satChecker = new SatisfiabilityChecker(solverTimeout);
     }
 
@@ -274,8 +274,9 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
         }
 
         Partition partition = new Partition(
-            this.run.benchmark,
-            this.run.tool,
+            this.iteration.benchmark,
+            this.iteration.tool,
+            this.iteration.iteration,
             this.partitionId,
             this.partitionClassification,
             this.partitionPcStatus,
@@ -285,7 +286,7 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
             this.hasPartitionUifV1,
             this.hasPartitionUifV2,
             this.partitionPcConstraintCount,
-            StopWatches.getTime("run"),
+            StopWatches.getTime("iteration-" + this.iteration.iteration),
             ""
         );
 

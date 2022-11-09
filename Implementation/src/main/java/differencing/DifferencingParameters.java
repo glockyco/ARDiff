@@ -34,12 +34,8 @@ public class DifferencingParameters implements Serializable {
         this.diffMethodDescription = diffMethodDescription;
     }
 
-    public int getIteration() {
-        return this.iteration;
-    }
-
-    public void startNextIteration() {
-        this.iteration++;
+    public void setIteration(int iteration) {
+        this.iteration = iteration;
     }
 
     public String getToolName() {

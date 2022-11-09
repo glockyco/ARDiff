@@ -25,6 +25,7 @@ public class PartitionRepository extends Repository {
         "INSERT INTO partition(" +
         "benchmark, " +
         "tool, " +
+        "iteration, " +
         "partition, " +
         "result, " +
         "pc_status, " +
@@ -38,7 +39,7 @@ public class PartitionRepository extends Repository {
         "runtime, " +
         "errors" +
         ") " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
         "ON CONFLICT DO UPDATE SET " +
         "result = excluded.result, " +
         "pc_status = excluded.pc_status, " +
@@ -57,18 +58,19 @@ public class PartitionRepository extends Repository {
         try (Connection conn = connect(); PreparedStatement ps = conn.prepareStatement(INSERT_OR_UPDATE_FULL)) {
             ps.setObject(1, partition.benchmark);
             ps.setObject(2, partition.tool);
-            ps.setObject(3, partition.partition);
-            ps.setObject(4, partition.result.toString());
-            ps.setObject(5, partition.pcStatus == null ? null : partition.pcStatus.toInt());
-            ps.setObject(6, partition.neqStatus == null ? null : partition.neqStatus.toInt());
-            ps.setObject(7, partition.eqStatus == null ? null : partition.eqStatus.toInt());
-            ps.setObject(8, partition.hasUif);
-            ps.setObject(9, partition.hasUifPc);
-            ps.setObject(10, partition.hasUifV1);
-            ps.setObject(11, partition.hasUifV2);
-            ps.setObject(12, partition.constraintCount);
-            ps.setObject(13, partition.runtime);
-            ps.setObject(14, partition.errors);
+            ps.setObject(3, partition.iteration);
+            ps.setObject(4, partition.partition);
+            ps.setObject(5, partition.result.toString());
+            ps.setObject(6, partition.pcStatus == null ? null : partition.pcStatus.toInt());
+            ps.setObject(7, partition.neqStatus == null ? null : partition.neqStatus.toInt());
+            ps.setObject(8, partition.eqStatus == null ? null : partition.eqStatus.toInt());
+            ps.setObject(9, partition.hasUif);
+            ps.setObject(10, partition.hasUifPc);
+            ps.setObject(11, partition.hasUifV1);
+            ps.setObject(12, partition.hasUifV2);
+            ps.setObject(13, partition.constraintCount);
+            ps.setObject(14, partition.runtime);
+            ps.setObject(15, partition.errors);
             ps.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -79,16 +81,18 @@ public class PartitionRepository extends Repository {
         "INSERT INTO partition(" +
         "benchmark, " +
         "tool, " +
+        "iteration, " +
         "partition " +
         ") " +
-        "VALUES (?, ?, ?) " +
+        "VALUES (?, ?, ?, ?) " +
         "ON CONFLICT DO NOTHING;";
 
     private static void insertOrUpdatePartial(Partition partition) {
         try (Connection conn = connect(); PreparedStatement ps = conn.prepareStatement(INSERT_OR_UPDATE_PARTIAL)) {
             ps.setObject(1, partition.benchmark);
             ps.setObject(2, partition.tool);
-            ps.setObject(3, partition.partition);
+            ps.setObject(3, partition.iteration);
+            ps.setObject(4, partition.partition);
             ps.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
