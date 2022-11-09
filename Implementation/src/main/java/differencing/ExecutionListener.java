@@ -113,20 +113,20 @@ public class ExecutionListener extends PropertyListenerAdapter {
     }
 
     @Override
-    public void executeInstruction(VM vm, ThreadInfo currentThread, gov.nasa.jpf.vm.Instruction instructionToExecute) {
-        MethodInfo mi = instructionToExecute.getMethodInfo();
-        if (instructionToExecute instanceof JVMReturnInstruction && this.runSpec.matches(mi)) {
+    public void instructionExecuted(VM vm, ThreadInfo currentThread, gov.nasa.jpf.vm.Instruction nextInstruction, gov.nasa.jpf.vm.Instruction executedInstruction) {
+        MethodInfo mi = executedInstruction.getMethodInfo();
+        if (executedInstruction instanceof JVMReturnInstruction && this.runSpec.matches(mi)) {
             this.startNextPartition();
         }
 
         if (this.isInMethodToCover & !vm.getSystemState().isIgnored() && !currentThread.isFirstStepInsn()) {
-            if (this.methodToCoverSpec.matchesClass(instructionToExecute.getMethodInfo().getClassInfo().getName())) {
+            if (this.methodToCoverSpec.matchesClass(executedInstruction.getMethodInfo().getClassInfo().getName())) {
                 assert vm.getChoiceGenerator() instanceof PCChoiceGenerator;
                 PCChoiceGenerator cg = vm.getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
 
                 // -------------------------------------------------------------
 
-                ExecutionNode node = new ExecutionNode(vm.getStateId(), cg.getNextChoice(), instructionToExecute, this.prevNode);
+                ExecutionNode node = new ExecutionNode(vm.getStateId(), cg.getNextChoice(), executedInstruction, this.prevNode);
                 node.pathCondition = PathCondition.getPC(vm);
 
                 ExecutionNode n = node;
@@ -149,11 +149,11 @@ public class ExecutionListener extends PropertyListenerAdapter {
                 Instruction instruction = new Instruction(
                     this.currentPartition.benchmark,
                     mi.getFullName(),
-                    instructionToExecute.getInstructionIndex(),
-                    instructionToExecute.toString(),
-                    instructionToExecute.getPosition(),
+                    executedInstruction.getInstructionIndex(),
+                    executedInstruction.toString(),
+                    executedInstruction.getPosition(),
                     mi.getSourceFileName(),
-                    instructionToExecute.getLineNumber()
+                    executedInstruction.getLineNumber()
                 );
 
                 PartitionInstruction partitionInstruction = new PartitionInstruction(

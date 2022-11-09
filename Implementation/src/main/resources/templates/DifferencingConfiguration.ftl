@@ -18,6 +18,5 @@ symbolic.strings = true
 symbolic.dp=coral
 symbolic.string_dp_timeout_ms=${timeout?string.computer}
 search.depth_limit=10
-listener = gov.nasa.jpf.symbc.SymbolicListener
 search.multiple_errors=true
 search.class = .search.CustomSearch

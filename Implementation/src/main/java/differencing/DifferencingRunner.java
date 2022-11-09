@@ -16,6 +16,7 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
+import gov.nasa.jpf.symbc.SymbolicListener;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
@@ -129,6 +130,7 @@ public class DifferencingRunner {
             BenchmarkRepository.insertOrUpdate(benchmark);
             RunRepository.insertOrUpdate(run);
 
+            IgnoreUnreachablePathsListener unreachableListener = new IgnoreUnreachablePathsListener(solverTimeout);
             ExecutionListener v1ExecListener = new ExecutionListener(run, parameters, "*.IoldV" + parameters.getToolName() + parameters.getIteration() + ".snippet");
             ExecutionListener v2ExecListener = new ExecutionListener(run, parameters, "*.InewV" + parameters.getToolName() + parameters.getIteration() + ".snippet");
             PathConditionListener pcListener = new PathConditionListener(parameters);
@@ -181,6 +183,8 @@ public class DifferencingRunner {
 
                     Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
                     JPF jpf = new JPF(config);
+                    jpf.addListener(unreachableListener);
+                    jpf.addListener(new SymbolicListener(config, jpf));
                     jpf.addListener(v1ExecListener);
                     jpf.addListener(v2ExecListener);
                     jpf.addListener(pcListener);

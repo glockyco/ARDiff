@@ -17,8 +17,6 @@ import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.symbc.SymbolicListener;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class SymbolicExecutionRunner {
     /**
@@ -167,6 +165,7 @@ public class SymbolicExecutionRunner {
             Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
             JPF jpf = new JPF(config);
 
+            jpf.addListener(new IgnoreUnreachablePathsListener(this.timeout / 1000));
             jpf.addListener(new SymbolicListener(config, jpf));
             jpf.run();
         } finally {
