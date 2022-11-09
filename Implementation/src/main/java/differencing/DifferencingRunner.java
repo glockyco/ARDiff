@@ -196,6 +196,8 @@ public class DifferencingRunner {
                     errorWriter.println("Differencing failed due to error.\n");
                     errorWriter.println(driverErrorBuffer);
                     errorWriter.flush();
+
+                    systemError.println(errors);
                 } finally {
                     outputWriter.println(driverOutputBuffer);
                     outputWriter.flush();
