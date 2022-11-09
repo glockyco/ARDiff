@@ -11,7 +11,14 @@
 //WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 package equiv.checking;
 
+import differencing.IgnoreUnreachablePathsListener;
+import gov.nasa.jpf.Config;
+import gov.nasa.jpf.JPF;
+import gov.nasa.jpf.symbc.SymbolicListener;
+
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class SymbolicExecutionRunner {
     /**
@@ -85,7 +92,6 @@ public class SymbolicExecutionRunner {
             "symbolic.dp=" + this.SMTSolver + " \n" +
             "symbolic.string_dp_timeout_ms=" + this.timeout + "\n" +
             "search.depth_limit=" + this.bound + "\n" +
-            "listener = gov.nasa.jpf.symbc.SymbolicListener \n" +
             "search.multiple_errors=true \n" +
             "search.class = .search.CustomSearch \n";
 
@@ -150,29 +156,22 @@ public class SymbolicExecutionRunner {
      * @param fileName the program
      */
     public void runningOnProgram(String fileName) throws IOException {
-        String mainCommand = "java -jar -Djava.library.path=" + ProjectPaths.dp + " "
-            + ProjectPaths.jpf_core + "/build/RunJPF.jar "
-            + this.path + fileName + ".jpf";
+        PrintStream systemOutputStream = System.out;
+        PrintStream systemErrorStream = System.err;
 
-        Process p = Runtime.getRuntime().exec(mainCommand);
-        BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-        FileWriter fw = new FileWriter(this.path + fileName + "JPFOutput.txt");
-        BufferedWriter bw = new BufferedWriter(fw);
-        String line = null;
-        while ((line = in.readLine()) != null) {
-            bw.write(line + "\n");
+        System.setOut(new PrintStream(new BufferedOutputStream(new FileOutputStream(this.path + fileName + "JPFOutput.txt"))));
+        System.setErr(new PrintStream(new BufferedOutputStream(new FileOutputStream(this.path + fileName + "JPFError.txt"))));
+
+        try {
+            File configFile = new File(this.path + fileName + ".jpf");
+            Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
+            JPF jpf = new JPF(config);
+
+            jpf.addListener(new SymbolicListener(config, jpf));
+            jpf.run();
+        } finally {
+            System.setOut(systemOutputStream);
+            System.setErr(systemErrorStream);
         }
-        bw.close();
-        fw.close();
-        in.close();
-        fw = new FileWriter(this.path + fileName + "JPFError.txt");
-        bw = new BufferedWriter(fw);
-        while ((line = err.readLine()) != null) {
-            bw.write(line + "\n");
-        }
-        bw.close();
-        fw.close();
-        err.close();
     }
 }
