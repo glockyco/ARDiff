@@ -775,10 +775,10 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
         Object[] attrs = ivk.getArgumentAttrs(ti);
         Object[] values = ivk.getArgumentValues(ti);
         String[] types = mi.getArgumentTypeNames();
-        assert (attrs != null);
 
-        assert (attrs.length == values.length &&
-                values.length == types.length);
+        //assert (attrs != null);
+        //assert (attrs.length == values.length && values.length == types.length);
+
         if(attrs == null)
             attrs = new Object[0];
         int size = attrs.length;
