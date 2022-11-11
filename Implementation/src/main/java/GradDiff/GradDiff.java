@@ -86,11 +86,15 @@ public class GradDiff extends DSE {
                 this.H1, this.H2, this.H31, this.H32, this.strategy
             );
 
+            StopWatches.stop("run:initialization");
+
             while (this.onGoing) {
                 iteration++;
+                StopWatches.start("iteration-" + iteration);
+
                 result += "-----------------------Iteration : " + iteration + " -------------------------------------------\n";
 
-                StopWatches.start("iteration-" + iteration);
+                StopWatches.start("iteration-" + iteration + ":instrumentation");
 
                 instrumentation.runInstrumentation(iteration, changes);
                 this.times[0] = instrumentation.getInitializationRuntime();
@@ -98,9 +102,17 @@ public class GradDiff extends DSE {
                 this.times[1] = instrumentation.getDefUseAndUifRuntime();
                 this.totalTimes[1] = instrumentation.getTotalDefUseAndUifRuntime();
 
+                StopWatches.stop("iteration-" + iteration + ":instrumentation");
+                StopWatches.start("iteration-" + iteration + ":symbolic-execution");
+
                 summary = this.runEquivalenceChecking(instrumentation);
-                finalRes = this.equivalenceResult(summary, changes, instrumentation);
+
+                StopWatches.stop("iteration-" + iteration + ":symbolic-execution");
+
+                finalRes = this.equivalenceResult(summary, changes, instrumentation, iteration);
                 result += finalRes;
+
+                StopWatches.start("iteration-" + iteration + ":finalization");
 
                 Path outputPath = Paths.get(this.path, "..", "outputs", this.toolName + ".txt");
                 outputPath.toFile().getParentFile().mkdirs();
@@ -110,8 +122,11 @@ public class GradDiff extends DSE {
                 modelPath.toFile().getParentFile().mkdirs();
                 Files.write(modelPath, summary.toWrite.getBytes());
 
+                StopWatches.stop("iteration-" + iteration + ":finalization");
                 StopWatches.stop("iteration-" + iteration);
             }
+
+            StopWatches.start("run:finalization");
 
             System.out.println(updateUserOutput(finalRes));
 
@@ -134,7 +149,13 @@ public class GradDiff extends DSE {
      * @param smtSummary the summaries for both programs to be compared
      * @return the equivalence result as a string
      */
-    public String equivalenceResult(SMTSummary smtSummary, ArrayList<Integer> changes, GradDiffInstrumentation instrumentation) throws IOException {
+    public String equivalenceResult(
+        SMTSummary smtSummary,
+        ArrayList<Integer> changes,
+        GradDiffInstrumentation instrumentation,
+        int iteration
+    ) throws IOException {
+        StopWatches.start("iteration-" + iteration + ":classification");
         if (Utils.DEBUG)
             System.out.println("-----------------------The current status-------------------------------------------\n");
         if (Utils.DEBUG) System.out.println(smtSummary.status);
@@ -149,6 +170,7 @@ public class GradDiff extends DSE {
             result += "Output : EQUIVALENT";
             result += "\n------------------------------END----------------------------------------\n";
             smtSummary.context.close();
+            StopWatches.stop("iteration-" + iteration + ":classification");
             return result;
         } else if (smtSummary.status == Status.UNKNOWN) {
             result += "  -Initialization : " + this.times[0] / (Math.pow(10, 6)) + " ms\n";
@@ -164,6 +186,7 @@ public class GradDiff extends DSE {
                 result += "\n------------------------------END Of REFINEMENT----------------------------------------\n";
                 result += "\n------------------------------END----------------------------------------\n";
                 smtSummary.context.close();
+                StopWatches.stop("iteration-" + iteration + ":classification");
                 return result;
             }
             result += "\n------------------------------To be continued (REFINING)----------------------------------------\n";
@@ -182,6 +205,7 @@ public class GradDiff extends DSE {
                 result += "\n------------------------------END Of REFINEMENT----------------------------------------\n";
                 result += "\n------------------------------END----------------------------------------\n";
                 smtSummary.context.close();
+                StopWatches.stop("iteration-" + iteration + ":classification");
                 return result;
             }
             ////////////////////////////////refinement might help//////////////////////////////////
@@ -207,12 +231,17 @@ public class GradDiff extends DSE {
                     result += "\n------------------------------END----------------------------------------\n";
                 }
                 smtSummary.context.close();
+                StopWatches.stop("iteration-" + iteration + ":classification");
                 return result;
             } else {
                 result += "Output : UNKNOWN \n";
                 result += "Reason : solver found a counterexample, but it could be due to too much abstraction";
             }
         }
+
+        StopWatches.stop("iteration-" + iteration + ":classification");
+        StopWatches.start("iteration-" + iteration + ":refinement");
+
         // if ((neqResult == UNKNOWN && hasUif) || (neqResult == SAT && eqResult != SAT && hasUif))
         result += "\n------------------------------To be continued (REFINING)----------------------------------------\n";
 
@@ -241,6 +270,9 @@ public class GradDiff extends DSE {
             this.times[3] += end - start;
             this.totalTimes[3] += times[3];
         }
+
+        StopWatches.stop("iteration-" + iteration + ":refinement");
+
         return result;
     }
 

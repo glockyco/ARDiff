@@ -2,6 +2,7 @@
 -- DROP TABLE IF EXISTS instruction;
 -- DROP TABLE IF EXISTS partition;
 -- DROP TABLE IF EXISTS iteration;
+-- DROP TABLE IF EXISTS runtime;
 -- DROP TABLE IF EXISTS run;
 -- DROP TABLE IF EXISTS benchmark;
 
@@ -29,6 +30,21 @@ CREATE TABLE IF NOT EXISTS run
 
     PRIMARY KEY (benchmark, tool),
     FOREIGN KEY (benchmark) REFERENCES benchmark(benchmark) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS runtime
+(
+    benchmark TEXT NOT NULL,
+    tool TEXT NOT NULL,
+    topic TEXT NOT NULL,
+    task TEXT NOT NULL,
+
+    runtime REAL NOT NULL,
+    step INTEGER NOT NULL,
+    is_missing BOOLEAN NOT NULL,
+
+    PRIMARY KEY (benchmark, tool, topic, task),
+    FOREIGN KEY (benchmark, tool) REFERENCES run(benchmark, tool) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS iteration

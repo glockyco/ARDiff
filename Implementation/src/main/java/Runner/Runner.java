@@ -17,8 +17,8 @@ import IMPs.ImpactedS;
 import SE.SE;
 import com.microsoft.z3.Context;
 import differencing.StopWatches;
+import differencing.TimeFactory;
 import differencing.classification.Classification;
-import differencing.classification.IterationClassifier;
 import differencing.classification.RunClassifier;
 import differencing.models.Benchmark;
 import differencing.models.Iteration;
@@ -26,6 +26,7 @@ import differencing.models.Run;
 import differencing.repositories.BenchmarkRepository;
 import differencing.repositories.IterationRepository;
 import differencing.repositories.RunRepository;
+import differencing.repositories.TimeRepository;
 import equiv.checking.OutputParser;
 import equiv.checking.ProjectPaths;
 import equiv.checking.SMTSummary;
@@ -36,6 +37,7 @@ import org.apache.commons.lang3.SystemUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
@@ -107,8 +109,9 @@ public class Runner{
             System.out.println("[WARNING] If you want to have a complete summary (exercise all behaviors), make sure your bound is big enough.");
     }
 
-    public static void runTool(String tool, String p1, String p2, String solver,int b,int t, int minInt,int maxInt,double minDouble,double maxDouble,String strategy) {
+    public static void runTool(String tool, String p1, String p2, String solver,int b,int t, int minInt,int maxInt,double minDouble,double maxDouble,String strategy) throws IOException {
         StopWatches.start("run");
+        StopWatches.start("run:initialization");
 
         String toolName = getToolName(tool, strategy);
 
@@ -119,34 +122,43 @@ public class Runner{
         RunRepository.delete(run);
         RunRepository.insertOrUpdate(run);
 
+        PrintStream systemError = System.err;
         Thread shutdownHook = new Thread(() -> {
-            Map<Integer, Iteration> iterations;
-            Classification runResult;
-            String errors = "";
-
             try {
-                iterations = OutputParser.readIterations(run, toolName, errors, true);
-                runResult = new RunClassifier(iterations).getClassification();
-            } catch (IOException e) {
-                e.printStackTrace(System.err);
-                iterations = Collections.emptyMap();
-                runResult = Classification.ERROR;
-                errors = ExceptionUtils.getStackTrace(e);
+                Map<Integer, Iteration> iterations;
+                Classification runResult;
+                String errors = "";
+
+                try {
+                    iterations = OutputParser.readIterations(run, toolName, errors, true);
+                    runResult = new RunClassifier(iterations).getClassification();
+                } catch (IOException e) {
+                    e.printStackTrace(System.err);
+                    iterations = Collections.emptyMap();
+                    runResult = Classification.ERROR;
+                    errors = ExceptionUtils.getStackTrace(e);
+                }
+
+                Iteration lastIteration = iterations.get(iterations.size());
+
+                Run finishedRun = new Run(
+                    lastIteration.benchmark,
+                    lastIteration.tool,
+                    runResult,
+                    lastIteration.hasTimedOut,
+                    lastIteration.isDepthLimited,
+                    lastIteration.hasUif,
+                    iterations.size(),
+                    StopWatches.getTime("run"),
+                    lastIteration.errors + errors
+                );
+
+                RunRepository.insertOrUpdate(finishedRun);
+
+                TimeRepository.insertOrUpdate(TimeFactory.create(finishedRun, StopWatches.getTimes()));
+            } catch (Exception e) {
+                e.printStackTrace(systemError);
             }
-
-            Iteration lastIteration = iterations.get(iterations.size());
-
-            RunRepository.insertOrUpdate(new Run(
-                lastIteration.benchmark,
-                lastIteration.tool,
-                runResult,
-                lastIteration.hasTimedOut,
-                lastIteration.isDepthLimited,
-                lastIteration.hasUif,
-                iterations.size(),
-                StopWatches.getTime("run"),
-                errors
-            ));
         });
 
         Map<Integer, Iteration> iterations;
@@ -156,22 +168,21 @@ public class Runner{
         try {
             Runtime.getRuntime().addShutdownHook(shutdownHook);
             runToolInternal(tool, p1, p2, solver, b, t, minInt, maxInt, minDouble, maxDouble, strategy);
-            iterations = OutputParser.readIterations(run, toolName, errors, false);
-            runResult = new RunClassifier(iterations).getClassification();
         } catch (Exception e) {
             e.printStackTrace(System.err);
-            iterations = Collections.emptyMap();
-            runResult = Classification.ERROR;
             errors = ExceptionUtils.getStackTrace(e);
         } finally {
             Runtime.getRuntime().removeShutdownHook(shutdownHook);
         }
 
+        iterations = OutputParser.readIterations(run, toolName, errors, false);
+        runResult = new RunClassifier(iterations).getClassification();
+
         IterationRepository.insertOrUpdate(iterations.values());
 
         Iteration lastIteration = iterations.get(iterations.size());
 
-        RunRepository.insertOrUpdate(new Run(
+        Run finishedRun = new Run(
             lastIteration.benchmark,
             lastIteration.tool,
             runResult,
@@ -179,9 +190,20 @@ public class Runner{
             lastIteration.isDepthLimited,
             lastIteration.hasUif,
             iterations.size(),
-            StopWatches.stopAndGetTime("run"),
-            lastIteration.errors + errors
-        ));
+            StopWatches.getTime("run"),
+            lastIteration.errors
+        );
+
+        RunRepository.insertOrUpdate(finishedRun);
+
+        // Only stop the stopwatches on successful runs.
+        // On unsuccessful runs, we cannot be sure they were started.
+        if (finishedRun.errors.isEmpty()) {
+            StopWatches.stop("run:finalization");
+            StopWatches.stop("run");
+        }
+
+        TimeRepository.insertOrUpdate(TimeFactory.create(finishedRun, StopWatches.getTimes()));
     }
 
     private static String getToolVariant(String tool, String strategy) {

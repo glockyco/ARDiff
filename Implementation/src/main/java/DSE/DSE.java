@@ -12,6 +12,7 @@
 package DSE;
 
 import com.microsoft.z3.Status;
+import differencing.StopWatches;
 import equiv.checking.*;
 
 import java.io.*;
@@ -104,14 +105,28 @@ public class DSE {
                 this.timeout
             );
 
+            StopWatches.stop("run:initialization");
+            StopWatches.start("iteration-" + iteration);
+            StopWatches.start("iteration-" + iteration + ":instrumentation");
+
             instrumentation.runInstrumentation(iteration, changes);
             this.times[0] = instrumentation.getInitializationRuntime();
             this.totalTimes[0] = instrumentation.getTotalInitializationRuntime();
             this.times[1] = instrumentation.getDefUseAndUifRuntime();
             this.totalTimes[1] = instrumentation.getTotalDefUseAndUifRuntime();
 
+            StopWatches.stop("iteration-" + iteration + ":instrumentation");
+            StopWatches.start("iteration-" + iteration + ":symbolic-execution");
+
             SMTSummary summary = this.runEquivalenceChecking(instrumentation);
+
+            StopWatches.stop("iteration-" + iteration + ":symbolic-execution");
+            StopWatches.start("iteration-" + iteration + ":classification");
+
             String result = this.equivalenceResult(summary);
+
+            StopWatches.stop("iteration-" + iteration + ":classification");
+            StopWatches.start("iteration-" + iteration + ":finalization");
 
             System.out.println(result);
 
@@ -122,6 +137,10 @@ public class DSE {
             Path modelPath = Paths.get(this.path, "..", "z3models", this.toolName + ".txt");
             modelPath.toFile().getParentFile().mkdirs();
             Files.write(modelPath, summary.toWrite.getBytes());
+
+            StopWatches.stop("iteration-" + iteration + ":finalization");
+            StopWatches.stop("iteration-" + iteration);
+            StopWatches.start("run:finalization");
 
             return summary;
         } catch (Exception e) {

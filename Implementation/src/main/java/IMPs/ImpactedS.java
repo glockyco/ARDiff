@@ -13,6 +13,7 @@ package IMPs;
 
 import br.usp.each.saeg.asm.defuse.Variable;
 import com.microsoft.z3.Status;
+import differencing.StopWatches;
 import equiv.checking.*;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
@@ -104,14 +105,29 @@ public class ImpactedS {
             this.setPathToDummy(changeExtractor.getClasspath());
             gumTreePassed = true;
 
+            StopWatches.stop("run:initialization");
+            StopWatches.start("iteration-" + iteration);
+            StopWatches.start("iteration-" + iteration + ":symbolic-execution");
+
             SMTSummary summary = runEquivalenceChecking(iteration);
+
+            StopWatches.stop("iteration-" + iteration + ":symbolic-execution");
+            StopWatches.start("iteration-" + iteration + ":classification");
+
             String result = equivalenceResult(summary);
+
+            StopWatches.stop("iteration-" + iteration + ":classification");
+            StopWatches.start("iteration-" + iteration + ":finalization");
 
             System.out.println(result);
 
             Path outputPath = Paths.get(this.path, "..", "outputs", this.toolName + ".txt");
             outputPath.toFile().getParentFile().mkdirs();
             Files.write(outputPath, result.getBytes());
+
+            StopWatches.stop("iteration-" + iteration + ":finalization");
+            StopWatches.stop("iteration-" + iteration);
+            StopWatches.start("run:finalization");
 
             return summary;
         } catch (Exception e) {

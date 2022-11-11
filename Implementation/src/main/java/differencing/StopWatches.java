@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StopWatches {
-    public static Map<String, StopWatch> stopWatches = new HashMap<>();
-    public static Map<String, Long> splits = new HashMap<>();
+    private final static Map<String, StopWatch> stopWatches = new HashMap<>();
+    private final static Map<String, Long> splits = new HashMap<>();
 
     public static void start(String name) {
         assert !stopWatches.containsKey(name) && !splits.containsKey(name);
@@ -48,5 +48,23 @@ public class StopWatches {
             ? stopWatches.get(name).getTime()
             : splits.get(name);
         return time / 1000f;
+    }
+
+    public static Float getTimeOrDefault(String name, Float value) {
+        if (stopWatches.containsKey(name) || splits.containsKey(name)) {
+            return getTime(name);
+        }
+        return value;
+    }
+
+    public static Map<String, Float> getTimes() {
+        Map<String, Float> times = new HashMap<>();
+        for (String name : stopWatches.keySet()) {
+            times.put(name, getTime(name));
+        }
+        for (String name : splits.keySet()) {
+            times.put(name, getTime(name));
+        }
+        return times;
     }
 }

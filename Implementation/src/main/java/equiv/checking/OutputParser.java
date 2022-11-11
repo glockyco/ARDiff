@@ -26,7 +26,7 @@ public class OutputParser {
                 run.benchmark, run.tool, 1,
                 isTimeout ? Classification.TIMEOUT : Classification.ERROR,
                 isTimeout, null, null,
-                StopWatches.getTime("iteration-" + 1),
+                StopWatches.getTimeOrDefault("iteration-" + 1, null),
                 errors
             ));
         }
