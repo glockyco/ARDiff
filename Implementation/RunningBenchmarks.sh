@@ -2,6 +2,9 @@
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+DB_PATH="${SCRIPT_DIR}/analysis/results/sqlite.db"
+DB_SCHEMA_PATH="${SCRIPT_DIR}/analysis/create-schema.sql"
+
 BASE_JAR_PATH="${SCRIPT_DIR}/build/libs/ARDiff-base-1.0-SNAPSHOT-all.jar"
 DIFF_JAR_PATH="${SCRIPT_DIR}/build/libs/ARDiff-diff-1.0-SNAPSHOT-all.jar"
 
@@ -9,7 +12,9 @@ DIFF_JAR_PATH="${SCRIPT_DIR}/build/libs/ARDiff-diff-1.0-SNAPSHOT-all.jar"
 
 dry_run=false
 
-clean=false
+clean_files=false
+clean_db=false
+
 build=true
 
 timeout="300" # seconds
@@ -186,7 +191,7 @@ configurations=(
 
 # Remove results from previous runs
 
-if [ "$clean" = true ] ; then
+if [ "$clean_files" = true ] ; then
   for d1 in ../benchmarks/* ; do
     for d2 in "$d1"/* ; do
       for d3 in "$d2"/* ; do
@@ -206,6 +211,15 @@ if [ "$clean" = true ] ; then
     done
   done
 fi
+
+# Set up the database
+
+if [ "$clean_db" = true ] ; then
+  rm ${DB_PATH}
+fi
+
+touch ${DB_PATH}
+sqlite3 ${DB_PATH} < ${DB_SCHEMA_PATH}
 
 # Build the application JAR files
 
