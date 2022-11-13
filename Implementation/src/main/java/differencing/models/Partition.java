@@ -50,6 +50,8 @@ public class Partition {
         Float runtime,
         String errors
     ) {
+        assert result != Classification.ERROR || !errors.isEmpty();
+
         this.benchmark = benchmark;
         this.tool = tool;
         this.iteration = iteration;

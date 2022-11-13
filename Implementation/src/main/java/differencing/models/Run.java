@@ -33,6 +33,8 @@ public class Run {
         Float runtime,
         String errors
     ) {
+        assert result != Classification.ERROR || !errors.isEmpty();
+
         this.benchmark = benchmark;
         this.tool = tool;
         this.result = result;
