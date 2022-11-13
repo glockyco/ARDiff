@@ -58,7 +58,6 @@ public class PartitionClassifier implements Classifier {
         REACHABLE,
         UNREACHABLE,
         MAYBE_REACHABLE,
-        ERROR
     }
 
     private enum EquivalenceClassification {
@@ -67,7 +66,6 @@ public class PartitionClassifier implements Classifier {
         MAYBE_EQ,
         MAYBE_NEQ,
         UNKNOWN,
-        ERROR
     }
 
     private Classification classify() {
@@ -149,7 +147,7 @@ public class PartitionClassifier implements Classifier {
             if (this.eqStatus == Status.SATISFIABLE) {
                 return EquivalenceClassification.EQ;
             } else if (this.eqStatus == Status.UNSATISFIABLE) {
-                return EquivalenceClassification.ERROR;
+                return EquivalenceClassification.EQ;
             } else {
                 assert this.eqStatus == Status.UNKNOWN;
                 return EquivalenceClassification.EQ;
@@ -181,7 +179,7 @@ public class PartitionClassifier implements Classifier {
             if (this.eqStatus == Status.SATISFIABLE) {
                 return EquivalenceClassification.EQ;
             } else if (this.eqStatus == Status.UNSATISFIABLE) {
-                return EquivalenceClassification.ERROR;
+                return EquivalenceClassification.EQ;
             } else {
                 assert this.eqStatus == Status.UNKNOWN;
                 return EquivalenceClassification.EQ;
@@ -200,9 +198,7 @@ public class PartitionClassifier implements Classifier {
     }
 
     private Classification classifyOverall(ReachabilityClassification rc, EquivalenceClassification ec) {
-        if (rc == ReachabilityClassification.ERROR || ec == EquivalenceClassification.ERROR) {
-            return Classification.ERROR;
-        } else if (rc == ReachabilityClassification.UNREACHABLE) {
+        if (rc == ReachabilityClassification.UNREACHABLE) {
             return Classification.UNREACHABLE;
         } else if (rc == ReachabilityClassification.REACHABLE) {
             switch (ec) {
