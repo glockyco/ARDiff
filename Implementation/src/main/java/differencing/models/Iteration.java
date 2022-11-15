@@ -15,11 +15,12 @@ public class Iteration {
     public Boolean hasTimedOut;
     public Boolean isDepthLimited;
     public Boolean hasUif;
+    public Integer partitionCount;
     public Float runtime;
     public String errors;
 
     public Iteration(String benchmark, String tool, int iteration) {
-        this(benchmark, tool, iteration, null, null, null, null, null, null);
+        this(benchmark, tool, iteration, null, null, null, null, null, null, null);
     }
 
     public Iteration(
@@ -30,6 +31,7 @@ public class Iteration {
         Boolean hasTimedOut,
         Boolean isDepthLimited,
         Boolean hasUif,
+        Integer partitionCount,
         Float runtime,
         String errors
     ) {
@@ -42,6 +44,7 @@ public class Iteration {
         this.hasTimedOut = hasTimedOut;
         this.isDepthLimited = isDepthLimited;
         this.hasUif = hasUif;
+        this.partitionCount = partitionCount;
         this.runtime = runtime;
         this.errors = errors;
     }

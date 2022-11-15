@@ -16,15 +16,17 @@ public class IterationRepository extends Repository {
         "has_timed_out, " +
         "is_depth_limited, " +
         "has_uif, " +
+        "partition_count, " +
         "runtime, " +
         "errors" +
         ") " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
         "ON CONFLICT DO UPDATE SET " +
         "result = excluded.result, " +
         "has_timed_out = excluded.has_timed_out, " +
         "is_depth_limited = excluded.is_depth_limited, " +
         "has_uif = excluded.has_uif, " +
+        "partition_count = excluded.partition_count, " +
         "runtime = excluded.runtime, " +
         "errors = excluded.errors";
 
@@ -43,8 +45,9 @@ public class IterationRepository extends Repository {
             ps.setObject(5, iteration.hasTimedOut);
             ps.setObject(6, iteration.isDepthLimited);
             ps.setObject(7, iteration.hasUif);
-            ps.setObject(8, iteration.runtime);
-            ps.setObject(9, iteration.errors);
+            ps.setObject(8, iteration.partitionCount);
+            ps.setObject(9, iteration.runtime);
+            ps.setObject(10, iteration.errors);
             ps.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);

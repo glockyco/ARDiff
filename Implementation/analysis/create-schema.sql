@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS iteration
     has_timed_out BOOLEAN,
     is_depth_limited BOOLEAN,
     has_uif BOOLEAN,
+    partition_count INTEGER,
     runtime REAL,
     errors TEXT,
 

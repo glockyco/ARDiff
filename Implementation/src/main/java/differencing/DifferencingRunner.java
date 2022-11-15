@@ -178,6 +178,7 @@ public class DifferencingRunner {
                             hasTimedOut,
                             diffListener.isDepthLimited(),
                             diffListener.hasUif(),
+                            diffListener.getPartitions().size(),
                             StopWatches.stopAndGetTime("iteration-" + currentIteration.iteration),
                             ""
                         );
@@ -289,6 +290,7 @@ public class DifferencingRunner {
                 false,
                 diffListener.isDepthLimited(),
                 diffListener.hasUif(),
+                diffListener.getPartitions().size(),
                 StopWatches.getTime("iteration-" + iteration.iteration),
                 errors
             );

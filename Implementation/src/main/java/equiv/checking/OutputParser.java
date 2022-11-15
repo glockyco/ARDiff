@@ -25,7 +25,7 @@ public class OutputParser {
             return Collections.singletonMap(1, new Iteration(
                 run.benchmark, run.tool, 1,
                 isTimeout ? Classification.TIMEOUT : Classification.ERROR,
-                isTimeout, null, null,
+                isTimeout, null, null, null,
                 StopWatches.getTimeOrDefault("iteration-" + 1, null),
                 errors
             ));
@@ -51,7 +51,7 @@ public class OutputParser {
 
             iterations.put(i, new Iteration(
                 run.benchmark, run.tool, i, result,
-                isLastIteration && isTimeout, isDepthLimited, hasUif,
+                isLastIteration && isTimeout, isDepthLimited, hasUif, null,
                 StopWatches.getTime("iteration-" + i),
                 isLastIteration ? errors : ""
             ));
