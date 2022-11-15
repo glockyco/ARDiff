@@ -139,6 +139,8 @@ public class Runner{
                     errors = ExceptionUtils.getStackTrace(e);
                 }
 
+                IterationRepository.insertOrUpdate(iterations.values());
+
                 Iteration lastIteration = iterations.get(iterations.size());
 
                 Run finishedRun = new Run(
