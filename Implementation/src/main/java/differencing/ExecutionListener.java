@@ -154,6 +154,8 @@ public class ExecutionListener extends PropertyListenerAdapter {
 
                 Instruction instruction = new Instruction(
                     this.currentPartition.benchmark,
+                    this.currentPartition.tool,
+                    this.currentPartition.iteration,
                     mi.getFullName(),
                     executedInstruction.getInstructionIndex(),
                     executedInstruction.toString(),

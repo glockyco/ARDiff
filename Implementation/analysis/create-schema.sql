@@ -90,6 +90,8 @@ CREATE TABLE IF NOT EXISTS partition
 CREATE TABLE IF NOT EXISTS instruction
 (
     benchmark TEXT NOT NULL,
+    tool TEXT NOT NULL,
+    iteration INTEGER NOT NULL,
     method TEXT NOT NULL,
     instruction_index INTEGER NOT NULL,
 
@@ -98,8 +100,8 @@ CREATE TABLE IF NOT EXISTS instruction
     source_file TEXT,
     source_line INTEGER,
 
-    PRIMARY KEY (benchmark, method, instruction_index),
-    FOREIGN KEY (benchmark) REFERENCES benchmark(benchmark) ON DELETE CASCADE
+    PRIMARY KEY (benchmark, tool, iteration, method, instruction_index),
+    FOREIGN KEY (benchmark, tool, iteration) REFERENCES iteration(benchmark, tool, iteration) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS partition_instruction
@@ -118,5 +120,5 @@ CREATE TABLE IF NOT EXISTS partition_instruction
 
     PRIMARY KEY (benchmark, tool, iteration, partition, version, method, instruction_index, execution_index),
     FOREIGN KEY (benchmark, tool, iteration, partition) REFERENCES partition(benchmark, tool, iteration, partition) ON DELETE CASCADE,
-    FOREIGN KEY (benchmark, method, instruction_index) REFERENCES instruction(benchmark, method, instruction_index) ON DELETE CASCADE
+    FOREIGN KEY (benchmark, tool, iteration, method, instruction_index) REFERENCES instruction(benchmark, tool, iteration, method, instruction_index) ON DELETE CASCADE
 );
