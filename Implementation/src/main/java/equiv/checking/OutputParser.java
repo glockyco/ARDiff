@@ -42,8 +42,12 @@ public class OutputParser {
             Boolean isDepthLimited = isDepthLimited(benchmarkPath, tool, i);
             Boolean hasUif = hasUif(benchmarkPath, tool, i);
 
+            // The output file only contains completed iterations.
+            // Thus, none of the read iterations should be classified as timed out.
+            boolean hasTimedOut = false;
+
             Classification result = new IterationClassifier(
-                false, false, !errors.isEmpty(), isTimeout,
+                false, false, !errors.isEmpty(), hasTimedOut,
                 Collections.singletonList(classify(output, isDepthLimited))
             ).getClassification();
 
@@ -51,9 +55,23 @@ public class OutputParser {
 
             iterations.put(i, new Iteration(
                 run.benchmark, run.tool, i, result,
-                isLastIteration && isTimeout, isDepthLimited, hasUif, null,
+                hasTimedOut, isDepthLimited, hasUif, null,
                 StopWatches.getTime("iteration-" + i),
                 isLastIteration ? errors : ""
+            ));
+        }
+
+        // The output file only contains completed iterations.
+        // Thus, we should always add another iteration that represent the
+        // currently-in-progress iteration that hasn't been written to the
+        // output file yet.
+        if (isTimeout) {
+            int iteration = iterations.size() + 1;
+            iterations.put(iteration, new Iteration(
+                run.benchmark, run.tool, iteration, Classification.TIMEOUT,
+                true, null, null, null,
+                StopWatches.getTimeOrDefault("iteration-" + iteration, null),
+                ""
             ));
         }
 

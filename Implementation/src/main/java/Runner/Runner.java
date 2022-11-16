@@ -125,35 +125,23 @@ public class Runner{
         PrintStream systemError = System.err;
         Thread shutdownHook = new Thread(() -> {
             try {
-                Map<Integer, Iteration> iterations;
-                Classification runResult;
-                String errors = "";
-
-                try {
-                    iterations = OutputParser.readIterations(run, toolName, errors, true);
-                    runResult = new RunClassifier(iterations).getClassification();
-                } catch (IOException e) {
-                    e.printStackTrace(System.err);
-                    iterations = Collections.emptyMap();
-                    runResult = Classification.ERROR;
-                    errors = ExceptionUtils.getStackTrace(e);
-                }
-
+                Map<Integer, Iteration> iterations = OutputParser.readIterations(run, toolName, "", true);
                 IterationRepository.insertOrUpdate(iterations.values());
 
+                Iteration resultIteration = new RunClassifier(iterations).getClassificationIteration();
                 Iteration lastIteration = iterations.get(iterations.size());
 
                 Run finishedRun = new Run(
-                    lastIteration.benchmark,
-                    lastIteration.tool,
-                    runResult,
+                    resultIteration.benchmark,
+                    resultIteration.tool,
+                    resultIteration.result,
                     lastIteration.hasTimedOut,
-                    lastIteration.isDepthLimited,
-                    lastIteration.hasUif,
-                    iterations.size(),
-                    iterations.size(),
+                    resultIteration.isDepthLimited,
+                    resultIteration.hasUif,
+                    lastIteration.iteration,
+                    resultIteration.iteration,
                     StopWatches.getTime("run"),
-                    lastIteration.errors + errors
+                    lastIteration.errors
                 );
 
                 RunRepository.insertOrUpdate(finishedRun);
@@ -165,7 +153,6 @@ public class Runner{
         });
 
         Map<Integer, Iteration> iterations;
-        Classification runResult;
         String errors = "";
 
         try {
@@ -179,21 +166,20 @@ public class Runner{
         }
 
         iterations = OutputParser.readIterations(run, toolName, errors, false);
-        runResult = new RunClassifier(iterations).getClassification();
-
         IterationRepository.insertOrUpdate(iterations.values());
 
+        Iteration resultIteration = new RunClassifier(iterations).getClassificationIteration();
         Iteration lastIteration = iterations.get(iterations.size());
 
         Run finishedRun = new Run(
-            lastIteration.benchmark,
-            lastIteration.tool,
-            runResult,
+            resultIteration.benchmark,
+            resultIteration.tool,
+            resultIteration.result,
             lastIteration.hasTimedOut,
-            lastIteration.isDepthLimited,
-            lastIteration.hasUif,
-            iterations.size(),
-            iterations.size(),
+            resultIteration.isDepthLimited,
+            resultIteration.hasUif,
+            lastIteration.iteration,
+            resultIteration.iteration,
             StopWatches.getTime("run"),
             lastIteration.errors
         );
