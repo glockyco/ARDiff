@@ -68,7 +68,7 @@ public class IterationClassifier implements Classifier {
                 // An iteration should be classified as NEQ if we've identified
                 // even just a single partition as definitely NEQ.
                 this.classification = Classification.NEQ;
-            } else if (!isTimeout && (eqCount + unreachableCount) == partitionCount) {
+            } else if (!isTimeout && partitionCount > 0 && (eqCount + unreachableCount) == partitionCount) {
                 // An iteration should only be classified as EQ if it has run to
                 // completion without reaching the timeout and ALL reachable
                 // partitions are definitely EQ.
@@ -77,7 +77,7 @@ public class IterationClassifier implements Classifier {
                 this.classification = Classification.MAYBE_NEQ;
             } else if (maybeEqCount > 0 || eqCount > 0) {
                 this.classification = Classification.MAYBE_EQ;
-            } else if (unknownCount > 0) {
+            } else if (partitionCount == 0 || unknownCount > 0) {
                 // If we have not identified *any* (MAYBE_)EQ or (MAYBE_)NEQ
                 // partitions, classify the iteration as either:
                 // (i)  UNKNOWN to signify that we *can't* provide a more
