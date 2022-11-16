@@ -151,6 +151,7 @@ public class Runner{
                     lastIteration.isDepthLimited,
                     lastIteration.hasUif,
                     iterations.size(),
+                    iterations.size(),
                     StopWatches.getTime("run"),
                     lastIteration.errors + errors
                 );
@@ -191,6 +192,7 @@ public class Runner{
             lastIteration.hasTimedOut,
             lastIteration.isDepthLimited,
             lastIteration.hasUif,
+            iterations.size(),
             iterations.size(),
             StopWatches.getTime("run"),
             lastIteration.errors

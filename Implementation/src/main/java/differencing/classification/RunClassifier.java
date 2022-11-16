@@ -6,6 +6,7 @@ import java.util.Map;
 
 public class RunClassifier implements Classifier {
     private final Classification classification;
+    private final int classificationIteration;
 
     public RunClassifier(Map<Integer, Iteration> iterations) {
         int iterationCount = iterations.size();
@@ -28,6 +29,7 @@ public class RunClassifier implements Classifier {
 
         if (!lastIteration.hasTimedOut || iterationCount == 1) {
             this.classification = lastIteration.result;
+            this.classificationIteration = lastIteration.iteration;
         } else {
             assert iterationCount > 1;
             switch (lastIteration.result) {
@@ -37,6 +39,7 @@ public class RunClassifier implements Classifier {
                 case MISSING:
                 case BASE_TOOL_MISSING:
                     this.classification = lastIteration.result;
+                    this.classificationIteration = lastIteration.iteration;
                     break;
                 case MAYBE_EQ:
                 case MAYBE_NEQ:
@@ -45,6 +48,7 @@ public class RunClassifier implements Classifier {
                 case TIMEOUT:
                 case UNREACHABLE:
                     this.classification = iterations.get(iterationCount - 1).result;
+                    this.classificationIteration = iterations.get(iterationCount - 1).iteration;
                     break;
                 default:
                     throw new RuntimeException("Unable to classify run.");
@@ -55,6 +59,10 @@ public class RunClassifier implements Classifier {
     @Override
     public Classification getClassification() {
         return this.classification;
+    }
+
+    public int getClassificationIteration() {
+        return this.classificationIteration;
     }
 
     @Override

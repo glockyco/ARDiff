@@ -74,11 +74,7 @@ public class DifferencingRunner {
                 parameters.getBenchmarkName(),
                 parameters.getToolVariant(),
                 Classification.BASE_TOOL_MISSING,
-                null,
-                null,
-                null,
-                null,
-                null,
+                null, null, null, null, null, null,
                 error
             );
 
@@ -186,7 +182,9 @@ public class DifferencingRunner {
                         iterations.put(currentIteration.iteration, currentIteration);
                         IterationRepository.insertOrUpdate(currentIteration);
 
-                        Classification runResult = new RunClassifier(iterations).getClassification();
+                        RunClassifier runClassifier = new RunClassifier(iterations);
+                        Classification runResult = runClassifier.getClassification();
+                        int runResultIteration = runClassifier.getClassificationIteration();
 
                         Run finishedRun = new Run(
                             currentIteration.benchmark,
@@ -196,6 +194,7 @@ public class DifferencingRunner {
                             currentIteration.isDepthLimited,
                             currentIteration.hasUif,
                             currentIteration.iteration,
+                            runResultIteration,
                             StopWatches.getTime("run"),
                             currentIteration.errors
                         );
@@ -349,7 +348,10 @@ public class DifferencingRunner {
 
         StopWatches.start("run:finalization");
 
-        Classification runResult = new RunClassifier(iterations).getClassification();
+        RunClassifier runClassifier = new RunClassifier(iterations);
+        Classification runResult = runClassifier.getClassification();
+        int runResultIteration = runClassifier.getClassificationIteration();
+
         Iteration lastIteration = iterations.get(iterations.size());
 
         Run finishedRun = new Run(
@@ -360,6 +362,7 @@ public class DifferencingRunner {
             lastIteration.isDepthLimited,
             lastIteration.hasUif,
             lastIteration.iteration,
+            runResultIteration,
             StopWatches.getTime("run"),
             lastIteration.errors
         );
