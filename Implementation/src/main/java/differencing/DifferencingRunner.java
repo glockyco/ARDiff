@@ -200,11 +200,12 @@ public class DifferencingRunner {
 
                     instrumentation.runInstrumentation(iteration.iteration, changes);
 
+                    File javaFile = this.createDifferencingDriverClass(parameters);
+                    this.compile(ProjectPaths.classpath, javaFile);
+
                     StopWatches.stop("iteration-" + iteration.iteration + ":instrumentation");
                     StopWatches.start("iteration-" + iteration.iteration + ":symbolic-execution");
 
-                    File javaFile = this.createDifferencingDriverClass(parameters);
-                    this.compile(ProjectPaths.classpath, javaFile);
                     File configFile = this.createDifferencingJpfConfiguration(parameters, solverTimeout);
 
                     Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
