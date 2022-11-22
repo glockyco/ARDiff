@@ -3,7 +3,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 DB_PATH="${SCRIPT_DIR}/analysis/results/sqlite.db"
-DB_SCHEMA_PATH="${SCRIPT_DIR}/analysis/create-schema.sql"
+DB_CREATE_TABLES_PATH="${SCRIPT_DIR}/analysis/create-tables.sql"
 
 BASE_JAR_PATH="${SCRIPT_DIR}/build/libs/ARDiff-base-1.0-SNAPSHOT-all.jar"
 DIFF_JAR_PATH="${SCRIPT_DIR}/build/libs/ARDiff-diff-1.0-SNAPSHOT-all.jar"
@@ -219,7 +219,7 @@ if [ "$clean_db" = true ] ; then
 fi
 
 touch ${DB_PATH}
-sqlite3 ${DB_PATH} < ${DB_SCHEMA_PATH}
+sqlite3 ${DB_PATH} < ${DB_CREATE_TABLES_PATH}
 
 # Build the application JAR files
 
