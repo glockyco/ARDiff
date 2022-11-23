@@ -232,7 +232,7 @@ public class Runner{
 
         if (name1.equals("Eq") || name2.equals("Eq")) {
             return Classification.EQ.toString();
-        } else if (name1.equals("NEq") || name2.equals("NEq")) {
+        } else if (name1.equals("NEq") || name2.equals("NEq") || name1.equals("Neq") || name2.equals("Neq")) {
             return Classification.NEQ.toString();
         }
 
