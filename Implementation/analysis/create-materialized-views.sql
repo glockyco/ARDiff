@@ -106,22 +106,22 @@ CREATE TABLE IF NOT EXISTS mv_line_features
     '#_partitions' INTEGER NOT NULL,
     '#_partitions_EQ' INTEGER NOT NULL,
     '#_partitions_NEQ' INTEGER NOT NULL,
-    '#_partitions_UNKNOWN' INTEGER NOT NULL,
+    "#_partitions_UNDECIDED" INTEGER NOT NULL,
     ---
-    is_EQ BOOLEAN NOT NULL,
-    is_NEQ BOOLEAN NOT NULL,
-    is_UNKNOWN BOOLEAN NOT NULL,
+    has_EQ BOOLEAN NOT NULL,
+    has_NEQ BOOLEAN NOT NULL,
+    has_UNDECIDED BOOLEAN NOT NULL,
     ---
     is_non_mixed BOOLEAN NOT NULL,
-    is_only_EQ BOOLEAN NOT NULL,
-    is_only_NEQ BOOLEAN NOT NULL,
-    is_only_UNKNOWN BOOLEAN NOT NULL,
+    has_only_EQ BOOLEAN NOT NULL,
+    has_only_NEQ BOOLEAN NOT NULL,
+    has_only_UNDECIDED BOOLEAN NOT NULL,
     ---
     is_mixed BOOLEAN NOT NULL,
     is_mixed_EQ_NEQ BOOLEAN NOT NULL,
-    is_mixed_EQ_UNKNOWN BOOLEAN NOT NULL,
-    is_mixed_NEQ_UNKNOWN BOOLEAN NOT NULL,
-    is_mixed_EQ_NEQ_UNKNOWN BOOLEAN NOT NULL,
+    is_mixed_EQ_UNDECIDED BOOLEAN NOT NULL,
+    is_mixed_NEQ_UNDECIDED BOOLEAN NOT NULL,
+    is_mixed_EQ_NEQ_UNDECIDED BOOLEAN NOT NULL,
     ---
     PRIMARY KEY (benchmark, tool, iteration, source_file, source_line),
     FOREIGN KEY (benchmark, tool, iteration, source_file, source_line)
@@ -145,22 +145,22 @@ INSERT INTO mv_line_features
     '#_partitions',
     '#_partitions_EQ',
     '#_partitions_NEQ',
-    '#_partitions_UNKNOWN',
+    "#_partitions_UNDECIDED",
     ---
-    is_EQ,
-    is_NEQ,
-    is_UNKNOWN,
+    has_EQ,
+    has_NEQ,
+    has_UNDECIDED,
     ---
     is_non_mixed,
-    is_only_EQ,
-    is_only_NEQ,
-    is_only_UNKNOWN,
+    has_only_EQ,
+    has_only_NEQ,
+    has_only_UNDECIDED,
     ---
     is_mixed,
     is_mixed_EQ_NEQ,
-    is_mixed_EQ_UNKNOWN,
-    is_mixed_NEQ_UNKNOWN,
-    is_mixed_EQ_NEQ_UNKNOWN
+    is_mixed_EQ_UNDECIDED,
+    is_mixed_NEQ_UNDECIDED,
+    is_mixed_EQ_NEQ_UNDECIDED
 )
 WITH l_features AS (
     WITH l_features AS (
@@ -170,19 +170,19 @@ WITH l_features AS (
             count(*) AS "#_partitions",
             coalesce(sum(CASE p.result WHEN 'EQ' THEN 1 END), 0) AS "#_partitions_EQ",
             coalesce(sum(CASE p.result WHEN 'NEQ' THEN 1 END), 0) AS "#_partitions_NEQ",
-            coalesce(sum(CASE WHEN p.result != 'EQ' AND p.result != 'NEQ' THEN 1 END), 0) AS "#_partitions_UNKNOWN"
+            coalesce(sum(CASE WHEN p.result != 'EQ' AND p.result != 'NEQ' THEN 1 END), 0) AS "#_partitions_UNDECIDED"
         FROM mv_line AS l
         INNER JOIN mv_partition_line AS pl USING (benchmark, tool, iteration, source_file, source_line)
         INNER JOIN partition AS p USING (benchmark, tool, iteration, partition)
         GROUP BY l.benchmark, l.tool, l.iteration, l.source_file, l.source_line
     )
     SELECT lf.*,
-        lf."#_partitions_EQ" > 0 AS is_EQ,
-        lf."#_partitions_NEQ" > 0 AS is_NEQ,
-        lf."#_partitions_UNKNOWN" > 0 AS is_UNKNOWN,
-        lf."#_partitions" = lf."#_partitions_EQ" AS is_only_EQ,
-        lf."#_partitions" = lf."#_partitions_NEQ" AS is_only_NEQ,
-        lf."#_partitions" = lf."#_partitions_UNKNOWN" AS is_only_UNKNOWN
+        lf."#_partitions_EQ" > 0 AS has_EQ,
+        lf."#_partitions_NEQ" > 0 AS has_NEQ,
+        lf."#_partitions_UNDECIDED" > 0 AS has_UNDECIDED,
+        lf."#_partitions" = lf."#_partitions_EQ" AS has_only_EQ,
+        lf."#_partitions" = lf."#_partitions_NEQ" AS has_only_NEQ,
+        lf."#_partitions" = lf."#_partitions_UNDECIDED" AS has_only_UNDECIDED
     FROM l_features AS lf
 )
 SELECT
@@ -200,22 +200,22 @@ SELECT
     lf."#_partitions",
     lf."#_partitions_EQ",
     lf."#_partitions_NEQ",
-    lf."#_partitions_UNKNOWN",
+    lf."#_partitions_UNDECIDED",
     ---
-    lf.is_EQ,
-    lf.is_NEQ,
-    lf.is_UNKNOWN,
+    lf.has_EQ,
+    lf.has_NEQ,
+    lf.has_UNDECIDED,
     ---
-    lf.is_only_EQ OR lf.is_only_NEQ OR lf.is_only_UNKNOWN AS is_non_mixed,
-    lf.is_only_EQ,
-    lf.is_only_NEQ,
-    lf.is_only_UNKNOWN,
+    lf.has_only_EQ OR lf.has_only_NEQ OR lf.has_only_UNDECIDED AS is_non_mixed,
+    lf.has_only_EQ,
+    lf.has_only_NEQ,
+    lf.has_only_UNDECIDED,
     ---
-    NOT lf.is_only_EQ AND NOT lf.is_only_NEQ AND NOT lf.is_only_UNKNOWN AS is_mixed,
-    (lf.is_EQ AND lf.is_NEQ) AND (NOT lf.is_UNKNOWN) AS is_mixed_EQ_NEQ,
-    (lf.is_EQ AND lf.is_UNKNOWN) AND (NOT lf.is_NEQ) AS is_mixed_EQ_UNKNOWN,
-    (lf.is_NEQ AND lf.is_UNKNOWN) AND (NOT lf.is_EQ) AS is_mixed_NEQ_UNKNOWN,
-    (lf.is_EQ AND lf.is_NEQ AND lf.is_UNKNOWN) AS is_mixed_EQ_NEQ_UNKNOWN
+    NOT lf.has_only_EQ AND NOT lf.has_only_NEQ AND NOT lf.has_only_UNDECIDED AS is_mixed,
+    (lf.has_EQ AND lf.has_NEQ) AND (NOT lf.has_UNDECIDED) AS is_mixed_EQ_NEQ,
+    (lf.has_EQ AND lf.has_UNDECIDED) AND (NOT lf.has_NEQ) AS is_mixed_EQ_UNDECIDED,
+    (lf.has_NEQ AND lf.has_UNDECIDED) AND (NOT lf.has_EQ) AS is_mixed_NEQ_UNDECIDED,
+    (lf.has_EQ AND lf.has_NEQ AND lf.has_UNDECIDED) AS is_mixed_EQ_NEQ_UNDECIDED
 FROM l_features AS lf;
 
 ---
@@ -336,58 +336,58 @@ CREATE TABLE IF NOT EXISTS mv_iteration_features
     are_partitions_reducible BOOLEAN NOT NULL,
     are_lines_reducible BOOLEAN NOT NULL,
     ---
-    is_EQ BOOLEAN NOT NULL,
-    is_NEQ BOOLEAN NOT NULL,
-    is_UNKNOWN BOOLEAN NOT NULL,
+    has_EQ BOOLEAN NOT NULL,
+    has_NEQ BOOLEAN NOT NULL,
+    has_UNDECIDED BOOLEAN NOT NULL,
     ---
     is_non_mixed BOOLEAN NOT NULL,
-    is_only_EQ BOOLEAN NOT NULL,
-    is_only_NEQ BOOLEAN NOT NULL,
-    is_only_UNKNOWN BOOLEAN NOT NULL,
+    has_only_EQ BOOLEAN NOT NULL,
+    has_only_NEQ BOOLEAN NOT NULL,
+    has_only_UNDECIDED BOOLEAN NOT NULL,
     ---
     is_mixed BOOLEAN NOT NULL,
     is_mixed_EQ_NEQ BOOLEAN NOT NULL,
-    is_mixed_EQ_UNKNOWN BOOLEAN NOT NULL,
-    is_mixed_NEQ_UNKNOWN BOOLEAN NOT NULL,
-    is_mixed_EQ_NEQ_UNKNOWN BOOLEAN NOT NULL,
+    is_mixed_EQ_UNDECIDED BOOLEAN NOT NULL,
+    is_mixed_NEQ_UNDECIDED BOOLEAN NOT NULL,
+    is_mixed_EQ_NEQ_UNDECIDED BOOLEAN NOT NULL,
     ---
     '#_partitions' INTEGER, -- Can be NULL.
     ---
     '#_partitions_EQ' INTEGER, -- Can be NULL.
     '#_partitions_NEQ' INTEGER, -- Can be NULL.
-    '#_partitions_UNKNOWN' INTEGER, -- Can be NULL.
+    "#_partitions_UNDECIDED" INTEGER, -- Can be NULL.
     ---
     '%_partitions_EQ' REAL, -- Can be NULL.
     '%_partitions_NEQ' REAL, -- Can be NULL.
-    '%_partitions_UNKNOWN' REAL, -- Can be NULL.
+    "%_partitions_UNDECIDED" REAL, -- Can be NULL.
     ---
     '#_lines' INTEGER, -- Can be NULL.
     ---
     '#_lines_EQ' INTEGER, -- Can be NULL.
     '#_lines_NEQ' INTEGER, -- Can be NULL.
-    '#_lines_UNKNOWN' INTEGER, -- Can be NULL.
+    "#_lines_UNDECIDED" INTEGER, -- Can be NULL.
     '#_lines_non_mixed' INTEGER, -- Can be NULL.
     '#_lines_only_EQ' INTEGER, -- Can be NULL.
     '#_lines_only_NEQ' INTEGER, -- Can be NULL.
-    '#_lines_only_UNKNOWN' INTEGER, -- Can be NULL.
+    "#_lines_only_UNDECIDED" INTEGER, -- Can be NULL.
     '#_lines_mixed' INTEGER, -- Can be NULL.
     '#_lines_mixed_EQ_NEQ' INTEGER, -- Can be NULL.
-    '#_lines_mixed_EQ_UNKNOWN' INTEGER, -- Can be NULL.
-    '#_lines_mixed_NEQ_UNKNOWN' INTEGER, -- Can be NULL.
-    '#_lines_mixed_EQ_NEQ_UNKNOWN' INTEGER, -- Can be NULL.
+    "#_lines_mixed_EQ_UNDECIDED" INTEGER, -- Can be NULL.
+    "#_lines_mixed_NEQ_UNDECIDED" INTEGER, -- Can be NULL.
+    "#_lines_mixed_EQ_NEQ_UNDECIDED" INTEGER, -- Can be NULL.
     ---
     '%_lines_EQ' REAL, -- Can be NULL.
     '%_lines_NEQ' REAL, -- Can be NULL.
-    '%_lines_UNKNOWN' REAL, -- Can be NULL.
+    "%_lines_UNDECIDED" REAL, -- Can be NULL.
     '%_lines_non_mixed' REAL, -- Can be NULL.
     '%_lines_only_EQ' REAL, -- Can be NULL.
     '%_lines_only_NEQ' REAL, -- Can be NULL.
-    '%_lines_only_UNKNOWN' REAL, -- Can be NULL.
+    "%_lines_only_UNDECIDED" REAL, -- Can be NULL.
     '%_lines_mixed' REAL, -- Can be NULL.
     '%_lines_mixed_EQ_NEQ' REAL, -- Can be NULL.
-    '%_lines_mixed_EQ_UNKNOWN' REAL, -- Can be NULL.
-    '%_lines_mixed_NEQ_UNKNOWN' REAL, -- Can be NULL.
-    '%_lines_mixed_EQ_NEQ_UNKNOWN' REAL, -- Can be NULL.
+    "%_lines_mixed_EQ_UNDECIDED" REAL, -- Can be NULL.
+    "%_lines_mixed_NEQ_UNDECIDED" REAL, -- Can be NULL.
+    "%_lines_mixed_EQ_NEQ_UNDECIDED" REAL, -- Can be NULL.
     ---
     PRIMARY KEY (benchmark, tool, iteration),
     FOREIGN KEY (benchmark, tool)
@@ -423,58 +423,58 @@ INSERT INTO mv_iteration_features
     are_partitions_reducible,
     are_lines_reducible,
     ---
-    is_EQ,
-    is_NEQ,
-    is_UNKNOWN,
+    has_EQ,
+    has_NEQ,
+    has_UNDECIDED,
     ---
     is_non_mixed,
-    is_only_EQ,
-    is_only_NEQ,
-    is_only_UNKNOWN,
+    has_only_EQ,
+    has_only_NEQ,
+    has_only_UNDECIDED,
     ---
     is_mixed,
     is_mixed_EQ_NEQ,
-    is_mixed_EQ_UNKNOWN,
-    is_mixed_NEQ_UNKNOWN,
-    is_mixed_EQ_NEQ_UNKNOWN,
+    is_mixed_EQ_UNDECIDED,
+    is_mixed_NEQ_UNDECIDED,
+    is_mixed_EQ_NEQ_UNDECIDED,
     ---
     "#_partitions",
     ---
     "#_partitions_EQ",
     "#_partitions_NEQ",
-    "#_partitions_UNKNOWN",
+    "#_partitions_UNDECIDED",
     ---
     "%_partitions_EQ",
     "%_partitions_NEQ",
-    "%_partitions_UNKNOWN",
+    "%_partitions_UNDECIDED",
     ---
     "#_lines",
     ---
     "#_lines_EQ",
     "#_lines_NEQ",
-    "#_lines_UNKNOWN",
+    "#_lines_UNDECIDED",
     "#_lines_non_mixed",
     "#_lines_only_EQ",
     "#_lines_only_NEQ",
-    "#_lines_only_UNKNOWN",
+    "#_lines_only_UNDECIDED",
     "#_lines_mixed",
     "#_lines_mixed_EQ_NEQ",
-    "#_lines_mixed_EQ_UNKNOWN",
-    "#_lines_mixed_NEQ_UNKNOWN",
-    "#_lines_mixed_EQ_NEQ_UNKNOWN",
+    "#_lines_mixed_EQ_UNDECIDED",
+    "#_lines_mixed_NEQ_UNDECIDED",
+    "#_lines_mixed_EQ_NEQ_UNDECIDED",
     ---
     "%_lines_EQ",
     "%_lines_NEQ",
-    "%_lines_UNKNOWN",
+    "%_lines_UNDECIDED",
     "%_lines_non_mixed",
     "%_lines_only_EQ",
     "%_lines_only_NEQ",
-    "%_lines_only_UNKNOWN",
+    "%_lines_only_UNDECIDED",
     "%_lines_mixed",
     "%_lines_mixed_EQ_NEQ",
-    "%_lines_mixed_EQ_UNKNOWN",
-    "%_lines_mixed_NEQ_UNKNOWN",
-    "%_lines_mixed_EQ_NEQ_UNKNOWN"
+    "%_lines_mixed_EQ_UNDECIDED",
+    "%_lines_mixed_NEQ_UNDECIDED",
+    "%_lines_mixed_EQ_NEQ_UNDECIDED"
 )
 WITH i_features_5 AS
 (
@@ -514,36 +514,36 @@ WITH i_features_5 AS
                     nullif(count(pf.partition), 0) AS '#_partitions',
                     CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'EQ' THEN 1 END), 0) END AS '#_partitions_EQ',
                     CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'NEQ' THEN 1 END), 0) END AS '#_partitions_NEQ',
-                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE WHEN pf.result != 'EQ' AND pf.result != 'NEQ' THEN 1 END), 0) END AS '#_partitions_UNKNOWN'
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE WHEN pf.result != 'EQ' AND pf.result != 'NEQ' THEN 1 END), 0) END AS "#_partitions_UNDECIDED"
                 FROM i_features_1 AS if_1
                 LEFT JOIN mv_partition_features AS pf USING(benchmark, tool, iteration)
                 GROUP BY if_1.benchmark, if_1.tool, if_1.iteration
             )
             SELECT if_2.*,
                 nullif(count(lf.source_line), 0) AS '#_lines',
-                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_EQ), 0) END AS '#_lines_EQ',
-                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_NEQ), 0) END AS '#_lines_NEQ',
-                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_UNKNOWN), 0) END AS '#_lines_UNKNOWN',
+                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_EQ), 0) END AS '#_lines_EQ',
+                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_NEQ), 0) END AS '#_lines_NEQ',
+                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_UNDECIDED), 0) END AS "#_lines_UNDECIDED",
                 CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_non_mixed), 0) END AS '#_lines_non_mixed',
-                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_only_EQ), 0) END AS '#_lines_only_EQ',
-                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_only_NEQ), 0) END AS '#_lines_only_NEQ',
-                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_only_UNKNOWN), 0) END AS '#_lines_only_UNKNOWN',
+                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_only_EQ), 0) END AS '#_lines_only_EQ',
+                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_only_NEQ), 0) END AS '#_lines_only_NEQ',
+                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_only_UNDECIDED), 0) END AS "#_lines_only_UNDECIDED",
                 CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_mixed), 0) END AS '#_lines_mixed',
                 CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_mixed_EQ_NEQ), 0) END AS '#_lines_mixed_EQ_NEQ',
-                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_mixed_EQ_UNKNOWN), 0) END AS '#_lines_mixed_EQ_UNKNOWN',
-                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_mixed_NEQ_UNKNOWN), 0) END AS '#_lines_mixed_NEQ_UNKNOWN',
-                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_mixed_EQ_NEQ_UNKNOWN), 0) END AS '#_lines_mixed_EQ_NEQ_UNKNOWN'
+                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_mixed_EQ_UNDECIDED), 0) END AS "#_lines_mixed_EQ_UNDECIDED",
+                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_mixed_NEQ_UNDECIDED), 0) END AS "#_lines_mixed_NEQ_UNDECIDED",
+                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_mixed_EQ_NEQ_UNDECIDED), 0) END AS "#_lines_mixed_EQ_NEQ_UNDECIDED"
             FROM i_features_2 AS if_2
             LEFT JOIN mv_line_features AS lf USING(benchmark, tool, iteration)
             GROUP BY if_2.benchmark, if_2.tool, if_2.iteration
         )
         SELECT if_3.*,
-            CASE WHEN if_3."#_partitions" IS NULL THEN if_3.result = 'EQ' ELSE if_3."#_partitions_EQ" > 0 END AS is_EQ,
-            CASE WHEN if_3."#_partitions" IS NULL THEN if_3.result = 'NEQ' ELSE if_3."#_partitions_NEQ" > 0 END AS is_NEQ,
-            CASE WHEN if_3."#_partitions" IS NULL THEN if_3.result != 'EQ' AND if_3.result != 'NEQ' ELSE if_3."#_partitions_UNKNOWN" > 0 END AS is_UNKNOWN,
-            CASE WHEN if_3."#_partitions" IS NULL THEN if_3.result = 'EQ' ELSE if_3."#_partitions" = if_3."#_partitions_EQ" END AS is_only_EQ,
-            CASE WHEN if_3."#_partitions" IS NULL THEN if_3.result = 'NEQ' ELSE if_3."#_partitions" = if_3."#_partitions_NEQ" END AS is_only_NEQ,
-            CASE WHEN if_3."#_partitions" IS NULL THEN if_3.result != 'EQ' AND if_3.result != 'NEQ' ELSE if_3."#_partitions" = if_3."#_partitions_UNKNOWN" END AS is_only_UNKNOWN
+            CASE WHEN if_3."#_partitions" IS NULL THEN if_3.result = 'EQ' ELSE if_3."#_partitions_EQ" > 0 END AS has_EQ,
+            CASE WHEN if_3."#_partitions" IS NULL THEN if_3.result = 'NEQ' ELSE if_3."#_partitions_NEQ" > 0 END AS has_NEQ,
+            CASE WHEN if_3."#_partitions" IS NULL THEN if_3.result != 'EQ' AND if_3.result != 'NEQ' ELSE if_3."#_partitions_UNDECIDED" > 0 END AS has_UNDECIDED,
+            CASE WHEN if_3."#_partitions" IS NULL THEN if_3.result = 'EQ' ELSE if_3."#_partitions" = if_3."#_partitions_EQ" END AS has_only_EQ,
+            CASE WHEN if_3."#_partitions" IS NULL THEN if_3.result = 'NEQ' ELSE if_3."#_partitions" = if_3."#_partitions_NEQ" END AS has_only_NEQ,
+            CASE WHEN if_3."#_partitions" IS NULL THEN if_3.result != 'EQ' AND if_3.result != 'NEQ' ELSE if_3."#_partitions" = if_3."#_partitions_UNDECIDED" END AS has_only_UNDECIDED
         FROM i_features_3 AS if_3
     )
     SELECT if_4.*,
@@ -580,30 +580,30 @@ WITH i_features_5 AS
             )
         ) END AS are_lines_reducible,
         ---
-        if_4.is_only_EQ OR if_4.is_only_NEQ OR if_4.is_only_UNKNOWN AS is_non_mixed,
+        if_4.has_only_EQ OR if_4.has_only_NEQ OR if_4.has_only_UNDECIDED AS is_non_mixed,
         ---
-        NOT if_4.is_only_EQ AND NOT if_4.is_only_NEQ AND NOT if_4.is_only_UNKNOWN AS is_mixed,
-        (if_4.is_EQ AND if_4.is_NEQ) AND (NOT if_4.is_UNKNOWN) AS is_mixed_EQ_NEQ,
-        (if_4.is_EQ AND if_4.is_UNKNOWN) AND (NOT if_4.is_NEQ) AS is_mixed_EQ_UNKNOWN,
-        (if_4.is_NEQ AND if_4.is_UNKNOWN) AND (NOT if_4.is_EQ) AS is_mixed_NEQ_UNKNOWN,
-        (if_4.is_EQ AND if_4.is_NEQ AND if_4.is_UNKNOWN) AS is_mixed_EQ_NEQ_UNKNOWN,
+        NOT if_4.has_only_EQ AND NOT if_4.has_only_NEQ AND NOT if_4.has_only_UNDECIDED AS is_mixed,
+        (if_4.has_EQ AND if_4.has_NEQ) AND (NOT if_4.has_UNDECIDED) AS is_mixed_EQ_NEQ,
+        (if_4.has_EQ AND if_4.has_UNDECIDED) AND (NOT if_4.has_NEQ) AS is_mixed_EQ_UNDECIDED,
+        (if_4.has_NEQ AND if_4.has_UNDECIDED) AND (NOT if_4.has_EQ) AS is_mixed_NEQ_UNDECIDED,
+        (if_4.has_EQ AND if_4.has_NEQ AND if_4.has_UNDECIDED) AS is_mixed_EQ_NEQ_UNDECIDED,
         ---
         (if_4."#_partitions_EQ" * 1.0 / if_4."#_partitions") * 100 AS '%_partitions_EQ',
         (if_4."#_partitions_NEQ" * 1.0 / if_4."#_partitions") * 100 AS '%_partitions_NEQ',
-        (if_4."#_partitions_UNKNOWN" * 1.0 / if_4."#_partitions") * 100 AS '%_partitions_UNKNOWN',
+        (if_4."#_partitions_UNDECIDED" * 1.0 / if_4."#_partitions") * 100 AS "%_partitions_UNDECIDED",
         ---
         (if_4."#_lines_EQ" * 1.0 / if_4."#_lines") * 100 AS '%_lines_EQ',
         (if_4."#_lines_NEQ" * 1.0 / if_4."#_lines") * 100 AS '%_lines_NEQ',
-        (if_4."#_lines_UNKNOWN" * 1.0 / if_4."#_lines") * 100 AS '%_lines_UNKNOWN',
+        (if_4."#_lines_UNDECIDED" * 1.0 / if_4."#_lines") * 100 AS "%_lines_UNDECIDED",
         (if_4."#_lines_non_mixed" * 1.0 / if_4."#_lines") * 100 AS '%_lines_non_mixed',
         (if_4."#_lines_only_EQ" * 1.0 / if_4."#_lines") * 100 AS '%_lines_only_EQ',
         (if_4."#_lines_only_NEQ" * 1.0 / if_4."#_lines") * 100 AS '%_lines_only_NEQ',
-        (if_4."#_lines_only_UNKNOWN" * 1.0 / if_4."#_lines") * 100 AS '%_lines_only_UNKNOWN',
+        (if_4."#_lines_only_UNDECIDED" * 1.0 / if_4."#_lines") * 100 AS "%_lines_only_UNDECIDED",
         (if_4."#_lines_mixed" * 1.0 / if_4."#_lines") * 100 AS '%_lines_mixed',
         (if_4."#_lines_mixed_EQ_NEQ" * 1.0 / if_4."#_lines") * 100 AS '%_lines_mixed_EQ_NEQ',
-        (if_4."#_lines_mixed_EQ_UNKNOWN" * 1.0 / if_4."#_lines") * 100 AS '%_lines_mixed_EQ_UNKNOWN',
-        (if_4."#_lines_mixed_NEQ_UNKNOWN" * 1.0 / if_4."#_lines") * 100 AS '%_lines_mixed_NEQ_UNKNOWN',
-        (if_4."#_lines_mixed_EQ_NEQ_UNKNOWN" * 1.0 / if_4."#_lines") * 100 AS '%_lines_mixed_EQ_NEQ_UNKNOWN'
+        (if_4."#_lines_mixed_EQ_UNDECIDED" * 1.0 / if_4."#_lines") * 100 AS "%_lines_mixed_EQ_UNDECIDED",
+        (if_4."#_lines_mixed_NEQ_UNDECIDED" * 1.0 / if_4."#_lines") * 100 AS "%_lines_mixed_NEQ_UNDECIDED",
+        (if_4."#_lines_mixed_EQ_NEQ_UNDECIDED" * 1.0 / if_4."#_lines") * 100 AS "%_lines_mixed_EQ_NEQ_UNDECIDED"
     FROM i_features_4 AS if_4
 )
 SELECT
@@ -633,58 +633,58 @@ SELECT
     if_5.are_partitions_reducible,
     if_5.are_lines_reducible,
     ---
-    if_5.is_EQ,
-    if_5.is_NEQ,
-    if_5.is_UNKNOWN,
+    if_5.has_EQ,
+    if_5.has_NEQ,
+    if_5.has_UNDECIDED,
     ---
     if_5.is_non_mixed,
-    if_5.is_only_EQ,
-    if_5.is_only_NEQ,
-    if_5.is_only_UNKNOWN,
+    if_5.has_only_EQ,
+    if_5.has_only_NEQ,
+    if_5.has_only_UNDECIDED,
     ---
     if_5.is_mixed,
     if_5.is_mixed_EQ_NEQ,
-    if_5.is_mixed_EQ_UNKNOWN,
-    if_5.is_mixed_NEQ_UNKNOWN,
-    if_5.is_mixed_EQ_NEQ_UNKNOWN,
+    if_5.is_mixed_EQ_UNDECIDED,
+    if_5.is_mixed_NEQ_UNDECIDED,
+    if_5.is_mixed_EQ_NEQ_UNDECIDED,
     ---
     if_5."#_partitions",
     ---
     if_5."#_partitions_EQ",
     if_5."#_partitions_NEQ",
-    if_5."#_partitions_UNKNOWN",
+    if_5."#_partitions_UNDECIDED",
     ---
     if_5.'%_partitions_EQ',
     if_5.'%_partitions_NEQ',
-    if_5.'%_partitions_UNKNOWN',
+    if_5."%_partitions_UNDECIDED",
     ---
     if_5."#_lines",
     ---
     if_5."#_lines_EQ",
     if_5."#_lines_NEQ",
-    if_5."#_lines_UNKNOWN",
+    if_5."#_lines_UNDECIDED",
     if_5."#_lines_non_mixed",
     if_5."#_lines_only_EQ",
     if_5."#_lines_only_NEQ",
-    if_5."#_lines_only_UNKNOWN",
+    if_5."#_lines_only_UNDECIDED",
     if_5."#_lines_mixed",
     if_5."#_lines_mixed_EQ_NEQ",
-    if_5."#_lines_mixed_EQ_UNKNOWN",
-    if_5."#_lines_mixed_NEQ_UNKNOWN",
-    if_5."#_lines_mixed_EQ_NEQ_UNKNOWN",
+    if_5."#_lines_mixed_EQ_UNDECIDED",
+    if_5."#_lines_mixed_NEQ_UNDECIDED",
+    if_5."#_lines_mixed_EQ_NEQ_UNDECIDED",
     ---
     if_5.'%_lines_EQ',
     if_5.'%_lines_NEQ',
-    if_5.'%_lines_UNKNOWN',
+    if_5."%_lines_UNDECIDED",
     if_5.'%_lines_non_mixed',
     if_5.'%_lines_only_EQ',
     if_5.'%_lines_only_NEQ',
-    if_5.'%_lines_only_UNKNOWN',
+    if_5."%_lines_only_UNDECIDED",
     if_5.'%_lines_mixed',
     if_5.'%_lines_mixed_EQ_NEQ',
-    if_5.'%_lines_mixed_EQ_UNKNOWN',
-    if_5.'%_lines_mixed_NEQ_UNKNOWN',
-    if_5.'%_lines_mixed_EQ_NEQ_UNKNOWN'
+    if_5."%_lines_mixed_EQ_UNDECIDED",
+    if_5."%_lines_mixed_NEQ_UNDECIDED",
+    if_5."%_lines_mixed_EQ_NEQ_UNDECIDED"
 FROM i_features_5 AS if_5;
 
 ---
@@ -719,58 +719,58 @@ CREATE TABLE IF NOT EXISTS mv_run_features
     are_partitions_reducible BOOLEAN NOT NULL,
     are_lines_reducible BOOLEAN NOT NULL,
     ---
-    is_EQ BOOLEAN NOT NULL,
-    is_NEQ BOOLEAN NOT NULL,
-    is_UNKNOWN BOOLEAN NOT NULL,
+    has_EQ BOOLEAN NOT NULL,
+    has_NEQ BOOLEAN NOT NULL,
+    has_UNDECIDED BOOLEAN NOT NULL,
     ---
     is_non_mixed BOOLEAN NOT NULL,
-    is_only_EQ BOOLEAN NOT NULL,
-    is_only_NEQ BOOLEAN NOT NULL,
-    is_only_UNKNOWN BOOLEAN NOT NULL,
+    has_only_EQ BOOLEAN NOT NULL,
+    has_only_NEQ BOOLEAN NOT NULL,
+    has_only_UNDECIDED BOOLEAN NOT NULL,
     ---
     is_mixed BOOLEAN NOT NULL,
     is_mixed_EQ_NEQ BOOLEAN NOT NULL,
-    is_mixed_EQ_UNKNOWN BOOLEAN NOT NULL,
-    is_mixed_NEQ_UNKNOWN BOOLEAN NOT NULL,
-    is_mixed_EQ_NEQ_UNKNOWN BOOLEAN NOT NULL,
+    is_mixed_EQ_UNDECIDED BOOLEAN NOT NULL,
+    is_mixed_NEQ_UNDECIDED BOOLEAN NOT NULL,
+    is_mixed_EQ_NEQ_UNDECIDED BOOLEAN NOT NULL,
     ---
     '#_partitions' INTEGER, -- Can be NULL.
     ---
     '#_partitions_EQ' INTEGER, -- Can be NULL.
     '#_partitions_NEQ' INTEGER, -- Can be NULL.
-    '#_partitions_UNKNOWN' INTEGER, -- Can be NULL.
+    "#_partitions_UNDECIDED" INTEGER, -- Can be NULL.
     ---
     '%_partitions_EQ' REAL, -- Can be NULL.
     '%_partitions_NEQ' REAL, -- Can be NULL.
-    '%_partitions_UNKNOWN' REAL, -- Can be NULL.
+    "%_partitions_UNDECIDED" REAL, -- Can be NULL.
     ---
     '#_lines' INTEGER, -- Can be NULL.
     ---
     '#_lines_EQ' INTEGER, -- Can be NULL.
     '#_lines_NEQ' INTEGER, -- Can be NULL.
-    '#_lines_UNKNOWN' INTEGER, -- Can be NULL.
+    "#_lines_UNDECIDED" INTEGER, -- Can be NULL.
     '#_lines_non_mixed' INTEGER, -- Can be NULL.
     '#_lines_only_EQ' INTEGER, -- Can be NULL.
     '#_lines_only_NEQ' INTEGER, -- Can be NULL.
-    '#_lines_only_UNKNOWN' INTEGER, -- Can be NULL.
+    "#_lines_only_UNDECIDED" INTEGER, -- Can be NULL.
     '#_lines_mixed' INTEGER, -- Can be NULL.
     '#_lines_mixed_EQ_NEQ' INTEGER, -- Can be NULL.
-    '#_lines_mixed_EQ_UNKNOWN' INTEGER, -- Can be NULL.
-    '#_lines_mixed_NEQ_UNKNOWN' INTEGER, -- Can be NULL.
-    '#_lines_mixed_EQ_NEQ_UNKNOWN' INTEGER, -- Can be NULL.
+    "#_lines_mixed_EQ_UNDECIDED" INTEGER, -- Can be NULL.
+    "#_lines_mixed_NEQ_UNDECIDED" INTEGER, -- Can be NULL.
+    "#_lines_mixed_EQ_NEQ_UNDECIDED" INTEGER, -- Can be NULL.
     ---
     '%_lines_EQ' REAL, -- Can be NULL.
     '%_lines_NEQ' REAL, -- Can be NULL.
-    '%_lines_UNKNOWN' REAL, -- Can be NULL.
+    "%_lines_UNDECIDED" REAL, -- Can be NULL.
     '%_lines_non_mixed' REAL, -- Can be NULL.
     '%_lines_only_EQ' REAL, -- Can be NULL.
     '%_lines_only_NEQ' REAL, -- Can be NULL.
-    '%_lines_only_UNKNOWN' REAL, -- Can be NULL.
+    "%_lines_only_UNDECIDED" REAL, -- Can be NULL.
     '%_lines_mixed' REAL, -- Can be NULL.
     '%_lines_mixed_EQ_NEQ' REAL, -- Can be NULL.
-    '%_lines_mixed_EQ_UNKNOWN' REAL, -- Can be NULL.
-    '%_lines_mixed_NEQ_UNKNOWN' REAL, -- Can be NULL.
-    '%_lines_mixed_EQ_NEQ_UNKNOWN' REAL, -- Can be NULL.
+    "%_lines_mixed_EQ_UNDECIDED" REAL, -- Can be NULL.
+    "%_lines_mixed_NEQ_UNDECIDED" REAL, -- Can be NULL.
+    "%_lines_mixed_EQ_NEQ_UNDECIDED" REAL, -- Can be NULL.
     ---
     PRIMARY KEY (benchmark, tool),
     FOREIGN KEY (benchmark, tool)
@@ -808,58 +808,58 @@ INSERT INTO mv_run_features
     are_partitions_reducible,
     are_lines_reducible,
     ---
-    is_EQ,
-    is_NEQ,
-    is_UNKNOWN,
+    has_EQ,
+    has_NEQ,
+    has_UNDECIDED,
     ---
     is_non_mixed,
-    is_only_EQ,
-    is_only_NEQ,
-    is_only_UNKNOWN,
+    has_only_EQ,
+    has_only_NEQ,
+    has_only_UNDECIDED,
     ---
     is_mixed,
     is_mixed_EQ_NEQ,
-    is_mixed_EQ_UNKNOWN,
-    is_mixed_NEQ_UNKNOWN,
-    is_mixed_EQ_NEQ_UNKNOWN,
+    is_mixed_EQ_UNDECIDED,
+    is_mixed_NEQ_UNDECIDED,
+    is_mixed_EQ_NEQ_UNDECIDED,
     ---
     "#_partitions",
     ---
     "#_partitions_EQ",
     "#_partitions_NEQ",
-    "#_partitions_UNKNOWN",
+    "#_partitions_UNDECIDED",
     ---
     "%_partitions_EQ",
     "%_partitions_NEQ",
-    "%_partitions_UNKNOWN",
+    "%_partitions_UNDECIDED",
     ---
     "#_lines",
     ---
     "#_lines_EQ",
     "#_lines_NEQ",
-    "#_lines_UNKNOWN",
+    "#_lines_UNDECIDED",
     "#_lines_non_mixed",
     "#_lines_only_EQ",
     "#_lines_only_NEQ",
-    "#_lines_only_UNKNOWN",
+    "#_lines_only_UNDECIDED",
     "#_lines_mixed",
     "#_lines_mixed_EQ_NEQ",
-    "#_lines_mixed_EQ_UNKNOWN",
-    "#_lines_mixed_NEQ_UNKNOWN",
-    "#_lines_mixed_EQ_NEQ_UNKNOWN",
+    "#_lines_mixed_EQ_UNDECIDED",
+    "#_lines_mixed_NEQ_UNDECIDED",
+    "#_lines_mixed_EQ_NEQ_UNDECIDED",
     ---
     "%_lines_EQ",
     "%_lines_NEQ",
-    "%_lines_UNKNOWN",
+    "%_lines_UNDECIDED",
     "%_lines_non_mixed",
     "%_lines_only_EQ",
     "%_lines_only_NEQ",
-    "%_lines_only_UNKNOWN",
+    "%_lines_only_UNDECIDED",
     "%_lines_mixed",
     "%_lines_mixed_EQ_NEQ",
-    "%_lines_mixed_EQ_UNKNOWN",
-    "%_lines_mixed_NEQ_UNKNOWN",
-    "%_lines_mixed_EQ_NEQ_UNKNOWN"
+    "%_lines_mixed_EQ_UNDECIDED",
+    "%_lines_mixed_NEQ_UNDECIDED",
+    "%_lines_mixed_EQ_NEQ_UNDECIDED"
 )
 SELECT
     r.benchmark,
@@ -890,58 +890,58 @@ SELECT
     i.are_partitions_reducible,
     i.are_lines_reducible,
     ---
-    i.is_EQ,
-    i.is_NEQ,
-    i.is_UNKNOWN,
+    i.has_EQ,
+    i.has_NEQ,
+    i.has_UNDECIDED,
     ---
     i.is_non_mixed,
-    i.is_only_EQ,
-    i.is_only_NEQ,
-    i.is_only_UNKNOWN,
+    i.has_only_EQ,
+    i.has_only_NEQ,
+    i.has_only_UNDECIDED,
     ---
     i.is_mixed,
     i.is_mixed_EQ_NEQ,
-    i.is_mixed_EQ_UNKNOWN,
-    i.is_mixed_NEQ_UNKNOWN,
-    i.is_mixed_EQ_NEQ_UNKNOWN,
+    i.is_mixed_EQ_UNDECIDED,
+    i.is_mixed_NEQ_UNDECIDED,
+    i.is_mixed_EQ_NEQ_UNDECIDED,
     ---
     i."#_partitions",
     ---
     i."#_partitions_EQ",
     i."#_partitions_NEQ",
-    i."#_partitions_UNKNOWN",
+    i."#_partitions_UNDECIDED",
     ---
     i."%_partitions_EQ",
     i."%_partitions_NEQ",
-    i."%_partitions_UNKNOWN",
+    i."%_partitions_UNDECIDED",
     ---
     i."#_lines",
     ---
     i."#_lines_EQ",
     i."#_lines_NEQ",
-    i."#_lines_UNKNOWN",
+    i."#_lines_UNDECIDED",
     i."#_lines_non_mixed",
     i."#_lines_only_EQ",
     i."#_lines_only_NEQ",
-    i."#_lines_only_UNKNOWN",
+    i."#_lines_only_UNDECIDED",
     i."#_lines_mixed",
     i."#_lines_mixed_EQ_NEQ",
-    i."#_lines_mixed_EQ_UNKNOWN",
-    i."#_lines_mixed_NEQ_UNKNOWN",
-    i."#_lines_mixed_EQ_NEQ_UNKNOWN",
+    i."#_lines_mixed_EQ_UNDECIDED",
+    i."#_lines_mixed_NEQ_UNDECIDED",
+    i."#_lines_mixed_EQ_NEQ_UNDECIDED",
     ---
     i."%_lines_EQ",
     i."%_lines_NEQ",
-    i."%_lines_UNKNOWN",
+    i."%_lines_UNDECIDED",
     i."%_lines_non_mixed",
     i."%_lines_only_EQ",
     i."%_lines_only_NEQ",
-    i."%_lines_only_UNKNOWN",
+    i."%_lines_only_UNDECIDED",
     i."%_lines_mixed",
     i."%_lines_mixed_EQ_NEQ",
-    i."%_lines_mixed_EQ_UNKNOWN",
-    i."%_lines_mixed_NEQ_UNKNOWN",
-    i."%_lines_mixed_EQ_NEQ_UNKNOWN"
+    i."%_lines_mixed_EQ_UNDECIDED",
+    i."%_lines_mixed_NEQ_UNDECIDED",
+    i."%_lines_mixed_EQ_NEQ_UNDECIDED"
 FROM run AS r
 INNER JOIN benchmark b on r.benchmark = b.benchmark
 INNER JOIN mv_iteration_features AS i ON r.benchmark = i.benchmark and r.tool = i.tool AND r.result_iteration = i.iteration;
