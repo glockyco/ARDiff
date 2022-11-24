@@ -40,9 +40,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
     private final Map<Integer, Integer> indexMap = new HashMap<>();
 
     private final Iteration iteration;
-    private final int version;
     private final Set<Partition> partitions = new HashSet<>();
-    private final Set<PartitionInstruction> currentPartitionInstructions = new HashSet<>();
     private final Set<Instruction> currentInstructions = new HashSet<>();
 
     private Partition currentPartition;
@@ -54,10 +52,10 @@ public class ExecutionListener extends PropertyListenerAdapter {
 
     protected int partitionId =  1;
 
-    public ExecutionListener(Iteration iteration, DifferencingParameters parameters, String methodToCover) {
+    public ExecutionListener(Iteration iteration, DifferencingParameters parameters) {
         this.iteration = iteration;
         this.parameters = parameters;
-        this.methodToCoverSpec = MethodSpec.createMethodSpec(methodToCover);
+        this.methodToCoverSpec = MethodSpec.createMethodSpec("*.I*V" + parameters.getToolName() + iteration.iteration + ".snippet");
         this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + iteration.iteration + ".run");
 
         this.currentPartition = new Partition(
@@ -66,9 +64,6 @@ public class ExecutionListener extends PropertyListenerAdapter {
             this.iteration.iteration,
             this.partitionId
         );
-
-        assert methodToCover.contains("IoldV") || methodToCover.contains("InewV");
-        this.version = methodToCover.contains("IoldV") ? 1 : 2;
     }
 
     @Override
@@ -132,7 +127,23 @@ public class ExecutionListener extends PropertyListenerAdapter {
 
                 // -------------------------------------------------------------
 
-                ExecutionNode node = new ExecutionNode(vm.getStateId(), cg.getNextChoice(), executedInstruction, this.prevNode);
+                Instruction instruction = new Instruction(
+                    this.currentPartition.benchmark,
+                    this.currentPartition.tool,
+                    this.currentPartition.iteration,
+                    mi.getFullName(),
+                    executedInstruction.getInstructionIndex(),
+                    executedInstruction.toString(),
+                    executedInstruction.getPosition(),
+                    mi.getSourceFileName(),
+                    executedInstruction.getLineNumber()
+                );
+
+                this.currentInstructions.add(instruction);
+
+                // -------------------------------------------------------------
+
+                ExecutionNode node = new ExecutionNode(vm.getStateId(), cg.getNextChoice(), instruction, this.prevNode);
                 node.pathCondition = PathCondition.getPC(vm);
 
                 ExecutionNode n = node;
@@ -149,44 +160,32 @@ public class ExecutionListener extends PropertyListenerAdapter {
 
                 this.prevNode = node;
                 this.prevIndex++;
-
-                // -------------------------------------------------------------
-
-                Instruction instruction = new Instruction(
-                    this.currentPartition.benchmark,
-                    this.currentPartition.tool,
-                    this.currentPartition.iteration,
-                    mi.getFullName(),
-                    executedInstruction.getInstructionIndex(),
-                    executedInstruction.toString(),
-                    executedInstruction.getPosition(),
-                    mi.getSourceFileName(),
-                    executedInstruction.getLineNumber()
-                );
-
-                PartitionInstruction partitionInstruction = new PartitionInstruction(
-                    this.currentPartition.benchmark,
-                    this.currentPartition.tool,
-                    this.currentPartition.iteration,
-                    this.currentPartition.partition,
-                    this.version,
-                    instruction.method,
-                    instruction.instructionIndex,
-                    this.prevIndex,
-                    cg.getStateId(),
-                    cg.getNextChoice()
-                );
-
-                this.currentInstructions.add(instruction);
-                this.currentPartitionInstructions.add(partitionInstruction);
             }
         }
     }
 
     private void startNextPartition() {
+        Set<PartitionInstruction> partitionInstructions = new HashSet<>();
+        ExecutionNode node = this.prevNode;
+        while (node != null) {
+            partitionInstructions.add(new PartitionInstruction(
+                this.currentPartition.benchmark,
+                this.currentPartition.tool,
+                this.currentPartition.iteration,
+                this.currentPartition.partition,
+                node.version,
+                node.instruction.method,
+                node.instruction.instructionIndex,
+                this.prevIndex,
+                node.stateId,
+                node.choiceId
+            ));
+            node = node.prev;
+        }
+
         PartitionRepository.insertOrUpdate(this.currentPartition);
         InstructionRepository.insertOrUpdate(this.currentInstructions);
-        PartitionInstructionRepository.insertOrUpdate(this.currentPartitionInstructions);
+        PartitionInstructionRepository.insertOrUpdate(partitionInstructions);
 
         this.partitions.add(this.currentPartition);
         this.partitionId++;
@@ -199,13 +198,13 @@ public class ExecutionListener extends PropertyListenerAdapter {
         );
 
         this.currentInstructions.clear();
-        this.currentPartitionInstructions.clear();
     }
 
     private static class ExecutionNode {
         public final int stateId;
         public final int choiceId;
-        public final gov.nasa.jpf.vm.Instruction instruction;
+        public final int version;
+        public final Instruction instruction;
         public final Set<Integer> partitionIds = new HashSet<>();
 
         public final ExecutionNode prev;
@@ -213,9 +212,10 @@ public class ExecutionListener extends PropertyListenerAdapter {
 
         public PathCondition pathCondition;
 
-        public ExecutionNode(int stateId, int choiceId, gov.nasa.jpf.vm.Instruction instruction, ExecutionNode prev) {
+        public ExecutionNode(int stateId, int choiceId, Instruction instruction, ExecutionNode prev) {
             this.stateId = stateId;
             this.choiceId = choiceId;
+            this.version = instruction.method.contains("IoldV") ? 1 : 2;
             this.instruction = instruction;
             this.prev = prev;
         }
@@ -240,7 +240,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
             sb.append(outerIndent);
             sb.append("stateId=" + this.stateId);
             sb.append(", choiceId=" + this.choiceId);
-            sb.append(", instruction=" + this.instruction.getMnemonic());
+            sb.append(", instruction=" + this.instruction.instruction);
 
             String partitions = this.partitionIds.stream().map(Object::toString).collect(Collectors.joining(","));
             sb.append(", partitionIds=[" + partitions + "]");

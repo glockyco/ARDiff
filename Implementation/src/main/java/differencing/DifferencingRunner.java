@@ -175,8 +175,7 @@ public class DifferencingRunner {
                 parameters.setIteration(iteration.iteration);
 
                 IgnoreUnreachablePathsListener unreachableListener = new IgnoreUnreachablePathsListener(solverTimeout);
-                ExecutionListener v1ExecListener = new ExecutionListener(iteration, parameters, "*.IoldV" + parameters.getToolName() + iteration.iteration + ".snippet");
-                ExecutionListener v2ExecListener = new ExecutionListener(iteration, parameters, "*.InewV" + parameters.getToolName() + iteration.iteration + ".snippet");
+                ExecutionListener execListener = new ExecutionListener(iteration, parameters);
                 PathConditionListener pcListener = new PathConditionListener(iteration, parameters);
                 DifferencingListener diffListener = new DifferencingListener(iteration, parameters, solverTimeout);
 
@@ -212,8 +211,7 @@ public class DifferencingRunner {
                     JPF jpf = new JPF(config);
                     jpf.addListener(unreachableListener);
                     jpf.addListener(new SymbolicListener(config, jpf));
-                    jpf.addListener(v1ExecListener);
-                    jpf.addListener(v2ExecListener);
+                    jpf.addListener(execListener);
                     jpf.addListener(pcListener);
                     jpf.addListener(diffListener);
                     jpf.run();
