@@ -82,16 +82,40 @@ WITH reducibility_overview AS
                 sum(has_only_NEQ) AS "#_has_only_NEQ",
                 sum(has_only_UNDECIDED) AS "#_has_only_UNDECIDED",
                 sum(is_mixed_NEQ_UNDECIDED) AS "#_is_mixed_NEQ_UNDECIDED",
+                sum("#_partitions") AS '#_partitions',
+                sum("#_lines") AS "#_lines",
+                sum("#_partitions_EQ") AS '#_partitions_EQ',
+                sum("#_partitions_NEQ") AS '#_partitions_NEQ',
+                sum("#_partitions_UNDECIDED") AS '#_partitions_UNDECIDED',
+                sum("#_lines_all_partitions") AS "#_lines_all_partitions",
+                sum("#_lines_EQ_partitions") AS '#_lines_EQ_partitions',
+                sum("#_lines_NEQ_partitions") AS '#_lines_NEQ_partitions',
+                sum("#_lines_UNDECIDED_partitions") AS '#_lines_UNDECIDED_partitions',
+                sum("%_line_coverage") AS '%_line_coverage_all_partitions',
+                sum("%_line_coverage_EQ_partitions") AS '%_line_coverage_EQ_partitions',
+                sum("%_line_coverage_NEQ_partitions") AS '%_line_coverage_NEQ_partitions',
+                sum("%_line_coverage_UNDECIDED_partitions") AS '%_line_coverage_UNDECIDED_partitions',
                 sum(is_reducible) AS '#_is_reducible',
                 sum(are_partitions_reducible) AS '#_are_partitions_reducible',
-                sum(CASE WHEN are_partitions_reducible = 1 THEN "#_partitions" END) AS "#_partitions",
+                sum(CASE WHEN are_partitions_reducible = 1 THEN "#_partitions" END) AS '#_partitions_in_reducible',
                 nullif(sum(CASE WHEN are_partitions_reducible = 1 THEN "#_partitions_EQ" ELSE 0 END), 0) AS '#_partitions_reducible',
                 nullif(sum(CASE WHEN are_partitions_reducible = 1 THEN "#_partitions" - "#_partitions_EQ" ELSE 0 END), 0) AS '#_partitions_!reducible',
                 sum(are_lines_reducible) AS '#_are_lines_reducible',
-                sum(CASE WHEN are_lines_reducible = 1 THEN "#_lines" END) AS "#_lines",
-                nullif(sum(CASE WHEN are_lines_reducible = 1 THEN "#_lines_only_EQ" ELSE 0 END), 0) AS "#_lines_reducible",
-                nullif(sum(CASE WHEN are_lines_reducible = 1 THEN "#_lines" - "#_lines_only_EQ" ELSE 0 END), 0) AS "#_lines_!reducible"
-            FROM mv_run_features
+                sum(CASE WHEN are_lines_reducible = 1 THEN "#_lines" END) AS '#_lines_in_reducible',
+                nullif(sum(CASE WHEN are_lines_reducible = 1 THEN "#_lines_only_EQ" ELSE 0 END), 0) AS '#_lines_reducible',
+                nullif(sum(CASE WHEN are_lines_reducible = 1 THEN "#_lines" - "#_lines_only_EQ" ELSE 0 END), 0) AS '#_lines_!reducible'
+            FROM
+            (
+                SELECT r.*,
+                    sum("%_line_coverage") AS '%_line_coverage',
+                    sum(CASE WHEN p.result = 'EQ' THEN "%_line_coverage" END) AS '%_line_coverage_EQ_partitions',
+                    sum(CASE WHEN p.result = 'NEQ' THEN "%_line_coverage" END) AS '%_line_coverage_NEQ_partitions',
+                    sum(CASE WHEN p.result IS NULL OR (p.result != 'EQ' AND p.result != 'NEQ') THEN "%_line_coverage" END) AS '%_line_coverage_UNDECIDED_partitions'
+                FROM mv_run_features AS r
+                LEFT JOIN mv_partition_features AS p ON r.benchmark = p.benchmark AND r.tool = p.tool AND r.result_iteration = p.iteration
+                GROUP BY r.benchmark, r.tool
+                ORDER BY benchmark, tool DESC
+            )
             GROUP BY tool, expected, is_fully_analyzed
             ORDER BY tool, expected, is_fully_analyzed DESC
         ),
@@ -105,16 +129,29 @@ WITH reducibility_overview AS
                 sum("#_EQ") AS '#_EQ',
                 sum("#_!EQ") AS '#_!EQ',
                 sum("#_!is_reducible") AS '#_!is_reducible',
-                sum("#_has_only_NEQ") AS "#_has_only_NEQ",
-                sum("#_has_only_UNDECIDED") AS "#_has_only_UNDECIDED",
-                sum("#_is_mixed_NEQ_UNDECIDED") AS "#_is_mixed_NEQ_UNDECIDED",
+                sum("#_has_only_NEQ") AS '#_has_only_NEQ',
+                sum("#_has_only_UNDECIDED") AS '#_has_only_UNDECIDED',
+                sum("#_is_mixed_NEQ_UNDECIDED") AS '#_is_mixed_NEQ_UNDECIDED',
+                sum("#_partitions") AS '#_partitions',
+                sum("#_lines") AS '#_lines',
+                sum("#_partitions_EQ") AS '#_partitions_EQ',
+                sum("#_partitions_NEQ") AS '#_partitions_NEQ',
+                sum("#_partitions_UNDECIDED") AS '#_partitions_UNDECIDED',
+                sum("#_lines_all_partitions") AS '#_lines_all_partitions',
+                sum("#_lines_EQ_partitions") AS '#_lines_EQ_partitions',
+                sum("#_lines_NEQ_partitions") AS '#_lines_NEQ_partitions',
+                sum("#_lines_UNDECIDED_partitions") AS '#_lines_UNDECIDED_partitions',
+                sum("%_line_coverage_all_partitions") AS '%_line_coverage_all_partitions',
+                sum("%_line_coverage_EQ_partitions") AS '%_line_coverage_EQ_partitions',
+                sum("%_line_coverage_NEQ_partitions") AS '%_line_coverage_NEQ_partitions',
+                sum("%_line_coverage_UNDECIDED_partitions") AS '%_line_coverage_UNDECIDED_partitions',
                 sum("#_is_reducible") AS '#_is_reducible',
                 sum("#_are_partitions_reducible") AS '#_are_partitions_reducible',
-                sum("#_partitions") AS '#_partitions',
+                sum("#_partitions_in_reducible") AS '#_partitions_in_reducible',
                 sum("#_partitions_reducible") AS '#_partitions_reducible',
                 sum("#_partitions_!reducible") AS '#_partitions_!reducible',
                 sum("#_are_lines_reducible") AS '#_are_lines_reducible',
-                sum("#_lines") AS '#_lines',
+                sum("#_lines_in_reducible") AS '#_lines_in_reducible',
                 sum("#_lines_reducible") AS '#_lines_reducible',
                 sum("#_lines_!reducible") AS '#_lines_!reducible'
             FROM run_reducibility_by_tool_and_expected_and_is_fully_analyzed
@@ -131,16 +168,29 @@ WITH reducibility_overview AS
                 sum("#_EQ") AS '#_EQ',
                 sum("#_!EQ") AS '#_!EQ',
                 sum("#_!is_reducible") AS '#_!is_reducible',
-                sum("#_has_only_NEQ") AS "#_has_only_NEQ",
-                sum("#_has_only_UNDECIDED") AS "#_has_only_UNDECIDED",
-                sum("#_is_mixed_NEQ_UNDECIDED") AS "#_is_mixed_NEQ_UNDECIDED",
+                sum("#_has_only_NEQ") AS '#_has_only_NEQ',
+                sum("#_has_only_UNDECIDED") AS '#_has_only_UNDECIDED',
+                sum("#_is_mixed_NEQ_UNDECIDED") AS '#_is_mixed_NEQ_UNDECIDED',
+                sum("#_partitions") AS '#_partitions',
+                sum("#_lines") AS '#_lines',
+                sum("#_partitions_EQ") AS '#_partitions_EQ',
+                sum("#_partitions_NEQ") AS '#_partitions_NEQ',
+                sum("#_partitions_UNDECIDED") AS '#_partitions_UNDECIDED',
+                sum("#_lines_all_partitions") AS '#_lines_all_partitions',
+                sum("#_lines_EQ_partitions") AS '#_lines_EQ_partitions',
+                sum("#_lines_NEQ_partitions") AS '#_lines_NEQ_partitions',
+                sum("#_lines_UNDECIDED_partitions") AS '#_lines_UNDECIDED_partitions',
+                sum("%_line_coverage_all_partitions") AS '%_line_coverage_all_partitions',
+                sum("%_line_coverage_EQ_partitions") AS '%_line_coverage_EQ_partitions',
+                sum("%_line_coverage_NEQ_partitions") AS '%_line_coverage_NEQ_partitions',
+                sum("%_line_coverage_UNDECIDED_partitions") AS '%_line_coverage_UNDECIDED_partitions',
                 sum("#_is_reducible") AS '#_is_reducible',
                 sum("#_are_partitions_reducible") AS '#_are_partitions_reducible',
-                sum("#_partitions") AS '#_partitions',
+                sum("#_partitions_in_reducible") AS '#_partitions_in_reducible',
                 sum("#_partitions_reducible") AS '#_partitions_reducible',
                 sum("#_partitions_!reducible") AS '#_partitions_!reducible',
                 sum("#_are_lines_reducible") AS '#_are_lines_reducible',
-                sum("#_lines") AS '#_lines',
+                sum("#_lines_in_reducible") AS '#_lines_in_reducible',
                 sum("#_lines_reducible") AS '#_lines_reducible',
                 sum("#_lines_!reducible") AS '#_lines_!reducible'
             FROM run_reducibility_by_tool_and_expected_and_is_fully_analyzed
@@ -157,16 +207,29 @@ WITH reducibility_overview AS
                 sum("#_EQ") AS '#_EQ',
                 sum("#_!EQ") AS '#_!EQ',
                 sum("#_!is_reducible") AS '#_!is_reducible',
-                sum("#_has_only_NEQ") AS "#_has_only_NEQ",
-                sum("#_has_only_UNDECIDED") AS "#_has_only_UNDECIDED",
-                sum("#_is_mixed_NEQ_UNDECIDED") AS "#_is_mixed_NEQ_UNDECIDED",
+                sum("#_has_only_NEQ") AS '#_has_only_NEQ',
+                sum("#_has_only_UNDECIDED") AS '#_has_only_UNDECIDED',
+                sum("#_is_mixed_NEQ_UNDECIDED") AS '#_is_mixed_NEQ_UNDECIDED',
+                sum("#_partitions") AS '#_partitions',
+                sum("#_lines") AS '#_lines',
+                sum("#_partitions_EQ") AS '#_partitions_EQ',
+                sum("#_partitions_NEQ") AS '#_partitions_NEQ',
+                sum("#_partitions_UNDECIDED") AS '#_partitions_UNDECIDED',
+                sum("#_lines_all_partitions") AS '#_lines_all_partitions',
+                sum("#_lines_EQ_partitions") AS '#_lines_EQ_partitions',
+                sum("#_lines_NEQ_partitions") AS '#_lines_NEQ_partitions',
+                sum("#_lines_UNDECIDED_partitions") AS '#_lines_UNDECIDED_partitions',
+                sum("%_line_coverage_all_partitions") AS '%_line_coverage_all_partitions',
+                sum("%_line_coverage_EQ_partitions") AS '%_line_coverage_EQ_partitions',
+                sum("%_line_coverage_NEQ_partitions") AS '%_line_coverage_NEQ_partitions',
+                sum("%_line_coverage_UNDECIDED_partitions") AS '%_line_coverage_UNDECIDED_partitions',
                 sum("#_is_reducible") AS '#_is_reducible',
                 sum("#_are_partitions_reducible") AS '#_are_partitions_reducible',
-                sum("#_partitions") AS '#_partitions',
+                sum("#_partitions_in_reducible") AS '#_partitions_in_reducible',
                 sum("#_partitions_reducible") AS '#_partitions_reducible',
                 sum("#_partitions_!reducible") AS '#_partitions_!reducible',
                 sum("#_are_lines_reducible") AS '#_are_lines_reducible',
-                sum("#_lines") AS '#_lines',
+                sum("#_lines_in_reducible") AS '#_lines_in_reducible',
                 sum("#_lines_reducible") AS '#_lines_reducible',
                 sum("#_lines_!reducible") AS '#_lines_!reducible'
             FROM run_reducibility_by_tool_and_expected_and_is_fully_analyzed
@@ -175,15 +238,15 @@ WITH reducibility_overview AS
         )
     SELECT * FROM run_reducibility_by_tool
     UNION ALL
-    SELECT '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''
+    SELECT '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''
     UNION ALL
     SELECT * FROM run_reducibility_by_tool_and_expected
     UNION ALL
-    SELECT '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''
+    SELECT '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''
     UNION ALL
     SELECT * FROM run_reducibility_by_tool_and_is_fully_analyzed
     UNION ALL
-    SELECT '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''
+    SELECT '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''
     UNION ALL
     SELECT * FROM run_reducibility_by_tool_and_expected_and_is_fully_analyzed
 )
@@ -216,16 +279,32 @@ SELECT
     is_fully_analyzed AS is_fully_analyzed,
     "#_are_partitions_reducible",
     coalesce(round(("#_are_partitions_reducible" * 1.0 / "#_!EQ") * 100, 2), '') AS '%_a_p_r',
-    "#_partitions",
+    "#_partitions_in_reducible",
     "#_partitions_reducible",
     "#_partitions_!reducible",
+    coalesce(round(("#_partitions_reducible" * 1.0 / "#_partitions_in_reducible") * 100, 2), '') AS '%_p_r',
+    coalesce(round(("#_partitions_!reducible" * 1.0 / "#_partitions_in_reducible") * 100, 2), '') AS '%_p_!r',
+    '' AS '|',
+    tool AS tool,
+    expected AS expected,
+    is_fully_analyzed AS is_fully_analyzed,
+    coalesce(round("#_lines_all_partitions" * 1.0 / "#_partitions", 2), '') AS '#_lines_per_partition',
+    coalesce(round("#_lines_EQ_partitions" * 1.0 / "#_partitions_EQ", 2), '') AS '#_lp_EQ_p',
+    coalesce(round("#_lines_NEQ_partitions" * 1.0 / "#_partitions_NEQ", 2), '') AS '#_lp_NEQ_p',
+    coalesce(round("#_lines_UNDECIDED_partitions" * 1.0 / "#_partitions_UNDECIDED", 2), '') AS '#_lp_UNDECIDED_p',
+    coalesce(round(("%_line_coverage_all_partitions" * 1.0 / "#_partitions"), 2), '') AS '%_coverage_per_partition',
+    coalesce(round(("%_line_coverage_EQ_partitions" * 1.0 / "#_partitions_EQ"), 2), '') AS '%_cp_EQ_p',
+    coalesce(round(("%_line_coverage_NEQ_partitions" * 1.0 / "#_partitions_NEQ"), 2), '') AS '%_cp_NEQ_p',
+    coalesce(round(("%_line_coverage_UNDECIDED_partitions" * 1.0 / "#_partitions_UNDECIDED"), 2), '') AS '%_cp_UNDECIDED_p',
     '' AS '|',
     tool AS tool,
     expected AS expected,
     is_fully_analyzed AS is_fully_analyzed,
     "#_are_lines_reducible",
     coalesce(round(("#_are_lines_reducible" * 1.0 / "#_!EQ") * 100, 2), '') AS '%_a_l_r',
-    "#_lines",
+    "#_lines_in_reducible",
     "#_lines_reducible",
-    "#_lines_!reducible"
+    "#_lines_!reducible",
+    coalesce(round(("#_lines_reducible" * 1.0 / "#_lines_in_reducible") * 100, 2), '') AS '%_l_r',
+    coalesce(round(("#_lines_!reducible" * 1.0 / "#_lines_in_reducible") * 100, 2), '') AS '%_l_!r'
 FROM reducibility_overview;
