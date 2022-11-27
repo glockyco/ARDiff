@@ -170,7 +170,7 @@ WITH l_features AS (
             count(*) AS "#_partitions",
             coalesce(sum(CASE p.result WHEN 'EQ' THEN 1 END), 0) AS "#_partitions_EQ",
             coalesce(sum(CASE p.result WHEN 'NEQ' THEN 1 END), 0) AS "#_partitions_NEQ",
-            coalesce(sum(CASE WHEN p.result != 'EQ' AND p.result != 'NEQ' THEN 1 END), 0) AS "#_partitions_UNDECIDED"
+            coalesce(sum(CASE WHEN p.result == null OR (p.result != 'EQ' AND p.result != 'NEQ') THEN 1 END), 0) AS "#_partitions_UNDECIDED"
         FROM mv_line AS l
         INNER JOIN mv_partition_line AS pl USING (benchmark, tool, iteration, source_file, source_line)
         INNER JOIN partition AS p USING (benchmark, tool, iteration, partition)
@@ -583,7 +583,7 @@ WITH i_features_5 AS
                     nullif(count(pf.partition), 0) AS '#_partitions',
                     CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'EQ' THEN 1 END), 0) END AS '#_partitions_EQ',
                     CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'NEQ' THEN 1 END), 0) END AS '#_partitions_NEQ',
-                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE WHEN pf.result != 'EQ' AND pf.result != 'NEQ' THEN 1 END), 0) END AS "#_partitions_UNDECIDED",
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE WHEN pf.result IS NULL OR (pf.result != 'EQ' AND pf.result != 'NEQ') THEN 1 END), 0) END AS "#_partitions_UNDECIDED",
                     nullif(sum(pf."#_lines_partition"), 0) AS '#_lines_all_partitions',
                     CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'EQ' THEN pf."#_lines_partition" END), 0) END AS '#_lines_EQ_partitions',
                     CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'NEQ' THEN pf."#_lines_partition" END), 0) END AS '#_lines_NEQ_partitions',
