@@ -506,7 +506,11 @@ WITH i_features_5 AS
                         b.expected = i.result AS is_correct,
                         (b.expected = 'EQ' AND i.result = 'NEQ') OR (b.expected = 'EQ' AND i.result = 'NEQ') AS is_incorrect,
                         i.result IS NULL OR (i.result != 'EQ' AND i.result != 'NEQ') AS is_undecided,
-                        coalesce(i.has_timed_out = 0 AND i.is_depth_limited = 0, 0) AS is_fully_analyzed
+                        coalesce(
+                            result IN ('EQ', 'NEQ', 'MAYBE_EQ', 'MAYBE_NEQ', 'UNKNOWN')
+                            AND i.has_timed_out = 0
+                            AND i.is_depth_limited = 0,
+                        0) AS is_fully_analyzed
                     FROM iteration AS i
                     INNER JOIN benchmark AS b USING(benchmark)
                 )
