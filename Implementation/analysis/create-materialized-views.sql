@@ -333,7 +333,7 @@ SELECT
     ---
     count(*) AS '#_lines_iteration',
     p."#_lines_partition",
-    round((p."#_lines_partition" * 1.0 / count(*)) * 100, 2) AS '%_line_coverage',
+    (p."#_lines_partition" * 1.0 / count(*)) * 100 AS '%_line_coverage',
     p."#_instructions_partition"
 FROM p_features AS p
 LEFT JOIN mv_line_features AS l USING (benchmark, tool, iteration)
