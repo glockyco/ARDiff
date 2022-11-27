@@ -306,8 +306,6 @@ GROUP BY p.benchmark, p.tool, p.iteration, p.partition;
 
 ---
 
-DROP TABLE IF EXISTS mv_iteration_features;
-
 CREATE TABLE IF NOT EXISTS mv_iteration_features
 (
     benchmark TEXT NOT NULL,
