@@ -242,8 +242,10 @@ CREATE TABLE IF NOT EXISTS mv_partition_features
     is_base BOOLEAN NOT NULL,
     is_diff BOOLEAN NOT NULL,
     ---
-    '#_lines' INTEGER NOT NULL,
-    '#_instructions' INTEGER NOT NULL,
+    "#_lines_iteration" INTEGER NOT NULL,
+    "#_lines_partition" INTEGER NOT NULL,
+    "%_line_coverage" REAL NOT NULL,
+    "#_instructions_partition" INTEGER NOT NULL,
     ---
     PRIMARY KEY (benchmark, tool, iteration, partition),
     FOREIGN KEY (benchmark, tool, iteration, partition)
@@ -273,8 +275,40 @@ INSERT INTO mv_partition_features
     is_base,
     is_diff,
     ---
-    "#_lines",
-    "#_instructions"
+    "#_lines_iteration",
+    "#_lines_partition",
+    "%_line_coverage",
+    "#_instructions_partition"
+)
+WITH p_features AS
+(
+    SELECT
+        p.benchmark,
+        p.tool,
+        p.iteration,
+        p.partition,
+        ---
+        p.result,
+        p.pc_status,
+        p.neq_status,
+        p.eq_status,
+        p.has_uif,
+        p.has_uif_pc,
+        p.has_uif_v1,
+        p.has_uif_v2,
+        p.constraint_count,
+        p.runtime,
+        p.errors,
+        ---
+        p.tool LIKE '%-base' AS is_base,
+        p.tool LIKE '%-diff' AS is_diff,
+        ---
+        count(DISTINCT i.source_file || ':' || i.source_line) AS '#_lines_partition',
+        count(pi.execution_index) AS '#_instructions_partition'
+    FROM partition AS p
+    LEFT JOIN partition_instruction AS pi USING(benchmark, tool, iteration, partition)
+    LEFT JOIN instruction AS i USING(benchmark, tool, iteration, method, instruction_index)
+    GROUP BY p.benchmark, p.tool, p.iteration, p.partition
 )
 SELECT
     p.benchmark,
@@ -294,14 +328,15 @@ SELECT
     p.runtime,
     p.errors,
     ---
-    p.tool LIKE '%-base' AS is_base,
-    p.tool LIKE '%-diff' AS is_diff,
+    p.is_base,
+    p.is_diff,
     ---
-    count(DISTINCT i.source_file || ':' || i.source_line) AS '#lines',
-    count(pi.execution_index) AS '#instructions'
-FROM partition AS p
-LEFT JOIN partition_instruction AS pi USING(benchmark, tool, iteration, partition)
-LEFT JOIN instruction AS i USING(benchmark, tool, iteration, method, instruction_index)
+    count(*) AS '#_lines_iteration',
+    p."#_lines_partition",
+    round((p."#_lines_partition" * 1.0 / count(*)) * 100, 2) AS '%_line_coverage',
+    p."#_instructions_partition"
+FROM p_features AS p
+LEFT JOIN mv_line_features AS l USING (benchmark, tool, iteration)
 GROUP BY p.benchmark, p.tool, p.iteration, p.partition;
 
 ---
@@ -358,6 +393,22 @@ CREATE TABLE IF NOT EXISTS mv_iteration_features
     '%_partitions_EQ' REAL, -- Can be NULL.
     '%_partitions_NEQ' REAL, -- Can be NULL.
     "%_partitions_UNDECIDED" REAL, -- Can be NULL.
+    --
+    '#_lines_all_partitions' INTEGER, -- Can be NULL.
+    ---
+    '#_lines_EQ_partitions' INTEGER, -- Can be NULL.
+    '#_lines_NEQ_partitions' INTEGER, -- Can be NULL.
+    '#_lines_UNDECIDED_partitions' INTEGER, -- Can be NULL.
+    ---
+    "#_lines_per_partition" INTEGER, -- Can be NULL.
+    "#_lines_per_EQ_partition" INTEGER, -- Can be NULL.
+    "#_lines_per_NEQ_partition" INTEGER, -- Can be NULL.
+    "#_lines_per_UNDECIDED_partition" INTEGER, -- Can be NULL.
+    ---
+    "%_line_coverage_per_partition" REAL, -- Can be NULL.
+    "%_line_coverage_per_EQ_partition" REAL, -- Can be NULL.
+    "%_line_coverage_per_NEQ_partition" REAL, -- Can be NULL.
+    "%_line_coverage_per_UNDECIDED_partition" REAL, -- Can be NULL.
     ---
     '#_lines' INTEGER, -- Can be NULL.
     ---
@@ -446,6 +497,22 @@ INSERT INTO mv_iteration_features
     "%_partitions_NEQ",
     "%_partitions_UNDECIDED",
     ---
+    "#_lines_all_partitions",
+    ---
+    "#_lines_EQ_partitions",
+    "#_lines_NEQ_partitions",
+    "#_lines_UNDECIDED_partitions",
+    ---
+    "#_lines_per_partition",
+    "#_lines_per_EQ_partition",
+    "#_lines_per_NEQ_partition",
+    "#_lines_per_UNDECIDED_partition",
+    ---
+    "%_line_coverage_per_partition",
+    "%_line_coverage_per_EQ_partition",
+    "%_line_coverage_per_NEQ_partition",
+    "%_line_coverage_per_UNDECIDED_partition",
+    ---
     "#_lines",
     ---
     "#_lines_EQ",
@@ -516,7 +583,11 @@ WITH i_features_5 AS
                     nullif(count(pf.partition), 0) AS '#_partitions',
                     CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'EQ' THEN 1 END), 0) END AS '#_partitions_EQ',
                     CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'NEQ' THEN 1 END), 0) END AS '#_partitions_NEQ',
-                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE WHEN pf.result != 'EQ' AND pf.result != 'NEQ' THEN 1 END), 0) END AS "#_partitions_UNDECIDED"
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE WHEN pf.result != 'EQ' AND pf.result != 'NEQ' THEN 1 END), 0) END AS "#_partitions_UNDECIDED",
+                    nullif(sum(pf."#_lines_partition"), 0) AS '#_lines_all_partitions',
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'EQ' THEN pf."#_lines_partition" END), 0) END AS '#_lines_EQ_partitions',
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'NEQ' THEN pf."#_lines_partition" END), 0) END AS '#_lines_NEQ_partitions',
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE WHEN pf.result != 'EQ' AND pf.result != 'NEQ' THEN pf."#_lines_partition" END), 0) END AS "#_lines_UNDECIDED_partitions"
                 FROM i_features_1 AS if_1
                 LEFT JOIN mv_partition_features AS pf USING(benchmark, tool, iteration)
                 GROUP BY if_1.benchmark, if_1.tool, if_1.iteration
@@ -585,6 +656,12 @@ WITH i_features_5 AS
         (if_4."#_partitions_NEQ" * 1.0 / if_4."#_partitions") * 100 AS '%_partitions_NEQ',
         (if_4."#_partitions_UNDECIDED" * 1.0 / if_4."#_partitions") * 100 AS "%_partitions_UNDECIDED",
         ---
+        if_4."#_lines_all_partitions" / "#_partitions" AS '#_lines_per_partition',
+        ---
+        if_4."#_lines_EQ_partitions" / "#_partitions_EQ" AS '#_lines_per_EQ_partition',
+        if_4."#_lines_NEQ_partitions" / "#_partitions_NEQ" AS '#_lines_per_NEQ_partition',
+        if_4."#_lines_UNDECIDED_partitions" / "#_partitions_UNDECIDED" AS '#_lines_per_UNDECIDED_partition',
+        ---
         (if_4."#_lines_EQ" * 1.0 / if_4."#_lines") * 100 AS '%_lines_EQ',
         (if_4."#_lines_NEQ" * 1.0 / if_4."#_lines") * 100 AS '%_lines_NEQ',
         (if_4."#_lines_UNDECIDED" * 1.0 / if_4."#_lines") * 100 AS "%_lines_UNDECIDED",
@@ -650,6 +727,22 @@ SELECT
     if_5.'%_partitions_EQ',
     if_5.'%_partitions_NEQ',
     if_5."%_partitions_UNDECIDED",
+    ---
+    if_5."#_lines_all_partitions",
+    ---
+    if_5."#_lines_EQ_partitions",
+    if_5."#_lines_NEQ_partitions",
+    if_5."#_lines_UNDECIDED_partitions",
+    ---
+    if_5."#_lines_per_partition",
+    if_5."#_lines_per_EQ_partition",
+    if_5."#_lines_per_NEQ_partition",
+    if_5."#_lines_per_UNDECIDED_partition",
+    ---
+    (if_5."#_lines_per_partition" * 1.0 / "#_lines") * 100 AS '%_line_coverage_per_partition',
+    (if_5."#_lines_per_EQ_partition" * 1.0 / "#_lines") * 100 AS '#_line_coverage_per_EQ_partition',
+    (if_5."#_lines_per_NEQ_partition" * 1.0 / "#_lines") * 100 AS '#_lines_coverage_per_NEQ_partition',
+    (if_5."#_lines_per_UNDECIDED_partition" * 1.0 / "#_lines") * 100 AS '#_line_coverage_per_UNDECIDED_partition',
     ---
     if_5."#_lines",
     ---
@@ -736,6 +829,22 @@ CREATE TABLE IF NOT EXISTS mv_run_features
     '%_partitions_EQ' REAL, -- Can be NULL.
     '%_partitions_NEQ' REAL, -- Can be NULL.
     "%_partitions_UNDECIDED" REAL, -- Can be NULL.
+    ---
+    '#_lines_all_partitions' INTEGER, -- Can be NULL.
+    ---
+    '#_lines_EQ_partitions' INTEGER, -- Can be NULL.
+    '#_lines_NEQ_partitions' INTEGER, -- Can be NULL.
+    '#_lines_UNDECIDED_partitions' INTEGER, -- Can be NULL.
+    ---
+    "#_lines_per_partition" INTEGER, -- Can be NULL.
+    "#_lines_per_EQ_partition" INTEGER, -- Can be NULL.
+    "#_lines_per_NEQ_partition" INTEGER, -- Can be NULL.
+    "#_lines_per_UNDECIDED_partition" INTEGER, -- Can be NULL.
+    ---
+    "%_line_coverage_per_partition" REAL, -- Can be NULL.
+    "%_line_coverage_per_EQ_partition" REAL, -- Can be NULL.
+    "%_line_coverage_per_NEQ_partition" REAL, -- Can be NULL.
+    "%_line_coverage_per_UNDECIDED_partition" REAL, -- Can be NULL.
     ---
     '#_lines' INTEGER, -- Can be NULL.
     ---
@@ -826,6 +935,22 @@ INSERT INTO mv_run_features
     "%_partitions_NEQ",
     "%_partitions_UNDECIDED",
     ---
+    "#_lines_all_partitions",
+    ---
+    "#_lines_EQ_partitions",
+    "#_lines_NEQ_partitions",
+    "#_lines_UNDECIDED_partitions",
+    ---
+    "#_lines_per_partition",
+    "#_lines_per_EQ_partition",
+    "#_lines_per_NEQ_partition",
+    "#_lines_per_UNDECIDED_partition",
+    ---
+    "%_line_coverage_per_partition",
+    "%_line_coverage_per_EQ_partition",
+    "%_line_coverage_per_NEQ_partition",
+    "%_line_coverage_per_UNDECIDED_partition",
+    ---
     "#_lines",
     ---
     "#_lines_EQ",
@@ -907,6 +1032,22 @@ SELECT
     i."%_partitions_EQ",
     i."%_partitions_NEQ",
     i."%_partitions_UNDECIDED",
+    ---
+    i."#_lines_all_partitions",
+    ---
+    i."#_lines_EQ_partitions",
+    i."#_lines_NEQ_partitions",
+    i."#_lines_UNDECIDED_partitions",
+    ---
+    i."#_lines_per_partition",
+    i."#_lines_per_EQ_partition",
+    i."#_lines_per_NEQ_partition",
+    i."#_lines_per_UNDECIDED_partition",
+    ---
+    i."%_line_coverage_per_partition",
+    i."%_line_coverage_per_EQ_partition",
+    i."%_line_coverage_per_NEQ_partition",
+    i."%_line_coverage_per_UNDECIDED_partition",
     ---
     i."#_lines",
     ---
