@@ -564,24 +564,15 @@ WITH i_features_5 AS
             )
         ) END AS are_partitions_reducible,
         CASE WHEN if_4."#_lines_only_EQ" IS NULL THEN 0 ELSE (
-            (
-                if_4.is_fully_analyzed
-                AND if_4."#_lines_only_EQ" > 0
-                AND if_4."#_lines_only_EQ" < if_4."#_lines"
-                -- @TODO: Use "#_total_lines" instead of "#_lines".
-                --   Where "#_total_lines" is the total number of lines in
-                --   the program, including those that were not visited during
-                --   the symbolic execution.
-            )
-            OR
-            (
-                NOT if_4.is_fully_analyzed
-                AND if_4."#_lines_only_EQ" > 0
-                -- @TODO: AND if_5."#_lines_only_EQ" < if_5."#_total_lines".
-                --   Where "#_total_lines" is the total number of lines in
-                --   the program, including those that were not visited during
-                --   the symbolic execution.
-            )
+            if_4.is_fully_analyzed
+            AND if_4."#_lines_only_EQ" > 0
+            AND if_4."#_lines_only_EQ" < if_4."#_lines"
+            -- @TODO: Use "#_total_lines" instead of "#_lines".
+            --   Where "#_total_lines" is the total number of lines in
+            --   the program, including those that were not visited during
+            --   the symbolic execution.
+            --   After all, lines can be reduced if all visited lines are
+            --   EQ but there are also unvisited lines (i.e., dead code).
         ) END AS are_lines_reducible,
         ---
         if_4.has_only_EQ OR if_4.has_only_NEQ OR if_4.has_only_UNDECIDED AS is_non_mixed,
