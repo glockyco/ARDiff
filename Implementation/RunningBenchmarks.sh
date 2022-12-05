@@ -222,7 +222,7 @@ fi
 
 touch ${DB_PATH}
 sqlite3 ${DB_PATH} < ${DB_CREATE_TABLES_PATH}
-sqlite3 ${DB_PATH} < ${DB_CREATE_VIEWS_PATH}
+sqlite3 ${DB_PATH} < ${DB_CREATE_VIEWS_PATH} > /dev/null
 
 # Build the application JAR files
 
