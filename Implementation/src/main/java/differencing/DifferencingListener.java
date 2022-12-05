@@ -35,9 +35,9 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
 
     private int partitionId =  1;
     private Classification partitionClassification = null;
-    private Status partitionPcStatus = null;
-    private Status partitionNeqStatus = null;
-    private Status partitionEqStatus = null;
+    private SatisfiabilityResult partitionPcResult = null;
+    private SatisfiabilityResult partitionNeqResult = null;
+    private SatisfiabilityResult partitionEqResult = null;
     private boolean hasPartitionUifPc = false;
     private boolean hasPartitionUifV1 = false;
     private boolean hasPartitionUifV2 = false;
@@ -167,8 +167,8 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
             if (areEquivalent) {
                 stackFrame.setOperand(0, 1, false);
             } else {
-                this.partitionNeqStatus = Status.SATISFIABLE;
-                this.partitionEqStatus = Status.UNSATISFIABLE;
+                this.partitionNeqResult = new SatisfiabilityResult(Status.SATISFIABLE, null, null, null);
+                this.partitionEqResult = new SatisfiabilityResult(Status.UNSATISFIABLE, null, null, null);
                 stackFrame.setOperand(0, 0, false);
             }
         } else if (this.areResultsEquivalentSpec.matches(mi)) {
@@ -223,13 +223,13 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
 
             boolean hasUif = this.hasPartitionUifPc || this.hasPartitionUifV1 || this.hasPartitionUifV2;
 
-            this.partitionPcStatus = this.satChecker.checkPc(pcModel);
-            this.partitionNeqStatus = this.satChecker.checkNeq(pcModel, v1Model, v2Model);
-            this.partitionEqStatus = this.satChecker.checkEq(pcModel, v1Model, v2Model);
+            this.partitionPcResult = this.satChecker.checkPc(pcModel);
+            this.partitionNeqResult = this.satChecker.checkNeq(pcModel, v1Model, v2Model);
+            this.partitionEqResult = this.satChecker.checkEq(pcModel, v1Model, v2Model);
 
             this.partitionClassification = new PartitionClassifier(
                 false, false, false, false, this.isPartitionDepthLimited,
-                this.partitionPcStatus, this.partitionNeqStatus, this.partitionEqStatus,
+                this.partitionPcResult.status, this.partitionNeqResult.status, this.partitionEqResult.status,
                 this.hasPartitionUifPc, hasUif
             ).getClassification();
 
@@ -264,11 +264,11 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
             this.partitionPcConstraintCount = this.getConstraintCount(pcConstraint);
             this.hasPartitionUifPc = HasUifVisitor.hasUif(pcModel);
 
-            this.partitionPcStatus = this.satChecker.checkPc(pcModel);
+            this.partitionPcResult = this.satChecker.checkPc(pcModel);
 
             this.partitionClassification = new PartitionClassifier(
                 false, false, false, false, this.isPartitionDepthLimited,
-                this.partitionPcStatus, this.partitionNeqStatus, this.partitionEqStatus,
+                this.partitionPcResult.status, this.partitionNeqResult.status, this.partitionEqResult.status,
                 this.hasPartitionUifPc, this.hasPartitionUifPc
             ).getClassification();
         }
@@ -279,9 +279,9 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
             this.iteration.iteration,
             this.partitionId,
             this.partitionClassification,
-            this.partitionPcStatus,
-            this.partitionNeqStatus,
-            this.partitionEqStatus,
+            this.partitionPcResult,
+            this.partitionNeqResult,
+            this.partitionEqResult,
             this.hasPartitionUifPc,
             this.hasPartitionUifV1,
             this.hasPartitionUifV2,
@@ -295,9 +295,9 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
         this.partitions.add(partition);
         this.partitionId++;
         this.partitionClassification = null;
-        this.partitionPcStatus = null;
-        this.partitionNeqStatus = null;
-        this.partitionEqStatus = null;
+        this.partitionPcResult = null;
+        this.partitionNeqResult = null;
+        this.partitionEqResult = null;
         this.hasPartitionUifPc = false;
         this.hasPartitionUifV1 = false;
         this.hasPartitionUifV2 = false;

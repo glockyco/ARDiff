@@ -3,6 +3,7 @@ package differencing;
 import com.microsoft.z3.*;
 import differencing.domain.Model;
 import differencing.transformer.ModelToZ3Transformer;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,7 @@ public class SatisfiabilityChecker {
         this.settings.put("timeout", Integer.toString(timeout));
     }
 
-    public Status checkPc(Model pcModel) {
+    public SatisfiabilityResult checkPc(Model pcModel) {
         try (Context context = new Context(this.settings)) {
             ModelToZ3Transformer modelToZ3 = new ModelToZ3Transformer(context);
             Expr<BoolSort> pcExpr = (Expr<BoolSort>) modelToZ3.transform(pcModel);
@@ -25,7 +26,7 @@ public class SatisfiabilityChecker {
         }
     }
 
-    public Status checkNeq(Model pcModel, Model v1Model, Model v2Model) {
+    public SatisfiabilityResult checkNeq(Model pcModel, Model v1Model, Model v2Model) {
         try (Context context = new Context(this.settings)) {
             ModelToZ3Transformer modelToZ3 = new ModelToZ3Transformer(context);
             Expr<BoolSort> pcExpr = (Expr<BoolSort>) modelToZ3.transform(pcModel);
@@ -39,7 +40,7 @@ public class SatisfiabilityChecker {
         }
     }
 
-    public Status checkEq(Model pcModel, Model v1Model, Model v2Model) {
+    public SatisfiabilityResult checkEq(Model pcModel, Model v1Model, Model v2Model) {
         try (Context context = new Context(this.settings)) {
             ModelToZ3Transformer modelToZ3 = new ModelToZ3Transformer(context);
             Expr<BoolSort> pcExpr = (Expr<BoolSort>) modelToZ3.transform(pcModel);
@@ -51,11 +52,11 @@ public class SatisfiabilityChecker {
             eqSolver.add(context.mkEq(v1Expr, v2Expr));
             return this.check(eqSolver);
         } catch (UnsupportedOperationException e) {
-            return Status.UNKNOWN;
+            return new SatisfiabilityResult(Status.UNKNOWN, null, ExceptionUtils.getStackTrace(e), null);
         }
     }
 
-    private Status check(Solver solver) {
+    private SatisfiabilityResult check(Solver solver) {
         // @TODO: This function only exists to remove function declarations
         //    that overwrite built-in z3 functions such as:
         //    (declare-fun sin (Real) Real)
@@ -87,7 +88,13 @@ public class SatisfiabilityChecker {
 
             Solver s = context.mkSolver();
             s.fromString(query);
-            return s.check();
+
+            Status status = s.check();
+            String model = status == Status.SATISFIABLE ? s.getModel().toString() : null;
+            String reasonUnknown = status == Status.UNKNOWN ? s.getReasonUnknown() : null;
+            String statistics = s.getStatistics().toString();
+
+            return new SatisfiabilityResult(status, model, reasonUnknown, statistics);
         }
     }
 }

@@ -35,7 +35,7 @@ public class IgnoreUnreachablePathsListener extends PropertyListenerAdapter {
         if (this.previousPathCondition != currentPathCondition && !this.previousPathCondition.equals(currentPathCondition)) {
             Constraint pcConstraint = currentPathCondition.header;
             Model pcModel = this.spfToModel.transform(pcConstraint);
-            Status pcStatus = this.satChecker.checkPc(pcModel);
+            Status pcStatus = this.satChecker.checkPc(pcModel).status;
 
             if (pcStatus == Status.UNSATISFIABLE) {
                 currentThread.getVM().getSystemState().setIgnored(true);
