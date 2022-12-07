@@ -1,7 +1,7 @@
 package differencing.models;
 
-import com.microsoft.z3.Status;
-import differencing.SatisfiabilityResult;
+import differencing.EquivalenceCheckResult;
+import differencing.ReachabilityCheckResult;
 import differencing.classification.Classification;
 
 import java.util.Objects;
@@ -15,9 +15,9 @@ public class Partition {
 
     // Non-Index
     public Classification result;
-    public SatisfiabilityResult pcResult;
-    public SatisfiabilityResult neqResult;
-    public SatisfiabilityResult eqResult;
+    public ReachabilityCheckResult pcResult;
+    public EquivalenceCheckResult neqResult;
+    public EquivalenceCheckResult eqResult;
     public Boolean hasUif;
     public Boolean hasUifPc;
     public Boolean hasUifV1;
@@ -41,9 +41,9 @@ public class Partition {
         int iteration,
         int partition,
         Classification result,
-        SatisfiabilityResult pcResult,
-        SatisfiabilityResult neqResult,
-        SatisfiabilityResult eqResult,
+        ReachabilityCheckResult pcResult,
+        EquivalenceCheckResult neqResult,
+        EquivalenceCheckResult eqResult,
         Boolean hasUifPc,
         Boolean hasUifV1,
         Boolean hasUifV2,

@@ -35,9 +35,9 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
 
     private int partitionId =  1;
     private Classification partitionClassification = null;
-    private SatisfiabilityResult partitionPcResult = null;
-    private SatisfiabilityResult partitionNeqResult = null;
-    private SatisfiabilityResult partitionEqResult = null;
+    private ReachabilityCheckResult partitionPcResult = null;
+    private EquivalenceCheckResult partitionNeqResult = null;
+    private EquivalenceCheckResult partitionEqResult = null;
     private boolean hasPartitionUifPc = false;
     private boolean hasPartitionUifV1 = false;
     private boolean hasPartitionUifV2 = false;
@@ -61,6 +61,7 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
 
     @Override
     public void close() throws Exception {
+        this.satChecker.close();
         this.context.close();
     }
 
@@ -167,8 +168,8 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
             if (areEquivalent) {
                 stackFrame.setOperand(0, 1, false);
             } else {
-                this.partitionNeqResult = new SatisfiabilityResult(Status.SATISFIABLE, null, null, null);
-                this.partitionEqResult = new SatisfiabilityResult(Status.UNSATISFIABLE, null, null, null);
+                this.partitionNeqResult = new EquivalenceCheckResult(Status.SATISFIABLE, null, null, null, null, null);
+                this.partitionEqResult = new EquivalenceCheckResult(Status.UNSATISFIABLE, null, null, null, null, null);
                 stackFrame.setOperand(0, 0, false);
             }
         } else if (this.areResultsEquivalentSpec.matches(mi)) {
@@ -266,9 +267,13 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
 
             this.partitionPcResult = this.satChecker.checkPc(pcModel);
 
+            Status pcStatus = this.partitionPcResult == null ? null : this.partitionPcResult.status;;
+            Status neqStatus = this.partitionNeqResult == null ? null : this.partitionNeqResult.status;
+            Status eqStatus = this.partitionEqResult == null ? null : this.partitionEqResult.status;
+
             this.partitionClassification = new PartitionClassifier(
                 false, false, false, false, this.isPartitionDepthLimited,
-                this.partitionPcResult.status, this.partitionNeqResult.status, this.partitionEqResult.status,
+                pcStatus, neqStatus, eqStatus,
                 this.hasPartitionUifPc, this.hasPartitionUifPc
             ).getClassification();
         }
