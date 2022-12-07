@@ -350,7 +350,7 @@ CREATE TABLE IF NOT EXISTS mv_iteration_features
     has_timed_out BOOLEAN NOT NULL,
     is_depth_limited BOOLEAN, -- Can be NULL (if result is TIMEOUT or ERROR).
     has_uif BOOLEAN, -- Can be NULL (if result is TIMEOUT or ERROR).
-    runtime REAL NOT NULL,
+    runtime REAL, -- Can be NULL (if result is BASE_TOOL_MISSING).
     errors TEXT NOT NULL,
     ---
     is_base BOOLEAN NOT NULL,
@@ -783,7 +783,7 @@ CREATE TABLE IF NOT EXISTS mv_run_features
     has_timed_out BOOLEAN NOT NULL,
     is_depth_limited BOOLEAN, -- Can be NULL (if result is TIMEOUT or ERROR).
     has_uif BOOLEAN, -- Can be NULL (if result is TIMEOUT or ERROR).
-    runtime REAL NOT NULL,
+    runtime REAL, -- Can be NULL (if result is BASE_TOOL_MISSING).
     errors TEXT NOT NULL,
     ---
     is_base BOOLEAN NOT NULL,
