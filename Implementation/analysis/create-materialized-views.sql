@@ -569,7 +569,7 @@ WITH i_features_5 AS
                         i.result AS result,
                         ---
                         b.expected = i.result AS is_correct,
-                        (b.expected = 'EQ' AND i.result = 'NEQ') OR (b.expected = 'EQ' AND i.result = 'NEQ') AS is_incorrect,
+                        (b.expected = 'EQ' AND i.result = 'NEQ') OR (b.expected = 'NEQ' AND i.result = 'EQ') AS is_incorrect,
                         i.result IS NULL OR (i.result != 'EQ' AND i.result != 'NEQ') AS is_undecided,
                         coalesce(
                             result IN ('EQ', 'NEQ', 'MAYBE_EQ', 'MAYBE_NEQ', 'UNKNOWN')
