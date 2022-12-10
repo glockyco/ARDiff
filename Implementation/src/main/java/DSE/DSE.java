@@ -255,9 +255,12 @@ public class DSE {
 
     public Status runZ3FromTerminal(SMTSummary smtSummary) throws IOException {
         Status status = null;
+        String oldSummary = smtSummary.firstSummary.replace(" Ret ", " Ret_1 ");
+        String newSummary = smtSummary.secondSummary.replace(" Ret ", " Ret_2 ");
         String toSolve = smtSummary.declarations
-            + "(assert (" + smtSummary.firstSummary + "))\n"
-            + "(assert (= (" + smtSummary.firstSummary + ") (" + smtSummary.secondSummary + ")))\n"
+            + "(assert (" + oldSummary + "))\n"
+            + "(assert (" + newSummary + "))\n"
+            + "(assert (= Ret_1 Ret_2))\n"
             + "(check-sat-using (then smt (par-or simplify aig solve-eqs qfnra-nlsat)))";
         String tmp2 = methodPathOld.replace("/", "").replace(".", "");
         File tmp = File.createTempFile(toolName + tmp2 + "SATCHECK", null);

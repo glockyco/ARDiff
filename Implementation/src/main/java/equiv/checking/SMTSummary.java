@@ -167,9 +167,16 @@ public class SMTSummary {
      */
     public void runZ3FromTerminal(SymParserSMTLib parser) throws IOException {
         this.declarations = parser.declarations() + parser.functionsDefinitions();
+        this.declarations = this.declarations.replaceAll(
+            "\\(declare-fun Ret \\(\\) (\\w+)\\)",
+            "(declare-fun Ret () $1)\n(declare-fun Ret_1 () $1)\n(declare-fun Ret_2 () $1)"
+        );
+        String oldSummary = this.firstSummary.replace(" Ret ", " Ret_1 ");
+        String newSummary = this.secondSummary.replace(" Ret ", " Ret_2 ");
         String toSolve = this.declarations
-            + "(assert (" + this.firstSummary + "))\n"
-            + "(assert (not (= (" + this.firstSummary + ") (" + this.secondSummary + "))))\n"
+            + "(assert (" + oldSummary + "))\n"
+            + "(assert (" + newSummary + "))\n"
+            + "(assert (not (= Ret_1 Ret_2)))\n"
             + "(check-sat-using (then smt (par-or simplify aig solve-eqs qfnra-nlsat)))\n"
             + "(get-info:reason-unknown)\n"
             + "(get-model)";
