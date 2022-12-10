@@ -87,6 +87,14 @@ public class OutputParser {
         String relevantOutput = output.substring(index);
         if (relevantOutput.startsWith("Output : EQUIVALENT")) {
             if (isDepthLimited == null || isDepthLimited) {
+                // An EQ classification can only be made if:
+                // (1) both programs were fully analyzed
+                // (2) no NEQ indicators were found.
+                //
+                // Depth-limited runs fail requirement (1). Thus, they can only
+                // ever be classified as MAYBE_EQ, even if requirement (2) is
+                // met, since there might still be NEQ indicators in the part
+                // of the code that was not analyzed due to the depth-limit.
                 return Classification.MAYBE_EQ;
             } else {
                 return Classification.EQ;
