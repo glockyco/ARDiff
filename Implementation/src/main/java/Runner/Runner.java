@@ -497,6 +497,10 @@ public class Runner{
     private static List<Path> getFiles(String glob, Path directory) throws IOException {
         List<Path> answerFiles = new ArrayList<>();
 
+        if (!directory.toFile().exists()) {
+            return answerFiles;
+        }
+
         PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(glob);
         Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
             @Override
