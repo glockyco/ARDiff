@@ -100,38 +100,7 @@ public class OutputParser {
                 return Classification.EQ;
             }
         } else if (relevantOutput.startsWith("Output : NOT EQUIVALENT")) {
-            if (isDepthLimited == null || isDepthLimited) {
-                // *-base tools cannot claim NEQ results for depth-limited runs.
-                //
-                // To explain why this is the case, let's check the possible
-                // depth-limitedness combinations across the two programs:
-                // (1) neither of the two programs is depth-limited,
-                // (2) only one of the two programs is depth-limited,
-                // (3) both of the two programs are depth-limited.
-                //
-                // Case (1) is fine. We have full specifications for both
-                // programs, so equivalence checking of these specifications
-                // is guaranteed to produce correct results.
-                //
-                // Case (2) is not fine, because the depth-limited program
-                // is missing some part of the specification, thus forcing
-                // a NEQ result even for programs that are EQ.
-                //
-                // Case (3) is not fine, because the two depth-limited programs
-                // might be missing different parts of the specification, thus
-                // forcing a NEQ result even for programs that are EQ.
-                //
-                // Note that the problematic cases of (2) and (3) could
-                // theoretically be distinguished from the non-problematic
-                // cases of (1) and (3). However, neither of the *-base tools
-                // provides (or even collects) the necessary information to
-                // make this distinction. Therefore, all depth-limited NEQ
-                // cases have to be classified as MAYBE_NEQ to avoid false
-                // positive NEQ results.
-                return Classification.MAYBE_NEQ;
-            } else {
-                return Classification.NEQ;
-            }
+            return Classification.NEQ;
         } else if (relevantOutput.startsWith("Output : UNKNOWN")) {
             if (relevantOutput.contains("too much abstraction")) {
                 return Classification.MAYBE_NEQ;
