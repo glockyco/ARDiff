@@ -35,29 +35,55 @@ public class SatisfiabilityChecker implements AutoCloseable {
 
     public EquivalenceCheckResult checkNeq(Model pcModel, Model v1Model, Model v2Model) {
         ModelToZ3Transformer modelToZ3 = new ModelToZ3Transformer(this.context);
-        Expr<BoolSort> pcExpr = (Expr<BoolSort>) modelToZ3.transform(pcModel);
-        Expr<?> v1Expr = modelToZ3.transform(v1Model);
-        Expr<?> v2Expr = modelToZ3.transform(v2Model);
+        BoolExpr pcExpr = (BoolExpr) modelToZ3.transform(pcModel);
+
+        Expr<?> v1ModelExpr = modelToZ3.transform(v1Model);
+        Expr<?> v1RetExpr =  this.context.mkConst("Ret_1", v1ModelExpr.getSort());
+        BoolExpr v1Expr = this.context.mkEq(v1RetExpr, v1ModelExpr);
+
+        Expr<?> v2ModelExpr = modelToZ3.transform(v2Model);
+        Expr<?> v2RetExpr =  this.context.mkConst("Ret_2", v2ModelExpr.getSort());
+        BoolExpr v2Expr = this.context.mkEq(v2RetExpr, v2ModelExpr);
 
         Solver solver = this.context.mkSolver();
         solver.add(pcExpr);
-        solver.add(this.context.mkNot(this.context.mkEq(v1Expr, v2Expr)));
+        solver.add(v1Expr);
+        solver.add(v2Expr);
         solver = this.removeFuncDeclsForBuiltIns(solver);
 
+        Status status = solver.check();
+        if (status == Status.UNKNOWN) {
+            return this.createEqualityResult(solver, status, v1Expr, v2Expr);
+        }
+
+        solver.add(this.context.mkNot(this.context.mkEq(v1RetExpr, v2RetExpr)));
         return this.createEqualityResult(solver, solver.check(), v1Expr, v2Expr);
     }
 
     public EquivalenceCheckResult checkEq(Model pcModel, Model v1Model, Model v2Model) {
         ModelToZ3Transformer modelToZ3 = new ModelToZ3Transformer(this.context);
-        Expr<BoolSort> pcExpr = (Expr<BoolSort>) modelToZ3.transform(pcModel);
-        Expr<?> v1Expr = modelToZ3.transform(v1Model);
-        Expr<?> v2Expr = modelToZ3.transform(v2Model);
+        BoolExpr pcExpr = (BoolExpr) modelToZ3.transform(pcModel);
+
+        Expr<?> v1ModelExpr = modelToZ3.transform(v1Model);
+        Expr<?> v1RetExpr =  this.context.mkConst("Ret_1", v1ModelExpr.getSort());
+        BoolExpr v1Expr = this.context.mkEq(v1RetExpr, v1ModelExpr);
+
+        Expr<?> v2ModelExpr = modelToZ3.transform(v2Model);
+        Expr<?> v2RetExpr =  this.context.mkConst("Ret_2", v2ModelExpr.getSort());
+        BoolExpr v2Expr = this.context.mkEq(v2RetExpr, v2ModelExpr);
 
         Solver solver = this.context.mkSolver();
         solver.add(pcExpr);
-        solver.add(this.context.mkEq(v1Expr, v2Expr));
+        solver.add(v1Expr);
+        solver.add(v2Expr);
         solver = this.removeFuncDeclsForBuiltIns(solver);
 
+        Status status = solver.check();
+        if (status == Status.UNKNOWN) {
+            return this.createEqualityResult(solver, status, v1Expr, v2Expr);
+        }
+
+        solver.add(this.context.mkEq(v1RetExpr, v2RetExpr));
         return this.createEqualityResult(solver, solver.check(), v1Expr, v2Expr);
     }
 

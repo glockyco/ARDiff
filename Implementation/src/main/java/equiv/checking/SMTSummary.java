@@ -176,6 +176,7 @@ public class SMTSummary {
         String toSolve = this.declarations
             + "(assert (" + oldSummary + "))\n"
             + "(assert (" + newSummary + "))\n"
+            + "(check-sat-using (then smt (par-or simplify aig solve-eqs qfnra-nlsat)))\n"
             + "(assert (not (= Ret_1 Ret_2)))\n"
             + "(check-sat-using (then smt (par-or simplify aig solve-eqs qfnra-nlsat)))\n"
             + "(get-info:reason-unknown)\n"
@@ -191,12 +192,13 @@ public class SMTSummary {
         BufferedReader in = new BufferedReader(new InputStreamReader(z3Process.getInputStream()));
         BufferedReader err = new BufferedReader(new InputStreamReader(z3Process.getErrorStream()));
         String line = null;
-        String answer = in.readLine();
-        if (answer == null) {
+        String answer1 = in.readLine();
+        String answer2 = in.readLine();
+        if (answer1 == null || answer2 == null) {
             this.status = Status.UNKNOWN;
             String error = err.readLine();
             this.reasonUnknown = "Error while running z3" + (error != null ? " : " + error : "");
-        } else if (answer.equals("timeout")) {
+        } else if (answer1.equals("timeout") || answer2.equals("timeout")) {
             //maybe read err line ?
             this.status = Status.UNKNOWN;
             this.reasonUnknown = "timeout";
@@ -206,13 +208,18 @@ public class SMTSummary {
             while ((line = in.readLine()) != null) {
                 model += line + "\n";
             }
-            switch (answer) {
+            switch (answer2) {
                 case "sat":
                     this.status = Status.SATISFIABLE;
                     this.toWrite = "\n\n----------------------------------------------------Model (the counterexample in z3 smt2 format): ---------------------------------\n" + model
                         + "\n-----------------------------------------------------------------------------------------------\n" + this.toWrite;
                     break;
                 case "unsat":
+                    if (answer1.equals("unknown")) {
+                        this.status = Status.UNKNOWN;
+                        this.reasonUnknown = "Target programs are unknown.";
+                        break;
+                    }
                     this.status = Status.UNSATISFIABLE;
                     break;
                 case "unknown":
