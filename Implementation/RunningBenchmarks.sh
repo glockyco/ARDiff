@@ -326,4 +326,6 @@ done
 
 # Set up "materialized views"
 
+printf "Creating materialized views ... "
 sqlite3 ${DB_PATH} < ${DB_CREATE_MATERIALIZED_VIEWS_PATH}
+printf "done!\n"
