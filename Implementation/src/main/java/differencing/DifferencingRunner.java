@@ -228,7 +228,7 @@ public class DifferencingRunner {
                 //------------------------------------------------------------------
                 // Write the results of this iteration to the DB + console.
 
-                StopWatches.start("iteration-" + iteration.iteration + ":classification");
+                StopWatches.start("iteration-" + iteration.iteration + ":program-classification");
 
                 iteration = this.finalizeIteration(iteration, diffListener, false, !hasSucceeded, errors);
                 iterations.put(iteration.iteration, iteration);
@@ -241,7 +241,7 @@ public class DifferencingRunner {
                     systemError.println(parameters.getTargetDirectory() + " -> " + iteration.result);
                 }
 
-                StopWatches.stop("iteration-" + iteration.iteration + ":classification");
+                StopWatches.stop("iteration-" + iteration.iteration + ":program-classification");
 
                 //------------------------------------------------------------------
                 // Check if we should do another iteration.

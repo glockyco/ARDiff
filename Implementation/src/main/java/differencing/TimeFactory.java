@@ -23,9 +23,10 @@ public class TimeFactory {
         iterationSteps.put("initialization", 1);
         iterationSteps.put("instrumentation", 2);
         iterationSteps.put("symbolic-execution", 3);
-        iterationSteps.put("classification", 4);
-        iterationSteps.put("refinement", 5);
-        iterationSteps.put("finalization", 6);
+        iterationSteps.put("partition-classification", 4);
+        iterationSteps.put("program-classification", 5);
+        iterationSteps.put("refinement", 6);
+        iterationSteps.put("finalization", 7);
 
         steps.put("run", runSteps);
         steps.put("iteration", iterationSteps);

@@ -52,17 +52,23 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
     private Map<String, Expr<?>> variables = new HashMap<>();
 
     public DifferencingListener(Iteration iteration, DifferencingParameters parameters, int solverTimeout) {
+        StopWatches.start("iteration-" + iteration.iteration + ":partition-classification");
+
         this.iteration = iteration;
         this.areErrorsEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + iteration.iteration + ".areErrorsEquivalent");
         this.areResultsEquivalentSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + iteration.iteration + ".areResultsEquivalent");
         this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + iteration.iteration + ".run");
         this.satChecker = new SatisfiabilityChecker(solverTimeout);
+
+        StopWatches.suspend("iteration-" + iteration.iteration + ":partition-classification");
     }
 
     @Override
     public void close() throws Exception {
         this.satChecker.close();
         this.context.close();
+
+        StopWatches.stop("iteration-" + iteration.iteration + ":partition-classification");
     }
 
     public Context getContext() {
@@ -146,6 +152,9 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
         if (this.runSpec.matches(mi)) {
             this.startNextPartition();
         } else if (this.areErrorsEquivalentSpec.matches(mi)) {
+            StopWatches.suspend("iteration-" + iteration.iteration + ":symbolic-execution");
+            StopWatches.resume("iteration-" + iteration.iteration + ":partition-classification");
+
             ThreadInfo threadInfo = vm.getCurrentThread();
             StackFrame stackFrame = threadInfo.getModifiableTopFrame();
             LocalVarInfo[] localVars = stackFrame.getLocalVars();
@@ -172,7 +181,13 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
                 this.partitionEqResult = new EquivalenceCheckResult(Status.UNSATISFIABLE, null, null, null, null, null);
                 stackFrame.setOperand(0, 0, false);
             }
+
+            StopWatches.suspend("iteration-" + iteration.iteration + ":partition-classification");
+            StopWatches.resume("iteration-" + iteration.iteration + ":symbolic-execution");
         } else if (this.areResultsEquivalentSpec.matches(mi)) {
+            StopWatches.suspend("iteration-" + iteration.iteration + ":symbolic-execution");
+            StopWatches.resume("iteration-" + iteration.iteration + ":partition-classification");
+
             ThreadInfo threadInfo = vm.getCurrentThread();
             StackFrame stackFrame = threadInfo.getModifiableTopFrame();
             LocalVarInfo[] localVars = stackFrame.getLocalVars();
@@ -245,6 +260,9 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
                 // mark it as NEQ, just to be safe.
                 stackFrame.setOperand(0, 0, false);
             }
+
+            StopWatches.suspend("iteration-" + iteration.iteration + ":partition-classification");
+            StopWatches.resume("iteration-" + iteration.iteration + ":symbolic-execution");
         }
     }
 
@@ -257,6 +275,9 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
     }
 
     private void startNextPartition() {
+        StopWatches.suspend("iteration-" + iteration.iteration + ":symbolic-execution");
+        StopWatches.resume("iteration-" + iteration.iteration + ":partition-classification");
+
         if (this.partitionClassification == null) {
             PathCondition pathCondition = PathCondition.getPC(VM.getVM());
             Constraint pcConstraint = pathCondition.header;
@@ -308,6 +329,9 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
         this.hasPartitionUifV2 = false;
         this.partitionPcConstraintCount = null;
         this.isPartitionDepthLimited = false;
+
+        StopWatches.suspend("iteration-" + iteration.iteration + ":partition-classification");
+        StopWatches.resume("iteration-" + iteration.iteration + ":symbolic-execution");
     }
 
     private int getConstraintCount(Constraint pcConstraint) {

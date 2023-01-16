@@ -112,11 +112,11 @@ public class ImpactedS {
             SMTSummary summary = runEquivalenceChecking(iteration);
 
             StopWatches.stop("iteration-" + iteration + ":symbolic-execution");
-            StopWatches.start("iteration-" + iteration + ":classification");
+            StopWatches.start("iteration-" + iteration + ":program-classification");
 
             String result = equivalenceResult(summary);
 
-            StopWatches.stop("iteration-" + iteration + ":classification");
+            StopWatches.stop("iteration-" + iteration + ":program-classification");
             StopWatches.start("iteration-" + iteration + ":finalization");
 
             System.out.println(result);

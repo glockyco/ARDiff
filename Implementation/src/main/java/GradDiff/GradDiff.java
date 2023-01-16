@@ -155,7 +155,7 @@ public class GradDiff extends DSE {
         GradDiffInstrumentation instrumentation,
         int iteration
     ) throws IOException {
-        StopWatches.start("iteration-" + iteration + ":classification");
+        StopWatches.start("iteration-" + iteration + ":program-classification");
         if (Utils.DEBUG)
             System.out.println("-----------------------The current status-------------------------------------------\n");
         if (Utils.DEBUG) System.out.println(smtSummary.status);
@@ -170,7 +170,7 @@ public class GradDiff extends DSE {
             result += "Output : EQUIVALENT";
             result += "\n------------------------------END----------------------------------------\n";
             smtSummary.context.close();
-            StopWatches.stop("iteration-" + iteration + ":classification");
+            StopWatches.stop("iteration-" + iteration + ":program-classification");
             return result;
         } else if (smtSummary.status == Status.UNKNOWN) {
             result += "  -Initialization : " + this.times[0] / (Math.pow(10, 6)) + " ms\n";
@@ -186,7 +186,7 @@ public class GradDiff extends DSE {
                 result += "\n------------------------------END Of REFINEMENT----------------------------------------\n";
                 result += "\n------------------------------END----------------------------------------\n";
                 smtSummary.context.close();
-                StopWatches.stop("iteration-" + iteration + ":classification");
+                StopWatches.stop("iteration-" + iteration + ":program-classification");
                 return result;
             }
             result += "\n------------------------------To be continued (REFINING)----------------------------------------\n";
@@ -205,7 +205,7 @@ public class GradDiff extends DSE {
                 result += "\n------------------------------END Of REFINEMENT----------------------------------------\n";
                 result += "\n------------------------------END----------------------------------------\n";
                 smtSummary.context.close();
-                StopWatches.stop("iteration-" + iteration + ":classification");
+                StopWatches.stop("iteration-" + iteration + ":program-classification");
                 return result;
             }
             ////////////////////////////////refinement might help//////////////////////////////////
@@ -231,7 +231,7 @@ public class GradDiff extends DSE {
                     result += "\n------------------------------END----------------------------------------\n";
                 }
                 smtSummary.context.close();
-                StopWatches.stop("iteration-" + iteration + ":classification");
+                StopWatches.stop("iteration-" + iteration + ":program-classification");
                 return result;
             } else {
                 result += "Output : UNKNOWN \n";
@@ -239,7 +239,7 @@ public class GradDiff extends DSE {
             }
         }
 
-        StopWatches.stop("iteration-" + iteration + ":classification");
+        StopWatches.stop("iteration-" + iteration + ":program-classification");
         StopWatches.start("iteration-" + iteration + ":refinement");
 
         // if ((neqResult == UNKNOWN && hasUif) || (neqResult == SAT && eqResult != SAT && hasUif))
