@@ -191,7 +191,7 @@ public class SymParserSMTLib {
             if (num.contains("E")) {// num 2.49958057E13
                 String base = num.split("E")[0]; //base = 2.49958057
                 String num2 = num.split("E")[1]; // num2 = 13
-                num = "(* " + base + " (^ 10 (* -1 " + num2 + ")))";
+                num = "(* " + base + " (^ 10 " + num2 + "))";
             }
             if (var.contains("REAL")) {
                 return new Pair<>("Real", num);
