@@ -82,7 +82,7 @@ public class PathConditionListener extends PropertyListenerAdapter {
             this.statePcMap.putIfAbsent(vm.getStateId(), choicePcMap);
             assert !choicePcMap.containsKey(choice);
 
-            this.writePathCondition(vm.getStateId(), choice, pc);
+            //this.writePathCondition(vm.getStateId(), choice, pc);
 
             choicePcMap.put(choice, pc);
         }
