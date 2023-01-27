@@ -4,6 +4,8 @@ DROP VIEW IF EXISTS run_result_crosstab_strict;
 
 DROP VIEW IF EXISTS run_runtime_overview;
 
+DROP VIEW IF EXISTS runtime_per_task;
+
 DROP VIEW IF EXISTS run_reducibility_statistics;
 
 CREATE VIEW IF NOT EXISTS run_result_crosstab_true AS
@@ -64,6 +66,109 @@ SELECT run.benchmark, benchmark.expected,
 FROM run
 INNER JOIN benchmark ON run.benchmark = benchmark.benchmark
 GROUP BY run.benchmark;
+
+CREATE VIEW IF NOT EXISTS runtime_per_task AS
+WITH
+    all_runtimes AS (
+        WITH
+            run_runtimes AS (
+                SELECT
+                    runtime.tool AS 'tool',
+                    topic AS 'topic',
+                    task AS 'task',
+                    printf("%.2f", avg(runtime.runtime)) AS 'avg_runtime',
+                    step AS 'step'
+                FROM runtime
+                INNER JOIN run on runtime.benchmark = run.benchmark AND runtime.tool = run.tool
+                WHERE
+                    topic = 'run'
+                    AND run.has_timed_out = 0
+                    AND run.result != 'ERROR'
+                    AND run.result != 'MISSING'
+                    AND run.result != 'BASE_TOOL_MISSING'
+                GROUP BY runtime.tool, topic, task, step
+                ORDER BY runtime.tool, topic, step
+            ),
+            iterations_runtimes AS (
+                SELECT tool, topic, task, printf("%.2f", avg(runtime)) AS 'avg_runtime', step
+                FROM (
+                    SELECT
+                        runtime.benchmark AS 'benchmark',
+                        runtime.tool AS 'tool',
+                        'iterations' AS 'topic',
+                        task AS 'task',
+                        sum(runtime.runtime) AS 'runtime',
+                        step AS 'step'
+                    FROM runtime
+                    INNER JOIN run on runtime.benchmark = run.benchmark AND runtime.tool = run.tool
+                    WHERE
+                        topic LIKE 'iteration-%'
+                        AND run.has_timed_out = 0
+                        AND run.result != 'ERROR'
+                        AND run.result != 'MISSING'
+                        AND run.result != 'BASE_TOOL_MISSING'
+                    GROUP BY runtime.benchmark, runtime.tool, runtime.step
+                )
+                GROUP BY tool, task, step
+                ORDER BY tool, step
+            ),
+            iteration_runtimes AS (
+                SELECT
+                    runtime.tool AS 'tool',
+                    'iteration' AS 'topic',
+                    task AS 'ask',
+                    printf("%.2f", avg(runtime.runtime)) AS 'avg_runtime',
+                    step AS 'step'
+                FROM runtime
+                INNER JOIN run on runtime.benchmark = run.benchmark AND runtime.tool = run.tool
+                WHERE
+                    topic LIKE 'iteration-%'
+                    AND run.has_timed_out = 0
+                    AND run.result != 'ERROR'
+                    AND run.result != 'MISSING'
+                    AND run.result != 'BASE_TOOL_MISSING'
+                GROUP BY runtime.tool, task, step
+                ORDER BY runtime.tool, step
+            )
+            SELECT * FROM run_runtimes
+            UNION ALL
+            SELECT * FROM iterations_runtimes
+            UNION ALL
+            SELECT * FROM iteration_runtimes
+            ORDER BY tool, topic, step
+    ),
+    ardiff_base_runtimes AS (SELECT * FROM all_runtimes WHERE tool = 'ARDiff-base'),
+    ardiff_diff_runtimes AS (SELECT * FROM all_runtimes WHERE tool = 'ARDiff-diff'),
+    dse_base_runtimes AS (SELECT * FROM all_runtimes WHERE tool = 'DSE-base'),
+    dse_diff_runtimes AS (SELECT * FROM all_runtimes WHERE tool = 'DSE-diff'),
+    se_base_runtimes AS (SELECT * FROM all_runtimes WHERE tool = 'SE-base'),
+    se_diff_runtimes AS (SELECT * FROM all_runtimes WHERE tool = 'SE-diff')
+SELECT
+    ardiff_base_runtimes.topic as topic,
+    ardiff_base_runtimes.task as task,
+    ardiff_base_runtimes.avg_runtime AS 'avg(ARDiff-base)',
+    ardiff_diff_runtimes.avg_runtime AS 'avg(ARDiff-diff)',
+    dse_base_runtimes.avg_runtime AS 'avg(DSE-base)',
+    dse_diff_runtimes.avg_runtime AS 'avg(DSE-diff)',
+    se_base_runtimes.avg_runtime AS 'avg(SE-base)',
+    se_diff_runtimes.avg_runtime AS 'avg(SE-diff)'
+FROM ardiff_base_runtimes
+INNER JOIN ardiff_diff_runtimes
+    ON ardiff_base_runtimes.topic = ardiff_diff_runtimes.topic
+    AND ardiff_base_runtimes.task = ardiff_diff_runtimes.task
+INNER JOIN dse_base_runtimes
+    ON ardiff_base_runtimes.topic = dse_base_runtimes.topic
+    AND ardiff_base_runtimes.task = dse_base_runtimes.task
+INNER JOIN dse_diff_runtimes
+    ON ardiff_base_runtimes.topic = dse_diff_runtimes.topic
+    AND ardiff_base_runtimes.task = dse_diff_runtimes.task
+INNER JOIN se_base_runtimes
+    ON ardiff_base_runtimes.topic = se_base_runtimes.topic
+    AND ardiff_base_runtimes.task = se_base_runtimes.task
+INNER JOIN se_diff_runtimes
+    ON ardiff_base_runtimes.topic = se_diff_runtimes.topic
+    AND ardiff_base_runtimes.task = se_diff_runtimes.task
+ORDER BY ardiff_base_runtimes.topic DESC, ardiff_base_runtimes.step;
 
 CREATE VIEW IF NOT EXISTS run_reducibility_statistics AS
 WITH reducibility_overview AS
