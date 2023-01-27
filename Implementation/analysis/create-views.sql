@@ -8,6 +8,10 @@ DROP VIEW IF EXISTS runtime_per_task;
 
 DROP VIEW IF EXISTS run_reducibility_statistics;
 
+DROP VIEW IF EXISTS __paper__classification_crosstab;
+DROP VIEW IF EXISTS __paper__runtime_per_expected;
+DROP VIEW IF EXISTS __paper__runtime_per_step;
+
 CREATE VIEW IF NOT EXISTS run_result_crosstab_true AS
 SELECT run.tool, benchmark.expected,
     count(CASE run.result WHEN 'EQ' THEN 1 END) AS 'EQ',
@@ -473,3 +477,128 @@ SELECT
     coalesce(round(("#_lines_reducible" * 1.0 / "#_lines_in_reducible") * 100, 2), '') AS '%_l_r',
     coalesce(round(("#_lines_!reducible" * 1.0 / "#_lines_in_reducible") * 100, 2), '') AS '%_l_!r'
 FROM reducibility_overview;
+
+CREATE VIEW IF NOT EXISTS __paper__classification_crosstab AS
+SELECT
+    tool,
+    expected,
+    EQ,
+    NEQ,
+    (MAYBE_EQ + MAYBE_NEQ + "UNKNOWN" + "TIMEOUT" + DEPTH_LIMITED + UNREACHABLE + ERROR + BASE_TOOL_MISSING + MISSING) AS 'UNKNOWN'
+FROM run_result_crosstab_true;
+
+CREATE VIEW IF NOT EXISTS __paper__runtime_per_expected AS
+SELECT
+    tool,
+    expected,
+    --count(*),
+    sum(has_timed_out) as timed_out,
+    --printf("%.2f", avg(CASE WHEN has_timed_out = 1 THEN runtime END)) AS avg_runtime,
+    sum(NOT has_timed_out) as not_timed_out,
+    printf("%.2f", avg(CASE WHEN has_timed_out = 0 THEN "#_iterations" END)) AS avg_iterations,
+    printf("%.2f", avg(CASE WHEN has_timed_out = 0 THEN runtime END)) AS avg_runtime,
+    printf("%.2f", median(CASE WHEN has_timed_out = 0 THEN runtime END)) median_runtime,
+    printf("%.2f", stdev(CASE WHEN has_timed_out = 0 THEN runtime END)) stdev_runtime
+FROM mv_run_features
+WHERE
+    result IS NOT NULL
+    AND result != 'ERROR'
+    AND result != 'MISSING'
+    AND result != 'BASE_TOOL_MISSING'
+GROUP BY tool, expected
+ORDER BY
+    CASE
+        WHEN tool = 'ARDiff-diff' AND expected = 'EQ' THEN 0
+        WHEN tool = 'DSE-diff' AND expected = 'EQ' THEN 1
+        WHEN tool = 'SE-diff' AND expected = 'EQ' THEN 2
+        WHEN tool = 'ARDiff-diff' AND expected = 'NEQ' THEN 3
+        WHEN tool = 'DSE-diff' AND expected = 'NEQ' THEN 4
+        WHEN tool = 'SE-diff' AND expected = 'NEQ' THEN 5
+        WHEN tool = 'ARDiff-base' AND expected = 'EQ' THEN 6
+        WHEN tool = 'DSE-base' AND expected = 'EQ' THEN 7
+        WHEN tool = 'SE-base' AND expected = 'EQ' THEN 8
+        WHEN tool = 'ARDiff-base' AND expected = 'NEQ' THEN 9
+        WHEN tool = 'DSE-base' AND expected = 'NEQ' THEN 10
+        WHEN tool = 'SE-base' AND expected = 'NEQ' THEN 11
+    END;
+
+CREATE VIEW IF NOT EXISTS __paper__runtime_per_step AS
+SELECT
+    CASE task WHEN '' THEN 'overall' ELSE task END as task,
+    sum("avg(ARDiff-diff)"),
+    sum("avg(ARDiff-base)"),
+    sum("avg(DSE-diff)"),
+    sum("avg(DSE-base)"),
+    sum("avg(SE-diff)"),
+    sum("avg(SE-base)")
+FROM runtime_per_task
+WHERE
+    topic in ('run', 'iterations')
+    AND NOT (topic = 'iterations' AND task = '')
+GROUP BY task
+ORDER BY
+    CASE task
+        WHEN 'initialization' THEN 0
+        WHEN 'instrumentation' THEN 1
+        WHEN 'symbolic-execution' THEN 2
+        WHEN 'partition-classification' THEN 3
+        WHEN 'program-classification' THEN 4
+        WHEN 'refinement' THEN 5
+        WHEN 'finalization' THEN 6
+        WHEN '' THEN 7
+    END;
+
+CREATE VIEW IF NOT EXISTS __paper__partitions_per_classification AS
+WITH partitions_per_classification AS
+(
+    SELECT
+        rf.benchmark,
+        rf.tool,
+        rf.expected,
+        rf.result,
+        rf.has_timed_out,
+        count(*) AS "#_Partitions",
+        sum(CASE WHEN pf.result = 'EQ' THEN 1 ELSE 0 END) AS '#_EQ',
+        sum(CASE WHEN pf.result = 'NEQ' THEN 1 ELSE 0 END) AS '#_NEQ',
+        sum(CASE WHEN pf.result = 'MAYBE_EQ' THEN 1 ELSE 0 END) AS '#_MAYBE_EQ',
+        sum(CASE WHEN pf.result = 'MAYBE_NEQ' THEN 1 ELSE 0 END) AS '#_MAYBE_NEQ',
+        sum(CASE WHEN pf.result = 'UNKNOWN' THEN 1 ELSE 0 END) AS '#_UNKNOWN',
+        sum(CASE WHEN pf.result = 'DEPTH_LIMITED' THEN 1 ELSE 0 END) AS '#_DEPTH_LIMITED',
+        sum(CASE WHEN pf.result IS NULL THEN 1 ELSE 0 END) AS '#_TIMEOUT'
+    FROM mv_run_features AS rf
+    LEFT JOIN mv_partition_features AS pf
+        ON rf.benchmark = pf.benchmark
+        AND rf.tool = pf.tool
+        AND rf.result_iteration = pf.iteration
+    WHERE rf.tool = 'ARDiff-diff'
+    GROUP BY rf.benchmark, rf.tool
+)
+SELECT
+    ppe.tool,
+    ppe.expected,
+    ppe.result,
+    count(*) AS '#_Runs',
+    sum(ppe.has_timed_out) AS "#_Timeouts",
+    printf("%.2f", avg(ppe."#_Partitions")) AS 'avg(#_Partitions)',
+    printf("%.2f", avg(ppe."#_EQ")) AS 'avg(#_EQ)',
+    printf("%.2f", avg(ppe."#_NEQ")) AS 'avg(#_NEQ)',
+    printf("%.2f", avg(ppe."#_MAYBE_EQ")) AS 'avg(#_MAYBE_EQ)',
+    printf("%.2f", avg(ppe."#_MAYBE_NEQ")) AS 'avg(#_MAYBE_NEQ)',
+    printf("%.2f", avg(ppe."#_UNKNOWN" + "#_TIMEOUT")) AS 'avg(#_UNKNOWN)',
+    printf("%.2f", avg(ppe."#_DEPTH_LIMITED")) AS 'avg(#_DEPTH_LIMITED)'
+FROM partitions_per_classification AS ppe
+GROUP BY ppe.expected, ppe.result
+ORDER BY
+    CASE
+        WHEN ppe.expected = 'EQ' AND ppe.result = 'EQ' THEN 0
+        WHEN ppe.expected = 'EQ' AND ppe.result = 'MAYBE_EQ' THEN 1
+        WHEN ppe.expected = 'EQ' AND ppe.result = 'MAYBE_NEQ' THEN 2
+        WHEN ppe.expected = 'EQ' AND ppe.result = 'UNKNOWN' THEN 3
+        WHEN ppe.expected = 'EQ' AND ppe.result = 'DEPTH_LIMITED' THEN 4
+        WHEN ppe.expected = 'EQ' AND ppe.result = 'ERROR' THEN 5
+        WHEN ppe.expected = 'NEQ' AND ppe.result = 'NEQ' THEN 6
+        WHEN ppe.expected = 'NEQ' AND ppe.result = 'MAYBE_EQ' THEN 7
+        WHEN ppe.expected = 'NEQ' AND ppe.result = 'MAYBE_NEQ' THEN 8
+        WHEN ppe.expected = 'NEQ' AND ppe.result = 'UNKNOWN' THEN 9
+        WHEN ppe.expected = 'NEQ' AND ppe.result = 'DEPTH_LIMITED' THEN 10
+    END;
