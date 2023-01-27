@@ -44,3 +44,5 @@ atlassian-ide-plugin.xml
 /benchmarks/**/instrumented/*
 /benchmarks/**/outputs/*
 /benchmarks/**/z3models/*
+
+/benchmarks-*/**/*
