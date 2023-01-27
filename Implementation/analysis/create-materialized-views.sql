@@ -106,11 +106,19 @@ CREATE TABLE IF NOT EXISTS mv_line_features
     '#_partitions' INTEGER NOT NULL,
     '#_partitions_EQ' INTEGER NOT NULL,
     '#_partitions_NEQ' INTEGER NOT NULL,
-    "#_partitions_UNDECIDED" INTEGER NOT NULL,
+    '#_partitions_UNDECIDED' INTEGER NOT NULL,
+    '#_partitions_MAYBE_EQ' INTEGER NOT NULL,
+    '#_partitions_MAYBE_NEQ' INTEGER NOT NULL,
+    '#_partitions_UNKNOWN' INTEGER NOT NULL,
+    '#_partitions_DEPTH_LIMITED' INTEGER NOT NULL,
     ---
     has_EQ BOOLEAN NOT NULL,
     has_NEQ BOOLEAN NOT NULL,
     has_UNDECIDED BOOLEAN NOT NULL,
+    has_MAYBE_EQ BOOLEAN NOT NULL,
+    has_MAYBE_NEQ BOOLEAN NOT NULL,
+    has_UNKNOWN BOOLEAN NOT NULL,
+    has_DEPTH_LIMITED BOOLEAN NOT NULL,
     ---
     is_non_mixed BOOLEAN NOT NULL,
     has_only_EQ BOOLEAN NOT NULL,
@@ -145,11 +153,19 @@ INSERT INTO mv_line_features
     '#_partitions',
     '#_partitions_EQ',
     '#_partitions_NEQ',
-    "#_partitions_UNDECIDED",
+    '#_partitions_UNDECIDED',
+    '#_partitions_MAYBE_EQ',
+    '#_partitions_MAYBE_NEQ',
+    '#_partitions_UNKNOWN',
+    '#_partitions_DEPTH_LIMITED',
     ---
     has_EQ,
     has_NEQ,
     has_UNDECIDED,
+    has_MAYBE_EQ,
+    has_MAYBE_NEQ,
+    has_UNKNOWN,
+    has_DEPTH_LIMITED,
     ---
     is_non_mixed,
     has_only_EQ,
@@ -170,7 +186,11 @@ WITH l_features AS (
             count(*) AS "#_partitions",
             coalesce(sum(CASE p.result WHEN 'EQ' THEN 1 END), 0) AS "#_partitions_EQ",
             coalesce(sum(CASE p.result WHEN 'NEQ' THEN 1 END), 0) AS "#_partitions_NEQ",
-            coalesce(sum(CASE WHEN p.result == null OR (p.result != 'EQ' AND p.result != 'NEQ') THEN 1 END), 0) AS "#_partitions_UNDECIDED"
+            coalesce(sum(CASE WHEN p.result == null OR (p.result != 'EQ' AND p.result != 'NEQ') THEN 1 END), 0) AS "#_partitions_UNDECIDED",
+            coalesce(sum(CASE p.result WHEN 'MAYBE_EQ' THEN 1 END), 0) AS "#_partitions_MAYBE_EQ",
+            coalesce(sum(CASE p.result WHEN 'MAYBE_NEQ' THEN 1 END), 0) AS "#_partitions_MAYBE_NEQ",
+            coalesce(sum(CASE WHEN p.result == null OR p.result = 'UNKNOWN' THEN 1 END), 0) AS "#_partitions_UNKNOWN",
+            coalesce(sum(CASE p.result WHEN 'DEPTH_LIMITED' THEN 1 END), 0) AS "#_partitions_DEPTH_LIMITED"
         FROM mv_line AS l
         INNER JOIN mv_partition_line AS pl USING (benchmark, tool, iteration, source_file, source_line)
         INNER JOIN partition AS p USING (benchmark, tool, iteration, partition)
@@ -180,6 +200,10 @@ WITH l_features AS (
         lf."#_partitions_EQ" > 0 AS has_EQ,
         lf."#_partitions_NEQ" > 0 AS has_NEQ,
         lf."#_partitions_UNDECIDED" > 0 AS has_UNDECIDED,
+        lf."#_partitions_MAYBE_EQ" > 0 AS has_MAYBE_EQ,
+        lf."#_partitions_MAYBE_NEQ" > 0 AS has_MAYBE_NEQ,
+        lf."#_partitions_UNKNOWN" > 0 AS has_UNKNOWN,
+        lf."#_partitions_DEPTH_LIMITED" > 0 AS has_DEPTH_LIMITED,
         lf."#_partitions" = lf."#_partitions_EQ" AS has_only_EQ,
         lf."#_partitions" = lf."#_partitions_NEQ" AS has_only_NEQ,
         lf."#_partitions" = lf."#_partitions_UNDECIDED" AS has_only_UNDECIDED
@@ -201,10 +225,18 @@ SELECT
     lf."#_partitions_EQ",
     lf."#_partitions_NEQ",
     lf."#_partitions_UNDECIDED",
+    lf."#_partitions_MAYBE_EQ",
+    lf."#_partitions_MAYBE_NEQ",
+    lf."#_partitions_UNKNOWN",
+    lf."#_partitions_DEPTH_LIMITED",
     ---
     lf.has_EQ,
     lf.has_NEQ,
     lf.has_UNDECIDED,
+    lf.has_MAYBE_EQ,
+    lf.has_MAYBE_NEQ,
+    lf.has_UNKNOWN,
+    lf.has_DEPTH_LIMITED,
     ---
     lf.has_only_EQ OR lf.has_only_NEQ OR lf.has_only_UNDECIDED AS is_non_mixed,
     lf.has_only_EQ,
@@ -389,26 +421,46 @@ CREATE TABLE IF NOT EXISTS mv_iteration_features
     '#_partitions_EQ' INTEGER, -- Can be NULL.
     '#_partitions_NEQ' INTEGER, -- Can be NULL.
     "#_partitions_UNDECIDED" INTEGER, -- Can be NULL.
+    "#_partitions_MAYBE_EQ" INTEGER, -- Can be NULL.
+    "#_partitions_MAYBE_NEQ" INTEGER, -- Can be NULL.
+    "#_partitions_UNKNOWN" INTEGER, -- Can be NULL.
+    "#_partitions_DEPTH_LIMITED" INTEGER, -- Can be NULL.
     ---
     '%_partitions_EQ' REAL, -- Can be NULL.
     '%_partitions_NEQ' REAL, -- Can be NULL.
     "%_partitions_UNDECIDED" REAL, -- Can be NULL.
+    "%_partitions_MAYBE_EQ" REAL, -- Can be NULL.
+    "%_partitions_MAYBE_NEQ" REAL, -- Can be NULL.
+    "%_partitions_UNKNOWN" REAL, -- Can be NULL.
+    "%_partitions_DEPTH_LIMITED" REAL, -- Can be NULL.
     --
     '#_lines_all_partitions' INTEGER, -- Can be NULL.
     ---
     '#_lines_EQ_partitions' INTEGER, -- Can be NULL.
     '#_lines_NEQ_partitions' INTEGER, -- Can be NULL.
     '#_lines_UNDECIDED_partitions' INTEGER, -- Can be NULL.
+    '#_lines_MAYBE_EQ_partitions' INTEGER, -- Can be NULL.
+    '#_lines_MAYBE_NEQ_partitions' INTEGER, -- Can be NULL.
+    '#_lines_UNKNOWN_partitions' INTEGER, -- Can be NULL.
+    '#_lines_DEPTH_LIMITED_partitions' INTEGER, -- Can be NULL.
     ---
     "#_lines_per_partition" INTEGER, -- Can be NULL.
     "#_lines_per_EQ_partition" INTEGER, -- Can be NULL.
     "#_lines_per_NEQ_partition" INTEGER, -- Can be NULL.
     "#_lines_per_UNDECIDED_partition" INTEGER, -- Can be NULL.
+    "#_lines_per_MAYBE_EQ_partition" INTEGER, -- Can be NULL.
+    "#_lines_per_MAYBE_NEQ_partition" INTEGER, -- Can be NULL.
+    "#_lines_per_UNKNOWN_partition" INTEGER, -- Can be NULL.
+    "#_lines_per_DEPTH_LIMITED_partition" INTEGER, -- Can be NULL.
     ---
     "%_line_coverage_per_partition" REAL, -- Can be NULL.
     "%_line_coverage_per_EQ_partition" REAL, -- Can be NULL.
     "%_line_coverage_per_NEQ_partition" REAL, -- Can be NULL.
     "%_line_coverage_per_UNDECIDED_partition" REAL, -- Can be NULL.
+    "%_line_coverage_per_MAYBE_EQ_partition" REAL, -- Can be NULL.
+    "%_line_coverage_per_MAYBE_NEQ_partition" REAL, -- Can be NULL.
+    "%_line_coverage_per_UNKNOWN_partition" REAL, -- Can be NULL.
+    "%_line_coverage_per_DEPTH_LIMITED_partition" REAL, -- Can be NULL.
     ---
     '#_lines' INTEGER, -- Can be NULL.
     ---
@@ -492,26 +544,46 @@ INSERT INTO mv_iteration_features
     "#_partitions_EQ",
     "#_partitions_NEQ",
     "#_partitions_UNDECIDED",
+    "#_partitions_MAYBE_EQ",
+    "#_partitions_MAYBE_NEQ",
+    "#_partitions_UNKNOWN",
+    "#_partitions_DEPTH_LIMITED",
     ---
     "%_partitions_EQ",
     "%_partitions_NEQ",
     "%_partitions_UNDECIDED",
+    "%_partitions_MAYBE_EQ",
+    "%_partitions_MAYBE_NEQ",
+    "%_partitions_UNKNOWN",
+    "%_partitions_DEPTH_LIMITED",
     ---
     "#_lines_all_partitions",
     ---
     "#_lines_EQ_partitions",
     "#_lines_NEQ_partitions",
     "#_lines_UNDECIDED_partitions",
+    "#_lines_MAYBE_EQ_partitions",
+    "#_lines_MAYBE_NEQ_partitions",
+    "#_lines_UNKNOWN_partitions",
+    "#_lines_DEPTH_LIMITED_partitions",
     ---
     "#_lines_per_partition",
     "#_lines_per_EQ_partition",
     "#_lines_per_NEQ_partition",
     "#_lines_per_UNDECIDED_partition",
+    "#_lines_per_MAYBE_EQ_partition",
+    "#_lines_per_MAYBE_NEQ_partition",
+    "#_lines_per_UNKNOWN_partition",
+    "#_lines_per_DEPTH_LIMITED_partition",
     ---
     "%_line_coverage_per_partition",
     "%_line_coverage_per_EQ_partition",
     "%_line_coverage_per_NEQ_partition",
     "%_line_coverage_per_UNDECIDED_partition",
+    "%_line_coverage_per_MAYBE_EQ_partition",
+    "%_line_coverage_per_MAYBE_NEQ_partition",
+    "%_line_coverage_per_UNKNOWN_partition",
+    "%_line_coverage_per_DEPTH_LIMITED_partition",
     ---
     "#_lines",
     ---
@@ -584,10 +656,18 @@ WITH i_features_5 AS
                     CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'EQ' THEN 1 END), 0) END AS '#_partitions_EQ',
                     CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'NEQ' THEN 1 END), 0) END AS '#_partitions_NEQ',
                     CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE WHEN pf.result IS NULL OR (pf.result != 'EQ' AND pf.result != 'NEQ') THEN 1 END), 0) END AS "#_partitions_UNDECIDED",
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'MAYBE_EQ' THEN 1 END), 0) END AS '#_partitions_MAYBE_EQ',
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'MAYBE_NEQ' THEN 1 END), 0) END AS '#_partitions_MAYBE_NEQ',
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE WHEN pf.result IS NULL OR pf.result = 'UNKNOWN' THEN 1 END), 0) END AS "#_partitions_UNKNOWN",
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'DEPTH_LIMITED' THEN 1 END), 0) END AS '#_partitions_DEPTH_LIMITED',
                     nullif(sum(pf."#_lines_partition"), 0) AS '#_lines_all_partitions',
                     CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'EQ' THEN pf."#_lines_partition" END), 0) END AS '#_lines_EQ_partitions',
                     CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'NEQ' THEN pf."#_lines_partition" END), 0) END AS '#_lines_NEQ_partitions',
-                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE WHEN pf.result != 'EQ' AND pf.result != 'NEQ' THEN pf."#_lines_partition" END), 0) END AS "#_lines_UNDECIDED_partitions"
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE WHEN pf.result != 'EQ' AND pf.result != 'NEQ' THEN pf."#_lines_partition" END), 0) END AS "#_lines_UNDECIDED_partitions",
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'MAYBE_EQ' THEN pf."#_lines_partition" END), 0) END AS '#_lines_MAYBE_EQ_partitions',
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'MAYBE_NEQ' THEN pf."#_lines_partition" END), 0) END AS '#_lines_MAYBE_NEQ_partitions',
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE WHEN pf.result IS NULL OR pf.result = 'UNKNOWN' THEN pf."#_lines_partition" END), 0) END AS "#_lines_UNKNOWN_partitions",
+                    CASE WHEN pf.partition IS NULL THEN NULL ELSE coalesce(sum(CASE pf.result WHEN 'DEPTH_LIMITED' THEN pf."#_lines_partition" END), 0) END AS '#_lines_DEPTH_LIMITED_partitions'
                 FROM i_features_1 AS if_1
                 LEFT JOIN mv_partition_features AS pf USING(benchmark, tool, iteration)
                 GROUP BY if_1.benchmark, if_1.tool, if_1.iteration
@@ -597,6 +677,10 @@ WITH i_features_5 AS
                 CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_EQ), 0) END AS '#_lines_EQ',
                 CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_NEQ), 0) END AS '#_lines_NEQ',
                 CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_UNDECIDED), 0) END AS "#_lines_UNDECIDED",
+                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_MAYBE_EQ), 0) END AS "#_lines_MAYBE_EQ",
+                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_MAYBE_NEQ), 0) END AS "#_lines_MAYBE_NEQ",
+                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_UNKNOWN), 0) END AS "#_lines_UNKNOWN",
+                CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_DEPTH_LIMITED), 0) END AS "#_lines_DEPTH_LIMITED",
                 CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.is_non_mixed), 0) END AS '#_lines_non_mixed',
                 CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_only_EQ), 0) END AS '#_lines_only_EQ',
                 CASE WHEN lf.source_line IS NULL THEN NULL ELSE coalesce(sum(lf.has_only_NEQ), 0) END AS '#_lines_only_NEQ',
@@ -655,16 +739,28 @@ WITH i_features_5 AS
         (if_4."#_partitions_EQ" * 1.0 / if_4."#_partitions") * 100 AS '%_partitions_EQ',
         (if_4."#_partitions_NEQ" * 1.0 / if_4."#_partitions") * 100 AS '%_partitions_NEQ',
         (if_4."#_partitions_UNDECIDED" * 1.0 / if_4."#_partitions") * 100 AS "%_partitions_UNDECIDED",
+        (if_4."#_partitions_MAYBE_EQ" * 1.0 / if_4."#_partitions") * 100 AS "%_partitions_MAYBE_EQ",
+        (if_4."#_partitions_MAYBE_NEQ" * 1.0 / if_4."#_partitions") * 100 AS "%_partitions_MAYBE_NEQ",
+        (if_4."#_partitions_UNKNOWN" * 1.0 / if_4."#_partitions") * 100 AS "%_partitions_UNKNOWN",
+        (if_4."#_partitions_DEPTH_LIMITED" * 1.0 / if_4."#_partitions") * 100 AS "%_partitions_DEPTH_LIMITED",
         ---
         if_4."#_lines_all_partitions" / "#_partitions" AS '#_lines_per_partition',
         ---
         if_4."#_lines_EQ_partitions" / "#_partitions_EQ" AS '#_lines_per_EQ_partition',
         if_4."#_lines_NEQ_partitions" / "#_partitions_NEQ" AS '#_lines_per_NEQ_partition',
         if_4."#_lines_UNDECIDED_partitions" / "#_partitions_UNDECIDED" AS '#_lines_per_UNDECIDED_partition',
+        if_4."#_lines_MAYBE_EQ_partitions" / "#_partitions_MAYBE_EQ" AS '#_lines_per_MAYBE_EQ_partition',
+        if_4."#_lines_MAYBE_NEQ_partitions" / "#_partitions_MAYBE_NEQ" AS '#_lines_per_MAYBE_NEQ_partition',
+        if_4."#_lines_UNKNOWN_partitions" / "#_partitions_UNKNOWN" AS '#_lines_per_UNKNOWN_partition',
+        if_4."#_lines_DEPTH_LIMITED_partitions" / "#_partitions_DEPTH_LIMITED" AS '#_lines_per_DEPTH_LIMITED_partition',
         ---
         (if_4."#_lines_EQ" * 1.0 / if_4."#_lines") * 100 AS '%_lines_EQ',
         (if_4."#_lines_NEQ" * 1.0 / if_4."#_lines") * 100 AS '%_lines_NEQ',
         (if_4."#_lines_UNDECIDED" * 1.0 / if_4."#_lines") * 100 AS "%_lines_UNDECIDED",
+        (if_4."#_lines_MAYBE_EQ" * 1.0 / if_4."#_lines") * 100 AS "%_lines_MAYBE_EQ",
+        (if_4."#_lines_MAYBE_NEQ" * 1.0 / if_4."#_lines") * 100 AS "%_lines_MAYBE_NEQ",
+        (if_4."#_lines_UNKNOWN" * 1.0 / if_4."#_lines") * 100 AS "%_lines_UNKNOWN",
+        (if_4."#_lines_DEPTH_LIMITED" * 1.0 / if_4."#_lines") * 100 AS "%_lines_DEPTH_LIMITED",
         (if_4."#_lines_non_mixed" * 1.0 / if_4."#_lines") * 100 AS '%_lines_non_mixed',
         (if_4."#_lines_only_EQ" * 1.0 / if_4."#_lines") * 100 AS '%_lines_only_EQ',
         (if_4."#_lines_only_NEQ" * 1.0 / if_4."#_lines") * 100 AS '%_lines_only_NEQ',
@@ -723,26 +819,46 @@ SELECT
     if_5."#_partitions_EQ",
     if_5."#_partitions_NEQ",
     if_5."#_partitions_UNDECIDED",
+    if_5."#_partitions_MAYBE_EQ",
+    if_5."#_partitions_MAYBE_NEQ",
+    if_5."#_partitions_UNKNOWN",
+    if_5."#_partitions_DEPTH_LIMITED",
     ---
     if_5.'%_partitions_EQ',
     if_5.'%_partitions_NEQ',
     if_5."%_partitions_UNDECIDED",
+    if_5."%_partitions_MAYBE_EQ",
+    if_5."%_partitions_MAYBE_NEQ",
+    if_5."%_partitions_UNKNOWN",
+    if_5."%_partitions_DEPTH_LIMITED",
     ---
     if_5."#_lines_all_partitions",
     ---
     if_5."#_lines_EQ_partitions",
     if_5."#_lines_NEQ_partitions",
     if_5."#_lines_UNDECIDED_partitions",
+    if_5."#_lines_MAYBE_EQ_partitions",
+    if_5."#_lines_MAYBE_NEQ_partitions",
+    if_5."#_lines_UNKNOWN_partitions",
+    if_5."#_lines_DEPTH_LIMITED_partitions",
     ---
     if_5."#_lines_per_partition",
     if_5."#_lines_per_EQ_partition",
     if_5."#_lines_per_NEQ_partition",
     if_5."#_lines_per_UNDECIDED_partition",
+    if_5."#_lines_per_MAYBE_EQ_partition",
+    if_5."#_lines_per_MAYBE_NEQ_partition",
+    if_5."#_lines_per_UNKNOWN_partition",
+    if_5."#_lines_per_DEPTH_LIMITED_partition",
     ---
     (if_5."#_lines_per_partition" * 1.0 / "#_lines") * 100 AS '%_line_coverage_per_partition',
     (if_5."#_lines_per_EQ_partition" * 1.0 / "#_lines") * 100 AS '#_line_coverage_per_EQ_partition',
     (if_5."#_lines_per_NEQ_partition" * 1.0 / "#_lines") * 100 AS '#_lines_coverage_per_NEQ_partition',
     (if_5."#_lines_per_UNDECIDED_partition" * 1.0 / "#_lines") * 100 AS '#_line_coverage_per_UNDECIDED_partition',
+    (if_5."#_lines_per_MAYBE_EQ_partition" * 1.0 / "#_lines") * 100 AS '#_line_coverage_per_MAYBE_EQ_partition',
+    (if_5."#_lines_per_MAYBE_NEQ_partition" * 1.0 / "#_lines") * 100 AS '#_line_coverage_per_MAYBE_NEQ_partition',
+    (if_5."#_lines_per_UNKNOWN_partition" * 1.0 / "#_lines") * 100 AS '#_line_coverage_per_UNKNOWN_partition',
+    (if_5."#_lines_per_DEPTH_LIMITED_partition" * 1.0 / "#_lines") * 100 AS '#_line_coverage_per_DEPTH_LIMITED_partition',
     ---
     if_5."#_lines",
     ---
@@ -825,26 +941,46 @@ CREATE TABLE IF NOT EXISTS mv_run_features
     '#_partitions_EQ' INTEGER, -- Can be NULL.
     '#_partitions_NEQ' INTEGER, -- Can be NULL.
     "#_partitions_UNDECIDED" INTEGER, -- Can be NULL.
+    '#_partitions_MAYBE_EQ' INTEGER, -- Can be NULL.
+    '#_partitions_MAYBE_NEQ' INTEGER, -- Can be NULL.
+    '#_partitions_UNKNOWN' INTEGER, -- Can be NULL.
+    '#_partitions_DEPTH_LIMITED' INTEGER, -- Can be NULL.
     ---
     '%_partitions_EQ' REAL, -- Can be NULL.
     '%_partitions_NEQ' REAL, -- Can be NULL.
     "%_partitions_UNDECIDED" REAL, -- Can be NULL.
+    "%_partitions_MAYBE_EQ" REAL, -- Can be NULL.
+    "%_partitions_MAYBE_NEQ" REAL, -- Can be NULL.
+    "%_partitions_UNKNOWN" REAL, -- Can be NULL.
+    "%_partitions_DEPTH_LIMITED" REAL, -- Can be NULL.
     ---
     '#_lines_all_partitions' INTEGER, -- Can be NULL.
     ---
     '#_lines_EQ_partitions' INTEGER, -- Can be NULL.
     '#_lines_NEQ_partitions' INTEGER, -- Can be NULL.
     '#_lines_UNDECIDED_partitions' INTEGER, -- Can be NULL.
+    '#_lines_MAYBE_EQ_partitions' INTEGER, -- Can be NULL.
+    '#_lines_MAYBE_NEQ_partitions' INTEGER, -- Can be NULL.
+    '#_lines_UNKNOWN_partitions' INTEGER, -- Can be NULL.
+    '#_lines_DEPTH_LIMITED_partitions' INTEGER, -- Can be NULL.
     ---
     "#_lines_per_partition" INTEGER, -- Can be NULL.
     "#_lines_per_EQ_partition" INTEGER, -- Can be NULL.
     "#_lines_per_NEQ_partition" INTEGER, -- Can be NULL.
     "#_lines_per_UNDECIDED_partition" INTEGER, -- Can be NULL.
+    "#_lines_per_MAYBE_EQ_partition" INTEGER, -- Can be NULL.
+    "#_lines_per_MAYBE_NEQ_partition" INTEGER, -- Can be NULL.
+    "#_lines_per_UNKNOWN_partition" INTEGER, -- Can be NULL.
+    "#_lines_per_DEPTH_LIMITED_partition" INTEGER, -- Can be NULL.
     ---
     "%_line_coverage_per_partition" REAL, -- Can be NULL.
     "%_line_coverage_per_EQ_partition" REAL, -- Can be NULL.
     "%_line_coverage_per_NEQ_partition" REAL, -- Can be NULL.
     "%_line_coverage_per_UNDECIDED_partition" REAL, -- Can be NULL.
+    "%_line_coverage_per_MAYBE_EQ_partition" REAL, -- Can be NULL.
+    "%_line_coverage_per_MAYBE_NEQ_partition" REAL, -- Can be NULL.
+    "%_line_coverage_per_UNKNOWN_partition" REAL, -- Can be NULL.
+    "%_line_coverage_per_DEPTH_LIMITED_partition" REAL, -- Can be NULL.
     ---
     '#_lines' INTEGER, -- Can be NULL.
     ---
@@ -930,26 +1066,46 @@ INSERT INTO mv_run_features
     "#_partitions_EQ",
     "#_partitions_NEQ",
     "#_partitions_UNDECIDED",
+    "#_partitions_MAYBE_EQ",
+    "#_partitions_MAYBE_NEQ",
+    "#_partitions_UNKNOWN",
+    "#_partitions_DEPTH_LIMITED",
     ---
     "%_partitions_EQ",
     "%_partitions_NEQ",
     "%_partitions_UNDECIDED",
+    "%_partitions_MAYBE_EQ",
+    "%_partitions_MAYBE_NEQ",
+    "%_partitions_UNKNOWN",
+    "%_partitions_DEPTH_LIMITED",
     ---
     "#_lines_all_partitions",
     ---
     "#_lines_EQ_partitions",
     "#_lines_NEQ_partitions",
     "#_lines_UNDECIDED_partitions",
+    "#_lines_MAYBE_EQ_partitions",
+    "#_lines_MAYBE_NEQ_partitions",
+    "#_lines_UNKNOWN_partitions",
+    "#_lines_DEPTH_LIMITED_partitions",
     ---
     "#_lines_per_partition",
     "#_lines_per_EQ_partition",
     "#_lines_per_NEQ_partition",
     "#_lines_per_UNDECIDED_partition",
+    "#_lines_per_MAYBE_EQ_partition",
+    "#_lines_per_MAYBE_NEQ_partition",
+    "#_lines_per_UNKNOWN_partition",
+    "#_lines_per_DEPTH_LIMITED_partition",
     ---
     "%_line_coverage_per_partition",
     "%_line_coverage_per_EQ_partition",
     "%_line_coverage_per_NEQ_partition",
     "%_line_coverage_per_UNDECIDED_partition",
+    "%_line_coverage_per_MAYBE_EQ_partition",
+    "%_line_coverage_per_MAYBE_NEQ_partition",
+    "%_line_coverage_per_UNKNOWN_partition",
+    "%_line_coverage_per_DEPTH_LIMITED_partition",
     ---
     "#_lines",
     ---
@@ -1028,26 +1184,46 @@ SELECT
     i."#_partitions_EQ",
     i."#_partitions_NEQ",
     i."#_partitions_UNDECIDED",
+    i."#_partitions_MAYBE_EQ",
+    i."#_partitions_MAYBE_NEQ",
+    i."#_partitions_UNKNOWN",
+    i."#_partitions_DEPTH_LIMITED",
     ---
     i."%_partitions_EQ",
     i."%_partitions_NEQ",
     i."%_partitions_UNDECIDED",
+    i."%_partitions_MAYBE_EQ",
+    i."%_partitions_MAYBE_NEQ",
+    i."%_partitions_UNKNOWN",
+    i."%_partitions_DEPTH_LIMITED",
     ---
     i."#_lines_all_partitions",
     ---
     i."#_lines_EQ_partitions",
     i."#_lines_NEQ_partitions",
     i."#_lines_UNDECIDED_partitions",
+    i."#_lines_MAYBE_EQ_partitions",
+    i."#_lines_MAYBE_NEQ_partitions",
+    i."#_lines_UNKNOWN_partitions",
+    i."#_lines_DEPTH_LIMITED_partitions",
     ---
     i."#_lines_per_partition",
     i."#_lines_per_EQ_partition",
     i."#_lines_per_NEQ_partition",
     i."#_lines_per_UNDECIDED_partition",
+    i."#_lines_per_MAYBE_EQ_partition",
+    i."#_lines_per_MAYBE_NEQ_partition",
+    i."#_lines_per_UNKNOWN_partition",
+    i."#_lines_per_DEPTH_LIMITED_partition",
     ---
     i."%_line_coverage_per_partition",
     i."%_line_coverage_per_EQ_partition",
     i."%_line_coverage_per_NEQ_partition",
     i."%_line_coverage_per_UNDECIDED_partition",
+    i."%_line_coverage_per_MAYBE_EQ_partition",
+    i."%_line_coverage_per_MAYBE_NEQ_partition",
+    i."%_line_coverage_per_UNKNOWN_partition",
+    i."%_line_coverage_per_DEPTH_LIMITED_partition",
     ---
     i."#_lines",
     ---
