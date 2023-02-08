@@ -6,6 +6,7 @@ DB_PATH="${SCRIPT_DIR}/analysis/results/sqlite.db"
 DB_CREATE_TABLES_PATH="${SCRIPT_DIR}/analysis/create-tables.sql"
 DB_CREATE_VIEWS_PATH="${SCRIPT_DIR}/analysis/create-views.sql"
 DB_CREATE_MATERIALIZED_VIEWS_PATH="${SCRIPT_DIR}/analysis/create-materialized-views.sql"
+DB_POPULATE_MATERIALIZED_VIEWS_PATH="${SCRIPT_DIR}/analysis/populate-materialized-views.sql"
 
 BASE_JAR_PATH="${SCRIPT_DIR}/build/libs/ARDiff-base-1.0-SNAPSHOT-all.jar"
 DIFF_JAR_PATH="${SCRIPT_DIR}/build/libs/ARDiff-diff-1.0-SNAPSHOT-all.jar"
@@ -221,8 +222,9 @@ if [ "$clean_db" = true ] ; then
 fi
 
 touch ${DB_PATH}
-sqlite3 ${DB_PATH} < ${DB_CREATE_TABLES_PATH}
+sqlite3 ${DB_PATH} < ${DB_CREATE_TABLES_PATH} > /dev/null
 sqlite3 ${DB_PATH} < ${DB_CREATE_VIEWS_PATH} > /dev/null
+sqlite3 ${DB_PATH} < ${DB_CREATE_MATERIALIZED_VIEWS_PATH} > /dev/null
 
 # Build the application JAR files
 
@@ -324,8 +326,8 @@ for d1 in ../benchmarks/* ; do
   done
 done
 
-# Set up "materialized views"
+# Populate "materialized views"
 
-printf "Creating materialized views ... "
-sqlite3 ${DB_PATH} < ${DB_CREATE_MATERIALIZED_VIEWS_PATH}
+printf "Populating materialized views ... "
+sqlite3 ${DB_PATH} < ${DB_POPULATE_MATERIALIZED_VIEWS_PATH} > /dev/null
 printf "done!\n"
