@@ -232,7 +232,7 @@ if [ "$build" = true ] ; then
 
     if [ "$run_base" = true ] ; then
       # Build base JAR
-      command="gradle -PmainClass=Runner.Runner shadowJar"
+      command="./gradlew -PmainClass=Runner.Runner shadowJar"
 
       if [ "$print_commands" = true ] ; then
         printf "\n%s" "${command}"
@@ -245,7 +245,7 @@ if [ "$build" = true ] ; then
 
     if [ "$run_diff" = true ] ; then
       # Build diff JAR
-      command="gradle -PmainClass=differencing.DifferencingRunner shadowJar"
+      command="./gradlew -PmainClass=differencing.DifferencingRunner shadowJar"
 
       if [ "$print_commands" = true ] ; then
         printf "\n%s" "${command}"
