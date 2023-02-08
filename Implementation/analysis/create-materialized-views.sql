@@ -1,11 +1,9 @@
-DROP TABLE IF EXISTS mv_run_features;
-DROP TABLE IF EXISTS mv_iteration_features;
-DROP TABLE IF EXISTS mv_partition_features;
-DROP TABLE IF EXISTS mv_line_features;
-DROP TABLE IF EXISTS mv_partition_line;
-DROP TABLE IF EXISTS mv_line;
-
----
+-- DROP TABLE IF EXISTS mv_run_features;
+-- DROP TABLE IF EXISTS mv_iteration_features;
+-- DROP TABLE IF EXISTS mv_partition_features;
+-- DROP TABLE IF EXISTS mv_line_features;
+-- DROP TABLE IF EXISTS mv_partition_line;
+-- DROP TABLE IF EXISTS mv_line;
 
 CREATE TABLE IF NOT EXISTS mv_line
 (

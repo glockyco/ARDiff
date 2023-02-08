@@ -1,16 +1,12 @@
-DROP VIEW IF EXISTS run_result_crosstab_true;
-DROP VIEW IF EXISTS run_result_crosstab_lenient;
-DROP VIEW IF EXISTS run_result_crosstab_strict;
-
-DROP VIEW IF EXISTS run_runtime_overview;
-
-DROP VIEW IF EXISTS runtime_per_task;
-
-DROP VIEW IF EXISTS run_reducibility_statistics;
-
-DROP VIEW IF EXISTS __paper__classification_crosstab;
-DROP VIEW IF EXISTS __paper__runtime_per_expected;
-DROP VIEW IF EXISTS __paper__runtime_per_step;
+-- DROP VIEW IF EXISTS run_result_crosstab_true;
+-- DROP VIEW IF EXISTS run_result_crosstab_lenient;
+-- DROP VIEW IF EXISTS run_result_crosstab_strict;
+-- DROP VIEW IF EXISTS run_runtime_overview;
+-- DROP VIEW IF EXISTS runtime_per_task;
+-- DROP VIEW IF EXISTS run_reducibility_statistics;
+-- DROP VIEW IF EXISTS __paper__classification_crosstab;
+-- DROP VIEW IF EXISTS __paper__runtime_per_expected;
+-- DROP VIEW IF EXISTS __paper__runtime_per_step;
 
 CREATE VIEW IF NOT EXISTS run_result_crosstab_true AS
 SELECT run.tool, benchmark.expected,
