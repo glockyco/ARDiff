@@ -62,4 +62,4 @@ pom.xml
 .version
 build.properties
 
-analysis/results
+analysis/results/*.db
