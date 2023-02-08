@@ -219,12 +219,12 @@ fi
 
 if [ "$clean_db" = true ] ; then
   rm ${DB_PATH}
-fi
 
-touch ${DB_PATH}
-sqlite3 ${DB_PATH} < ${DB_CREATE_TABLES_PATH} > /dev/null
-sqlite3 ${DB_PATH} < ${DB_CREATE_VIEWS_PATH} > /dev/null
-sqlite3 ${DB_PATH} < ${DB_CREATE_MATERIALIZED_VIEWS_PATH} > /dev/null
+  touch ${DB_PATH}
+  sqlite3 ${DB_PATH} < ${DB_CREATE_TABLES_PATH} > /dev/null
+  sqlite3 ${DB_PATH} < ${DB_CREATE_VIEWS_PATH} > /dev/null
+  sqlite3 ${DB_PATH} < ${DB_CREATE_MATERIALIZED_VIEWS_PATH} > /dev/null
+fi
 
 # Build the application JAR files
 
