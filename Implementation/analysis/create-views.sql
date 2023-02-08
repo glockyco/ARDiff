@@ -80,7 +80,7 @@ WITH
                     runtime.tool AS 'tool',
                     topic AS 'topic',
                     task AS 'task',
-                    printf("%.2f", avg(runtime.runtime)) AS 'avg_runtime',
+                    printf('%.2f', avg(runtime.runtime)) AS 'avg_runtime',
                     step AS 'step'
                 FROM runtime
                 INNER JOIN run on runtime.benchmark = run.benchmark AND runtime.tool = run.tool
@@ -94,7 +94,7 @@ WITH
                 ORDER BY runtime.tool, topic, step
             ),
             iterations_runtimes AS (
-                SELECT tool, topic, task, printf("%.2f", avg(runtime)) AS 'avg_runtime', step
+                SELECT tool, topic, task, printf('%.2f', avg(runtime)) AS 'avg_runtime', step
                 FROM (
                     SELECT
                         runtime.benchmark AS 'benchmark',
@@ -121,7 +121,7 @@ WITH
                     runtime.tool AS 'tool',
                     'iteration' AS 'topic',
                     task AS 'ask',
-                    printf("%.2f", avg(runtime.runtime)) AS 'avg_runtime',
+                    printf('%.2f', avg(runtime.runtime)) AS 'avg_runtime',
                     step AS 'step'
                 FROM runtime
                 INNER JOIN run on runtime.benchmark = run.benchmark AND runtime.tool = run.tool
@@ -493,12 +493,12 @@ SELECT
     expected,
     --count(*),
     sum(has_timed_out) as timed_out,
-    --printf("%.2f", avg(CASE WHEN has_timed_out = 1 THEN runtime END)) AS avg_runtime,
+    --printf('%.2f', avg(CASE WHEN has_timed_out = 1 THEN runtime END)) AS avg_runtime,
     sum(NOT has_timed_out) as not_timed_out,
-    printf("%.2f", avg(CASE WHEN has_timed_out = 0 THEN "#_iterations" END)) AS avg_iterations,
-    printf("%.2f", avg(CASE WHEN has_timed_out = 0 THEN runtime END)) AS avg_runtime,
-    printf("%.2f", median(CASE WHEN has_timed_out = 0 THEN runtime END)) median_runtime,
-    printf("%.2f", stdev(CASE WHEN has_timed_out = 0 THEN runtime END)) stdev_runtime
+    printf('%.2f', avg(CASE WHEN has_timed_out = 0 THEN "#_iterations" END)) AS avg_iterations,
+    printf('%.2f', avg(CASE WHEN has_timed_out = 0 THEN runtime END)) AS avg_runtime,
+    printf('%.2f', median(CASE WHEN has_timed_out = 0 THEN runtime END)) median_runtime,
+    printf('%.2f', stdev(CASE WHEN has_timed_out = 0 THEN runtime END)) stdev_runtime
 FROM mv_run_features
 WHERE
     result IS NOT NULL
@@ -579,13 +579,13 @@ SELECT
     ppe.result,
     count(*) AS '#_Runs',
     sum(ppe.has_timed_out) AS "#_Timeouts",
-    printf("%.2f", avg(ppe."#_Partitions")) AS 'avg(#_Partitions)',
-    printf("%.2f", avg(ppe."#_EQ")) AS 'avg(#_EQ)',
-    printf("%.2f", avg(ppe."#_NEQ")) AS 'avg(#_NEQ)',
-    printf("%.2f", avg(ppe."#_MAYBE_EQ")) AS 'avg(#_MAYBE_EQ)',
-    printf("%.2f", avg(ppe."#_MAYBE_NEQ")) AS 'avg(#_MAYBE_NEQ)',
-    printf("%.2f", avg(ppe."#_UNKNOWN" + "#_TIMEOUT")) AS 'avg(#_UNKNOWN)',
-    printf("%.2f", avg(ppe."#_DEPTH_LIMITED")) AS 'avg(#_DEPTH_LIMITED)'
+    printf('%.2f', avg(ppe."#_Partitions")) AS 'avg(#_Partitions)',
+    printf('%.2f', avg(ppe."#_EQ")) AS 'avg(#_EQ)',
+    printf('%.2f', avg(ppe."#_NEQ")) AS 'avg(#_NEQ)',
+    printf('%.2f', avg(ppe."#_MAYBE_EQ")) AS 'avg(#_MAYBE_EQ)',
+    printf('%.2f', avg(ppe."#_MAYBE_NEQ")) AS 'avg(#_MAYBE_NEQ)',
+    printf('%.2f', avg(ppe."#_UNKNOWN" + "#_TIMEOUT")) AS 'avg(#_UNKNOWN)',
+    printf('%.2f', avg(ppe."#_DEPTH_LIMITED")) AS 'avg(#_DEPTH_LIMITED)'
 FROM partitions_per_classification AS ppe
 GROUP BY ppe.expected, ppe.result
 ORDER BY
