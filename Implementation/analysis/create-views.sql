@@ -481,7 +481,22 @@ SELECT
     EQ,
     NEQ,
     (MAYBE_EQ + MAYBE_NEQ + "UNKNOWN" + "TIMEOUT" + DEPTH_LIMITED + UNREACHABLE + ERROR + BASE_TOOL_MISSING + MISSING) AS 'UNKNOWN'
-FROM run_result_crosstab_true;
+FROM run_result_crosstab_true
+ORDER BY
+    CASE
+        WHEN tool = 'ARDiff-diff' AND expected = 'EQ' THEN 0
+        WHEN tool = 'ARDiff-diff' AND expected = 'NEQ' THEN 1
+        WHEN tool = 'DSE-diff' AND expected = 'EQ' THEN 2
+        WHEN tool = 'DSE-diff' AND expected = 'NEQ' THEN 3
+        WHEN tool = 'SE-diff' AND expected = 'EQ' THEN 4
+        WHEN tool = 'SE-diff' AND expected = 'NEQ' THEN 5
+        WHEN tool = 'ARDiff-base' AND expected = 'EQ' THEN 6
+        WHEN tool = 'ARDiff-base' AND expected = 'NEQ' THEN 7
+        WHEN tool = 'DSE-base' AND expected = 'EQ' THEN 8
+        WHEN tool = 'DSE-base' AND expected = 'NEQ' THEN 9
+        WHEN tool = 'SE-base' AND expected = 'EQ' THEN 10
+        WHEN tool = 'SE-base' AND expected = 'NEQ' THEN 11
+    END;
 
 CREATE VIEW IF NOT EXISTS __paper__runtime_per_expected AS
 SELECT
@@ -505,16 +520,16 @@ GROUP BY tool, expected
 ORDER BY
     CASE
         WHEN tool = 'ARDiff-diff' AND expected = 'EQ' THEN 0
-        WHEN tool = 'DSE-diff' AND expected = 'EQ' THEN 1
-        WHEN tool = 'SE-diff' AND expected = 'EQ' THEN 2
-        WHEN tool = 'ARDiff-diff' AND expected = 'NEQ' THEN 3
-        WHEN tool = 'DSE-diff' AND expected = 'NEQ' THEN 4
+        WHEN tool = 'ARDiff-diff' AND expected = 'NEQ' THEN 1
+        WHEN tool = 'DSE-diff' AND expected = 'EQ' THEN 2
+        WHEN tool = 'DSE-diff' AND expected = 'NEQ' THEN 3
+        WHEN tool = 'SE-diff' AND expected = 'EQ' THEN 4
         WHEN tool = 'SE-diff' AND expected = 'NEQ' THEN 5
         WHEN tool = 'ARDiff-base' AND expected = 'EQ' THEN 6
-        WHEN tool = 'DSE-base' AND expected = 'EQ' THEN 7
-        WHEN tool = 'SE-base' AND expected = 'EQ' THEN 8
-        WHEN tool = 'ARDiff-base' AND expected = 'NEQ' THEN 9
-        WHEN tool = 'DSE-base' AND expected = 'NEQ' THEN 10
+        WHEN tool = 'ARDiff-base' AND expected = 'NEQ' THEN 7
+        WHEN tool = 'DSE-base' AND expected = 'EQ' THEN 8
+        WHEN tool = 'DSE-base' AND expected = 'NEQ' THEN 9
+        WHEN tool = 'SE-base' AND expected = 'EQ' THEN 10
         WHEN tool = 'SE-base' AND expected = 'NEQ' THEN 11
     END;
 
@@ -576,12 +591,12 @@ SELECT
     count(*) AS '#_Runs',
     sum(ppe.has_timed_out) AS "#_Timeouts",
     printf('%.2f', avg(ppe."#_Partitions")) AS 'avg(#_Partitions)',
-    printf('%.2f', avg(ppe."#_EQ")) AS 'avg(#_EQ)',
-    printf('%.2f', avg(ppe."#_NEQ")) AS 'avg(#_NEQ)',
-    printf('%.2f', avg(ppe."#_MAYBE_EQ")) AS 'avg(#_MAYBE_EQ)',
-    printf('%.2f', avg(ppe."#_MAYBE_NEQ")) AS 'avg(#_MAYBE_NEQ)',
-    printf('%.2f', avg(ppe."#_UNKNOWN" + "#_TIMEOUT")) AS 'avg(#_UNKNOWN)',
-    printf('%.2f', avg(ppe."#_DEPTH_LIMITED")) AS 'avg(#_DEPTH_LIMITED)'
+    printf('%.2f', 100 * avg(ppe."#_EQ") / avg(ppe."#_Partitions")) AS 'avg(%_EQ)',
+    printf('%.2f', 100 * avg(ppe."#_NEQ") / avg(ppe."#_Partitions")) AS 'avg(%_NEQ)',
+    printf('%.2f', 100 * avg(ppe."#_MAYBE_EQ") / avg(ppe."#_Partitions")) AS 'avg(%_MAYBE_EQ)',
+    printf('%.2f', 100 * avg(ppe."#_MAYBE_NEQ") / avg(ppe."#_Partitions")) AS 'avg(%_MAYBE_NEQ)',
+    printf('%.2f', 100 * avg(ppe."#_UNKNOWN" + "#_TIMEOUT") / avg(ppe."#_Partitions")) AS 'avg(%_UNKNOWN)',
+    printf('%.2f', 100 * avg(ppe."#_DEPTH_LIMITED") / avg(ppe."#_Partitions")) AS 'avg(%_DEPTH_LIMITED)'
 FROM partitions_per_classification AS ppe
 GROUP BY ppe.expected, ppe.result
 ORDER BY
