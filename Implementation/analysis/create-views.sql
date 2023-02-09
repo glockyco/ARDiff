@@ -492,9 +492,9 @@ SELECT
     --printf('%.2f', avg(CASE WHEN has_timed_out = 1 THEN runtime END)) AS avg_runtime,
     sum(NOT has_timed_out) as not_timed_out,
     printf('%.2f', avg(CASE WHEN has_timed_out = 0 THEN "#_iterations" END)) AS avg_iterations,
-    printf('%.2f', avg(CASE WHEN has_timed_out = 0 THEN runtime END)) AS avg_runtime,
-    printf('%.2f', median(CASE WHEN has_timed_out = 0 THEN runtime END)) median_runtime,
-    printf('%.2f', stdev(CASE WHEN has_timed_out = 0 THEN runtime END)) stdev_runtime
+    printf('%.2f', avg(CASE WHEN has_timed_out = 0 THEN runtime END)) AS avg_runtime
+    --printf('%.2f', median(CASE WHEN has_timed_out = 0 THEN runtime END)) median_runtime,
+    --printf('%.2f', stdev(CASE WHEN has_timed_out = 0 THEN runtime END)) stdev_runtime
 FROM mv_run_features
 WHERE
     result IS NOT NULL
