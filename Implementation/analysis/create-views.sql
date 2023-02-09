@@ -7,6 +7,7 @@
 -- DROP VIEW IF EXISTS __paper__classification_crosstab;
 -- DROP VIEW IF EXISTS __paper__runtime_per_expected;
 -- DROP VIEW IF EXISTS __paper__runtime_per_step;
+-- DROP VIEW IF EXISTS __paper__partitions_per_classification;
 
 CREATE VIEW IF NOT EXISTS run_result_crosstab_true AS
 SELECT run.tool, benchmark.expected,
