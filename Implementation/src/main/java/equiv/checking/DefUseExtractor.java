@@ -25,10 +25,10 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 
 import org.apache.commons.collections4.map.MultiKeyMap;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.objectweb.asm.tree.*;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
-
-import javafx.util.Pair;
 
 /**
  * This class conducts all the operations regarding def-use relations in a program
@@ -36,7 +36,7 @@ import javafx.util.Pair;
 
 public class DefUseExtractor {
 	protected static boolean isStatic = false;
-	private static Map<Integer,Pair<Integer,Integer>> variableScopes = null;
+	private static Map<Integer, Pair<Integer,Integer>> variableScopes = null;
 	private static Map<Integer,String[]> outputsPerBlock = null;
 	private static MultiKeyMap variablesNamesMapping = null;
 	private static Map<String,String> lossyMapping = null;
@@ -102,7 +102,7 @@ public class DefUseExtractor {
 					start = Integer.MIN_VALUE;
 				}
 				if (start != null && end != null) {
-					variables.add(new Pair<>(node.name, new Pair<>(start, end)));
+					variables.add(new MutablePair<>(node.name, new MutablePair<>(start, end)));
 					scopes.put(node.index, variables);
 				}
 				variablesNamesMapping.put("L@" + node.index, start, node.name);
@@ -280,7 +280,7 @@ public class DefUseExtractor {
 								inputs.add(var);
 						}
 						if (!perBlock.containsKey(name)) {
-							perBlock.put(name, new Pair(mustBeDefined, inputs));
+							perBlock.put(name, new MutablePair<>(mustBeDefined, inputs));
 						} else {
 							removeUsedBeforeRedefinition(name, inputs, perBlock);
 						}
@@ -330,7 +330,7 @@ public class DefUseExtractor {
 				if (defUsePerLine.containsKey(defLine)) {
 					inputs = defUsePerLine.get(defLine).getValue();
 				}
-				defUsePerLine.put(defLine, new Pair<>(var, inputs));
+				defUsePerLine.put(defLine, new MutablePair<>(var, inputs));
 				//Here we look at whether we should add start as well
 				//why do we had the start of the scope again ?
 				if (defLine != start) {
@@ -338,7 +338,7 @@ public class DefUseExtractor {
 					if (defUsePerLine.containsKey(start)) {
 						inputs = defUsePerLine.get(start).getValue();
 					}
-					defUsePerLine.put(start, new Pair<>(var, inputs));
+					defUsePerLine.put(start, new MutablePair<>(var, inputs));
 				}
 			}
 			if (useLine != null) {
@@ -353,7 +353,7 @@ public class DefUseExtractor {
 					} else {
 						HashSet<String> inputs = new HashSet<>();
 						inputs.add(s);
-						defUsePerLine.put(useLine, new Pair<>(null, inputs));
+						defUsePerLine.put(useLine, new MutablePair<>(null, inputs));
 					}
 				}
 			}
@@ -524,7 +524,7 @@ public class DefUseExtractor {
 								values[0] ++;
 							}
 							getNonLinearArithm(statement, name, inputsName, values);
-							info = new Pair(name, values);
+							info = new MutablePair<>(name, values);
 							if(Utils.DEBUG)System.out.println(Arrays.toString(values));
 						}
 					}

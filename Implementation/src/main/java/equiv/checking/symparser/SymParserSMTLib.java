@@ -13,7 +13,8 @@ package equiv.checking.symparser;
 
 import com.microsoft.z3.*;
 import equiv.checking.Utils;
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
@@ -130,9 +131,9 @@ public class SymParserSMTLib {
     public Pair<String,String> parseArithm() throws Exception {
         Pair<String,String> left = parseTerm();
         if (reader.eat('+')) {
-            left = new Pair<>(left.getKey(),"+ "+left.getValue()+" "+parseArithm().getValue()+"");
+            left = new MutablePair<>(left.getKey(),"+ "+left.getValue()+" "+parseArithm().getValue()+"");
         } else if (reader.eat('-')) {
-            left = new Pair<>(left.getKey(),"- "+left.getValue()+" "+parseArithm().getValue()+"");
+            left = new MutablePair<>(left.getKey(),"- "+left.getValue()+" "+parseArithm().getValue()+"");
         }
         return left;
     }
@@ -141,23 +142,23 @@ public class SymParserSMTLib {
         Pair<String,String> left = parseFactor();
         String integer = "Int";//to check
         if (reader.eat('*')) {
-            return new Pair<>(left.getKey(),"* "+left.getValue()+" "+parseTerm().getValue()+"");
+            return new MutablePair<>(left.getKey(),"* "+left.getValue()+" "+parseTerm().getValue()+"");
         }
         if (reader.eat('/')) {
             Pair<String,String> right = parseTerm();
             String div = "/";
             if(left.getKey().equals(integer) && right.getKey().equals(left.getKey())) { //int division
                 div = "div";
-                return new Pair<>(integer,div+" "+left.getValue()+" "+right.getValue()+"");
+                return new MutablePair<>(integer,div+" "+left.getValue()+" "+right.getValue()+"");
             }
-            return new Pair<>("Real",div+" "+left.getValue()+" "+right.getValue()+"");
+            return new MutablePair<>("Real",div+" "+left.getValue()+" "+right.getValue()+"");
         }
         if (reader.eat('%')) {
             //does not accept arithmetic expressions, only integer expressions
-            return new Pair<>("Int","mod "+left.getValue()+" "+parseTerm().getValue()+"");
+            return new MutablePair<>("Int","mod "+left.getValue()+" "+parseTerm().getValue()+"");
         }
         if(reader.eat('^')){
-            return new Pair<>(left.getKey(),"^ "+left.getValue()+" "+parseTerm().getValue()+"");
+            return new MutablePair<>(left.getKey(),"^ "+left.getValue()+" "+parseTerm().getValue()+"");
 
         }
         return left;
@@ -173,7 +174,7 @@ public class SymParserSMTLib {
             Pair<String, String> info = parseArithm();
             e = "( " + info.getValue() + " )";
             reader.eat(')');
-            return new Pair<>(info.getKey(), e);
+            return new MutablePair<>(info.getKey(), e);
         }
         //check for the closing brace maybe not the best way to do it
         while (reader.current != ' ' && reader.current != -1 && reader.current != '(' && reader.current != ',' && reader.current != ')')
@@ -194,9 +195,9 @@ public class SymParserSMTLib {
                 num = "(* " + base + " (^ 10 " + num2 + "))";
             }
             if (var.contains("REAL")) {
-                return new Pair<>("Real", num);
+                return new MutablePair<>("Real", num);
             } else {
-                return new Pair<>("Int", num);
+                return new MutablePair<>("Int", num);
             }
         } else if (var.startsWith("UF_") || var.startsWith("AF_")) {
             //function
@@ -230,7 +231,7 @@ public class SymParserSMTLib {
             }
         }
         formula += ")";
-        return new Pair<>("Real", formula);
+        return new MutablePair<>("Real", formula);
     }
 
     protected Pair<String, String> parseFunc(String funcName) throws Exception {
@@ -295,7 +296,7 @@ public class SymParserSMTLib {
                 this.variablesDeclaration.put(func, f);
 
             }
-            return new Pair<>(ret, formula);
+            return new MutablePair<>(ret, formula);
         }
         return null;
     }
@@ -328,7 +329,7 @@ public class SymParserSMTLib {
                 this.variables.put(var, e);
                 this.variablesDeclaration.put(var, e.getFuncDecl());
             }
-            return new Pair<>("Real", var);
+            return new MutablePair<>("Real", var);
         }
         if (!this.variables.containsKey(var)) {
             this.declarations += "(declare-fun " + var + " () Int)\n";
@@ -336,7 +337,7 @@ public class SymParserSMTLib {
             this.variables.put(var, e);
             this.variablesDeclaration.put(var, e.getFuncDecl());
         }
-        return new Pair<>("Int", var);
+        return new MutablePair<>("Int", var);
     }
 
     public Pair<String, String> parseVariable(String[] name) {
@@ -357,7 +358,7 @@ public class SymParserSMTLib {
                 this.variablesDeclaration.put(e.toString(), e.getFuncDecl());
             }
         }
-        return new Pair<>(ret, name[0]);
+        return new MutablePair<>(ret, name[0]);
     }
 
     public void createDecl(String name, String type) {

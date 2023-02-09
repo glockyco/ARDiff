@@ -21,7 +21,8 @@ import equiv.checking.CommonBlockExtractor;
 import equiv.checking.DefUseExtractor;
 import equiv.checking.Instrumentation;
 import equiv.checking.SourceInstrumentation;
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -239,12 +240,12 @@ public class DSEInstrumentation implements SourceInstrumentation {
                         if (var2 != null) { //we update the variable name in the other program but keep the same inputs
                             HashSet<String> inputs1 = defUseOld.getValue();
                             defUsePerLineOld.remove(i);
-                            defUsePerLineOld.put(i, new Pair<>(var2, inputs1));
+                            defUsePerLineOld.put(i, new MutablePair<>(var2, inputs1));
                         }
                     } else if (var2 == null) {
                         HashSet<String> inputs2 = defUseNew.getValue();
                         defUsePerLineNew.remove(i);
-                        defUsePerLineNew.put(i, new Pair<>(var1, inputs2));
+                        defUsePerLineNew.put(i, new MutablePair<>(var1, inputs2));
                     }
                 }
             }

@@ -19,7 +19,8 @@ import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import equiv.checking.ProjectPaths;
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.*;
 import java.util.*;
@@ -365,7 +366,7 @@ public class GradDiffInstrumentation extends DSEInstrumentation {
             } else {
                 HashSet<Expr<?>> set = new HashSet<>();
                 set.add(expr);
-                functionsInstances.put(funcName, new Pair<>(func, set));
+                functionsInstances.put(funcName, new MutablePair<>(func, set));
                 uFunctions.put(expr, 1);
             }
         } else if (funcName.startsWith("AF_")) {
@@ -395,7 +396,7 @@ public class GradDiffInstrumentation extends DSEInstrumentation {
             if (statementInfo != null) {
                 String val = statementInfo.getKey();
                 if (val != null && val.equals(name)) {
-                    statements.put(line, new Pair<>(val, statementInfo.getValue()));
+                    statements.put(line, new MutablePair<>(val, statementInfo.getValue()));
                 }
             }
         }
@@ -405,7 +406,7 @@ public class GradDiffInstrumentation extends DSEInstrumentation {
             if (statementInfo != null) {
                 String val = statementInfo.getKey();
                 if (val != null && val.equals(name)) {
-                    statements.put(line, new Pair<>(val, statementInfo.getValue()));
+                    statements.put(line, new MutablePair<>(val, statementInfo.getValue()));
                 }
             }
         }

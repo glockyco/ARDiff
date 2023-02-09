@@ -14,7 +14,8 @@ package equiv.checking;
 import java.io.*;
 import java.util.*;
 
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.objectweb.asm.tree.MethodNode;
 
 public class Instrumentation implements Utils{
@@ -163,7 +164,7 @@ public class Instrumentation implements Utils{
 		}
 		if(DEBUG) System.out.println("UF "+UninterpretedFunctions);
 		if(DEBUG) System.out.println("REPLACEMENT "+replacementStrings);
-		return new Pair(UninterpretedFunctions, replacementStrings);
+		return new MutablePair<>(UninterpretedFunctions, replacementStrings);
 	}
 
 
