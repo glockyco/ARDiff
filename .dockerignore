@@ -1,0 +1,8 @@
+**/*
+
+!benchmarks/**/*
+
+!Implementation/**/*
+Implementation/analysis/**/*
+!Implementation/analysis/*.sql
+!Implementation/analysis/results/sqlite.db
