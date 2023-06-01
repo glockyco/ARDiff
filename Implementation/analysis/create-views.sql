@@ -485,18 +485,22 @@ SELECT
 FROM run_result_crosstab_true
 ORDER BY
     CASE
-        WHEN tool = 'ARDiff-diff' AND expected = 'EQ' THEN 0
-        WHEN tool = 'ARDiff-diff' AND expected = 'NEQ' THEN 1
-        WHEN tool = 'DSE-diff' AND expected = 'EQ' THEN 2
-        WHEN tool = 'DSE-diff' AND expected = 'NEQ' THEN 3
-        WHEN tool = 'SE-diff' AND expected = 'EQ' THEN 4
-        WHEN tool = 'SE-diff' AND expected = 'NEQ' THEN 5
-        WHEN tool = 'ARDiff-base' AND expected = 'EQ' THEN 6
-        WHEN tool = 'ARDiff-base' AND expected = 'NEQ' THEN 7
-        WHEN tool = 'DSE-base' AND expected = 'EQ' THEN 8
-        WHEN tool = 'DSE-base' AND expected = 'NEQ' THEN 9
-        WHEN tool = 'SE-base' AND expected = 'EQ' THEN 10
-        WHEN tool = 'SE-base' AND expected = 'NEQ' THEN 11
+        WHEN tool = 'PASDA-diff' AND expected = 'EQ' THEN 0
+        WHEN tool = 'PASDA-diff' AND expected = 'NEQ' THEN 1
+        WHEN tool = 'ARDiff-diff' AND expected = 'EQ' THEN 2
+        WHEN tool = 'ARDiff-diff' AND expected = 'NEQ' THEN 3
+        WHEN tool = 'DSE-diff' AND expected = 'EQ' THEN 4
+        WHEN tool = 'DSE-diff' AND expected = 'NEQ' THEN 5
+        WHEN tool = 'SE-diff' AND expected = 'EQ' THEN 6
+        WHEN tool = 'SE-diff' AND expected = 'NEQ' THEN 7
+        WHEN tool = 'PASDA-base' AND expected = 'EQ' THEN 8
+        WHEN tool = 'PASDA-base' AND expected = 'NEQ' THEN 9
+        WHEN tool = 'ARDiff-base' AND expected = 'EQ' THEN 10
+        WHEN tool = 'ARDiff-base' AND expected = 'NEQ' THEN 11
+        WHEN tool = 'DSE-base' AND expected = 'EQ' THEN 12
+        WHEN tool = 'DSE-base' AND expected = 'NEQ' THEN 13
+        WHEN tool = 'SE-base' AND expected = 'EQ' THEN 14
+        WHEN tool = 'SE-base' AND expected = 'NEQ' THEN 15
     END;
 
 CREATE VIEW IF NOT EXISTS __paper__runtime_per_expected AS

@@ -14,6 +14,7 @@ package Runner;
 import DSE.DSE;
 import GradDiff.GradDiff;
 import IMPs.ImpactedS;
+import PASDA.PASDA;
 import SE.SE;
 import com.microsoft.z3.Context;
 import differencing.StopWatches;
@@ -215,6 +216,8 @@ public class Runner{
             }
         } else if (tool.contains("I")) {
             return "Imp";
+        } else if (tool.contains("P")) {
+            return "PASDA";
         }
         throw new RuntimeException("Unknown tool '" + tool + "'.");
     }
@@ -323,6 +326,17 @@ public class Runner{
                 deleteGeneratedFiles("Imp", runner.path);
                 ImpactedS impactedS = new ImpactedS(runner.path, runner.MethodPath1, runner.MethodPath2, bound, timeout, "Imp", SMTSolver, minInt, maxInt, minDouble, maxDouble, minLong, maxLong);
                 return impactedS.runTool();
+            }
+            ////*******************************************************************************************************************************************+////
+            ////*******************************************************************************************************************************************+////
+            ////*******************************************************************************************************************************************+////
+            if(tool.contains("P")) {
+                System.out.println("*****************************************************************************");
+                System.out.println("------------------------------------PASDA-----------------------------------");
+                System.out.println("*****************************************************************************");
+                deleteGeneratedFiles("PASDA", runner.path);
+                PASDA pasda = new PASDA(runner.path, runner.MethodPath1, runner.MethodPath2, "PASDA");
+                return pasda.runTool();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -181,6 +181,7 @@ tool_names=(
 #  "ARDiffR"
 #  "ARDiffH3"
   "ARDiff"
+  "PASDA"
 )
 
 configurations=(
@@ -190,6 +191,7 @@ configurations=(
 #  "--tool A --s coral --b 3 --H R"
 #  "--tool A --s coral --b 3 --H H3"
   "--tool A --s coral --b 3 --H H123"
+  "--tool P --s coral --b 3"
 )
 
 # Remove results from previous runs
