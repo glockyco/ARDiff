@@ -42,6 +42,7 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
     private boolean hasPartitionUifV1 = false;
     private boolean hasPartitionUifV2 = false;
     private Integer partitionPcConstraintCount = null;
+    private boolean hasPartitionTimedOut = false;
     private boolean isPartitionDepthLimited = false;
 
     private final Context context = new Context();
@@ -130,6 +131,9 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
         }
         if (search.getDepth() >= search.getDepthLimit()) {
             this.isPartitionDepthLimited = true;
+        }
+        if (search.getSearchConstraint().contains("iteration time")) {
+            this.hasPartitionTimedOut = true;
         }
         this.startNextPartition();
     }
@@ -244,7 +248,7 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
             this.partitionEqResult = this.satChecker.checkEq(pcModel, v1Model, v2Model);
 
             this.partitionClassification = new PartitionClassifier(
-                false, false, false, false, this.isPartitionDepthLimited,
+                false, false, false, this.hasPartitionTimedOut, this.isPartitionDepthLimited,
                 this.partitionPcResult.status, this.partitionNeqResult.status, this.partitionEqResult.status,
                 this.hasPartitionUifPc, hasUif
             ).getClassification();
@@ -293,7 +297,7 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
             Status eqStatus = this.partitionEqResult == null ? null : this.partitionEqResult.status;
 
             this.partitionClassification = new PartitionClassifier(
-                false, false, false, false, this.isPartitionDepthLimited,
+                false, false, false, this.hasPartitionTimedOut, this.isPartitionDepthLimited,
                 pcStatus, neqStatus, eqStatus,
                 this.hasPartitionUifPc, this.hasPartitionUifPc
             ).getClassification();
@@ -328,6 +332,7 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
         this.hasPartitionUifV1 = false;
         this.hasPartitionUifV2 = false;
         this.partitionPcConstraintCount = null;
+        this.hasPartitionTimedOut = false;
         this.isPartitionDepthLimited = false;
 
         StopWatches.suspend("iteration-" + iteration.iteration + ":partition-classification");

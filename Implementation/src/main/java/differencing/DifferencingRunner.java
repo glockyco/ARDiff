@@ -33,10 +33,10 @@ public class DifferencingRunner {
     private final Configuration freeMarkerConfiguration;
 
     public static void main(String[] args) throws Exception {
-        // Arguments: [benchmark] [tool] [solver-timeout]
+        // Arguments: [benchmark] [tool] [timeout]
         // - [benchmark]: Path to the benchmark directory, e.g., ../benchmarks/.
         // - [tool]: SE, DSEs, Imp, ARDiffs, ARDiffR, or ARDiffH3.
-        // - [solver-timeout]: Maximum time to use per diff solver query.
+        // - [timeout]: Maximum time to use across all iterations of the run.
         new DifferencingRunner().run(args[0], args[1], Integer.parseInt(args[2]));
     }
 
@@ -52,7 +52,10 @@ public class DifferencingRunner {
         this.freeMarkerConfiguration.setFallbackOnNullLoopVariable(false);
     }
 
-    public void run(String benchmarkDir, String toolName, int solverTimeout) throws Exception {
+    public void run(String benchmarkDir, String toolName, int timeout) throws Exception {
+        int iterationTimeout = (int) Math.round(timeout / Math.cbrt(timeout));
+        int solverTimeout = iterationTimeout / 3;
+
         // Read the differencing configuration:
         Path parameterFilePath = Paths.get(benchmarkDir, "instrumented", "IDiff" + toolName + "-Parameters.txt");
 
@@ -179,6 +182,8 @@ public class DifferencingRunner {
                 PathConditionListener pcListener = new PathConditionListener(iteration, parameters);
                 DifferencingListener diffListener = new DifferencingListener(iteration, parameters, solverTimeout);
 
+                TimeoutChecker timeoutChecker = new TimeoutChecker(diffListener, iteration, iterationTimeout);
+
                 diffListeners.put(iteration.iteration, diffListener);
                 if (diffListeners.containsKey(iteration.iteration - 1)) {
                     diffListeners.get(iteration.iteration - 1).close();
@@ -210,6 +215,7 @@ public class DifferencingRunner {
                     Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
                     JPF jpf = new JPF(config);
                     jpf.addListener(unreachableListener);
+                    jpf.addListener(timeoutChecker);
                     jpf.addListener(new SymbolicListener(config, jpf));
                     jpf.addListener(execListener);
                     jpf.addListener(pcListener);
@@ -257,7 +263,7 @@ public class DifferencingRunner {
                         || iteration.result == Classification.ERROR;
 
                 shouldKeepIterating = false;
-                if (!isFinalResult) {
+                if (!isFinalResult && StopWatches.getTime("run") < timeout) {
                     String nextToRefine = instrumentation.getNextToRefine(
                         diffListener.getContext(),
                         diffListener.getV1Summary(),

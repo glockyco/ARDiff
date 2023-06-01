@@ -305,7 +305,7 @@ for d1 in ../benchmarks/* ; do
 
           # Run diff tool(s)
           if [ "$run_diff" = true ] ; then
-            diff_command="timeout --verbose --foreground ${timeout}s java -jar '${DIFF_JAR_PATH}' ${d3} ${tool_names[$i]} $((${timeout} / 10))"
+            diff_command="timeout --verbose --foreground ${timeout}s java -jar '${DIFF_JAR_PATH}' ${d3} ${tool_names[$i]} ${timeout}"
 
             if [ "$print_commands" = true ] ; then
               printf "\n%s" "${diff_command}"
