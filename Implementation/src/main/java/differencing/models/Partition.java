@@ -4,16 +4,13 @@ import differencing.EquivalenceCheckResult;
 import differencing.ReachabilityCheckResult;
 import differencing.classification.Classification;
 
-import java.util.Objects;
-
 public class Partition {
     // Index
-    public String benchmark;
-    public String tool;
-    public int iteration;
-    public int partition;
+    public Integer id;
+    public int iterationId;
 
     // Non-Index
+    public int partition;
     public Classification result;
     public ReachabilityCheckResult pcResult;
     public EquivalenceCheckResult neqResult;
@@ -26,19 +23,17 @@ public class Partition {
     public Float runtime;
     public String errors;
 
-    public Partition(String benchmark, String tool, int iteration, int partition) {
+    public Partition(int iterationId, int partition) {
         this(
-            benchmark, tool, iteration, partition, null,
-            null, null, null,
+            iterationId, partition,
+            null, null, null, null,
             null, null, null,
             null, null, null
         );
     }
 
     public Partition(
-        String benchmark,
-        String tool,
-        int iteration,
+        int iterationId,
         int partition,
         Classification result,
         ReachabilityCheckResult pcResult,
@@ -53,11 +48,9 @@ public class Partition {
     ) {
         assert result != Classification.ERROR || !errors.isEmpty();
 
-        this.benchmark = benchmark;
-        this.tool = tool;
-        this.iteration = iteration;
-        this.partition = partition;
+        this.iterationId = iterationId;
 
+        this.partition = partition;
         this.result = result;
         this.pcResult = pcResult;
         this.neqResult = neqResult;
@@ -76,21 +69,5 @@ public class Partition {
                 || (hasUifV1 != null && hasUifV1)
                 || (hasUifV2 != null && hasUifV2);
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Partition partition1 = (Partition) o;
-        return iteration == partition1.iteration
-            && partition == partition1.partition
-            && benchmark.equals(partition1.benchmark)
-            && tool.equals(partition1.tool);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(benchmark, tool, iteration, partition);
     }
 }

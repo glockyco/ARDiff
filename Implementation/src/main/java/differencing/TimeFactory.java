@@ -64,8 +64,7 @@ public class TimeFactory {
         int step = getStep(topic, task);
 
         return new Time(
-            run.benchmark,
-            run.tool,
+            run.id,
             topic,
             task,
             runtime == null ? 0 : runtime,

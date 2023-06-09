@@ -6,10 +6,8 @@ import differencing.classification.RunClassifier;
 import differencing.models.Benchmark;
 import differencing.models.Iteration;
 import differencing.models.Run;
-import differencing.repositories.BenchmarkRepository;
-import differencing.repositories.IterationRepository;
-import differencing.repositories.RunRepository;
-import differencing.repositories.TimeRepository;
+import differencing.models.Settings;
+import differencing.repositories.*;
 import equiv.checking.ChangeExtractor;
 import equiv.checking.ProjectPaths;
 import equiv.checking.SourceInstrumentation;
@@ -25,6 +23,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 
 import javax.tools.*;
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -37,7 +36,8 @@ public class DifferencingRunner {
         // - [benchmark]: Path to the benchmark directory, e.g., ../benchmarks/.
         // - [tool]: SE, DSEs, Imp, ARDiffs, ARDiffR, or ARDiffH3.
         // - [timeout]: Maximum time to use across all iterations of the run.
-        new DifferencingRunner().run(args[0], args[1], Integer.parseInt(args[2]));
+        // - [depth_limit]: Maximum number of loop iterations to analyze.
+        new DifferencingRunner().run(args[0], args[1], Integer.parseInt(args[2]), Integer.parseInt(args[3]));
     }
 
     public DifferencingRunner() throws IOException {
@@ -52,9 +52,9 @@ public class DifferencingRunner {
         this.freeMarkerConfiguration.setFallbackOnNullLoopVariable(false);
     }
 
-    public void run(String benchmarkDir, String toolName, int timeout) throws Exception {
-        int iterationTimeout = (int) Math.round(timeout / Math.cbrt(timeout));
-        int solverTimeout = iterationTimeout / 3;
+    public void run(String benchmarkDir, String toolName, int runTimeout, int depthLimit) throws Exception {
+        int iterationTimeout = runTimeout;
+        int solverTimeout = (int) Math.round(runTimeout / Math.cbrt(runTimeout));
 
         // Read the differencing configuration:
         Path parameterFilePath = Paths.get(benchmarkDir, "instrumented", "IDiff" + toolName + "-Parameters.txt");
@@ -75,15 +75,16 @@ public class DifferencingRunner {
 
             Run run = new Run(
                 parameters.getBenchmarkName(),
-                parameters.getToolVariant(),
                 Classification.BASE_TOOL_MISSING,
                 null, null, null, null, null, null,
                 error
             );
 
-            RunRepository.delete(run);
             BenchmarkRepository.insertOrUpdate(benchmark);
             RunRepository.insertOrUpdate(run);
+
+            Settings settings = new Settings(run.id, parameters.getToolVariant(), runTimeout, iterationTimeout, solverTimeout, 10);
+            SettingsRepository.insertOrUpdate(settings);
 
             System.out.println(error);
             return;
@@ -101,9 +102,11 @@ public class DifferencingRunner {
         Benchmark benchmark = new Benchmark(parameters.getBenchmarkName(), parameters.getExpectedResult());
         BenchmarkRepository.insertOrUpdate(benchmark);
 
-        Run run = new Run(parameters.getBenchmarkName(), parameters.getToolVariant());
-        RunRepository.delete(run);
+        Run run = new Run(parameters.getBenchmarkName());
         RunRepository.insertOrUpdate(run);
+
+        Settings settings = new Settings(run.id, parameters.getToolVariant(), runTimeout, iterationTimeout, solverTimeout, 10);
+        SettingsRepository.insertOrUpdate(settings);
 
         Map<Integer, Iteration> iterations = new HashMap<>();
         Map<Integer, DifferencingListener> diffListeners = new HashMap<>();
@@ -114,7 +117,7 @@ public class DifferencingRunner {
         PrintStream systemOutput = System.out;
         PrintStream systemError = System.err;
 
-        PrintStream outputStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(parameters.getOutputFile())));
+        PrintStream outputStream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(Paths.get(parameters.getOutputFile()))));
         PrintStream errorStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(parameters.getErrorFile())));
 
         System.setOut(outputStream);
@@ -132,7 +135,7 @@ public class DifferencingRunner {
                 Iteration finishedIteration = this.finalizeIteration(currentIteration, diffListener, true, false, "");
                 iterations.put(finishedIteration.iteration, finishedIteration);
 
-                Run finishedRun = this.finalizeRun(iterations, true, false, "");
+                Run finishedRun = this.finalizeRun(run, iterations, true, false, "");
 
                 TimeRepository.insertOrUpdate(TimeFactory.create(finishedRun, StopWatches.getTimes()));
 
@@ -170,7 +173,7 @@ public class DifferencingRunner {
                 StopWatches.start("iteration-" + (iterations.size() + 1));
                 StopWatches.start("iteration-" + (iterations.size() + 1) + ":initialization");
 
-                Iteration iteration = new Iteration(run.benchmark, run.tool, iterations.size() + 1);
+                Iteration iteration = new Iteration(run.id, iterations.size() + 1);
                 iterations.put(iteration.iteration, iteration);
 
                 IterationRepository.insertOrUpdate(iteration);
@@ -210,7 +213,7 @@ public class DifferencingRunner {
                     StopWatches.stop("iteration-" + iteration.iteration + ":instrumentation");
                     StopWatches.start("iteration-" + iteration.iteration + ":symbolic-execution");
 
-                    File configFile = this.createDifferencingJpfConfiguration(parameters, solverTimeout);
+                    File configFile = this.createDifferencingJpfConfiguration(parameters, solverTimeout, depthLimit);
 
                     Config config = JPF.createConfig(new String[]{configFile.getAbsolutePath()});
                     JPF jpf = new JPF(config);
@@ -263,7 +266,7 @@ public class DifferencingRunner {
                         || iteration.result == Classification.ERROR;
 
                 shouldKeepIterating = false;
-                if (!isFinalResult && StopWatches.getTime("run") < timeout) {
+                if (!isFinalResult && StopWatches.getTime("run") < runTimeout) {
                     String nextToRefine = instrumentation.getNextToRefine(
                         diffListener.getContext(),
                         diffListener.getV1Summary(),
@@ -288,7 +291,7 @@ public class DifferencingRunner {
 
             StopWatches.start("run:finalization");
 
-            Run finishedRun = this.finalizeRun(iterations, false, false, "");
+            Run finishedRun = this.finalizeRun(run, iterations, false, false, "");
 
             StopWatches.stop("run:finalization");
             StopWatches.stop("run");
@@ -303,7 +306,7 @@ public class DifferencingRunner {
             e.printStackTrace(errorStream);
 
             try {
-                Run finishedRun = this.finalizeRun(iterations, false, true, ExceptionUtils.getStackTrace(e));
+                Run finishedRun = this.finalizeRun(run, iterations, false, true, ExceptionUtils.getStackTrace(e));
 
                 systemError.println("ERROR: " + parameters.getTargetDirectory() + " -> " + finishedRun.result);
             } catch (Exception ex) {
@@ -326,8 +329,7 @@ public class DifferencingRunner {
         ).getClassification();
 
         Iteration finishedIteration = new Iteration(
-            iteration.benchmark,
-            iteration.tool,
+            iteration.runId,
             iteration.iteration,
             result,
             hasTimedOut,
@@ -338,12 +340,14 @@ public class DifferencingRunner {
             errors
         );
 
+        finishedIteration.id = iteration.id;
         IterationRepository.insertOrUpdate(finishedIteration);
 
         return finishedIteration;
     }
 
     public Run finalizeRun(
+        Run run,
         Map<Integer, Iteration> iterations,
         boolean hasTimedOut,
         boolean isError,
@@ -353,9 +357,8 @@ public class DifferencingRunner {
         Iteration resultIteration = runClassifier.getClassificationIteration();
         Iteration lastIteration = iterations.get(iterations.size());
 
-        Run run = new Run(
-            resultIteration.benchmark,
-            resultIteration.tool,
+        Run finishedRun = new Run(
+            run.benchmark,
             isError ? Classification.ERROR : resultIteration.result,
             hasTimedOut || lastIteration.hasTimedOut,
             resultIteration.isDepthLimited,
@@ -366,9 +369,10 @@ public class DifferencingRunner {
             errors + lastIteration.errors
         );
 
-        RunRepository.insertOrUpdate(run);
+        finishedRun.id = run.id;
+        RunRepository.insertOrUpdate(finishedRun);
 
-        return run;
+        return finishedRun;
     }
 
     public File createDifferencingDriverClass(DifferencingParameters parameters) throws IOException, TemplateException {
@@ -390,11 +394,16 @@ public class DifferencingRunner {
         return file;
     }
 
-    public File createDifferencingJpfConfiguration(DifferencingParameters parameters, int timeout) throws IOException, TemplateException {
+    public File createDifferencingJpfConfiguration(
+        DifferencingParameters parameters,
+        int timeout,
+        int depthLimit
+    ) throws IOException, TemplateException {
         /* Create a data-model */
         Map<String, Object> root = new HashMap<>();
         root.put("parameters", parameters);
         root.put("timeout", timeout * 1000);
+        root.put("depthLimit", depthLimit);
 
         /* Get the template (uses cache internally) */
         Template template = this.freeMarkerConfiguration.getTemplate("DifferencingConfiguration.ftl");

@@ -24,10 +24,8 @@ import differencing.classification.RunClassifier;
 import differencing.models.Benchmark;
 import differencing.models.Iteration;
 import differencing.models.Run;
-import differencing.repositories.BenchmarkRepository;
-import differencing.repositories.IterationRepository;
-import differencing.repositories.RunRepository;
-import differencing.repositories.TimeRepository;
+import differencing.models.Settings;
+import differencing.repositories.*;
 import equiv.checking.OutputParser;
 import equiv.checking.ProjectPaths;
 import equiv.checking.SMTSummary;
@@ -119,9 +117,12 @@ public class Runner{
         Benchmark benchmark = new Benchmark(getBenchmarkName(p1), getBenchmarkExpected(p1));
         BenchmarkRepository.insertOrUpdate(benchmark);
 
-        Run run = new Run(benchmark.benchmark, getToolVariant(tool, strategy));
-        RunRepository.delete(run);
+        Run run = new Run(benchmark.benchmark);
         RunRepository.insertOrUpdate(run);
+
+        int solverTimeout = t / 3;
+        Settings settings = new Settings(run.id, getToolVariant(tool, strategy), t, t, solverTimeout, b);
+        SettingsRepository.insertOrUpdate(settings);
 
         PrintStream systemError = System.err;
         Thread shutdownHook = new Thread(() -> {
@@ -133,8 +134,7 @@ public class Runner{
                 Iteration lastIteration = iterations.get(iterations.size());
 
                 Run finishedRun = new Run(
-                    resultIteration.benchmark,
-                    resultIteration.tool,
+                    benchmark.benchmark,
                     resultIteration.result,
                     lastIteration.hasTimedOut,
                     resultIteration.isDepthLimited,
@@ -145,6 +145,7 @@ public class Runner{
                     lastIteration.errors
                 );
 
+                finishedRun.id = run.id;
                 RunRepository.insertOrUpdate(finishedRun);
 
                 TimeRepository.insertOrUpdate(TimeFactory.create(finishedRun, StopWatches.getTimes()));
@@ -158,7 +159,7 @@ public class Runner{
 
         try {
             Runtime.getRuntime().addShutdownHook(shutdownHook);
-            runToolInternal(tool, p1, p2, solver, b, t, minInt, maxInt, minDouble, maxDouble, strategy);
+            runToolInternal(tool, p1, p2, solver, b, solverTimeout, minInt, maxInt, minDouble, maxDouble, strategy);
         } catch (Exception e) {
             e.printStackTrace(System.err);
             errors = ExceptionUtils.getStackTrace(e);
@@ -173,8 +174,7 @@ public class Runner{
         Iteration lastIteration = iterations.get(iterations.size());
 
         Run finishedRun = new Run(
-            resultIteration.benchmark,
-            resultIteration.tool,
+            run.benchmark,
             resultIteration.result,
             lastIteration.hasTimedOut,
             resultIteration.isDepthLimited,
@@ -185,6 +185,7 @@ public class Runner{
             lastIteration.errors
         );
 
+        finishedRun.id = run.id;
         RunRepository.insertOrUpdate(finishedRun);
 
         // Only stop the stopwatches on successful runs.

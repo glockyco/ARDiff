@@ -30,10 +30,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
     // Note: all code that involves ExecutionNodes is only there to make
     // debugging easier by providing a tree view of all instructions executed
     // during the symbolic execution. Look at `roots` in `searchFinished` to
-    // see the full execution tree. The actual data that we're collecting is
-    // stored in the fields `currentPartition`, `currentInstructions`, and
-    // `currentPartitionInstructions`, which are persisted to the DB after
-    // every partition.
+    // see the full execution tree.
 
     private final List<ExecutionNode> roots = new ArrayList<>();
     private final Map<Integer, ExecutionNode> nodeMap = new HashMap<>();
@@ -41,7 +38,6 @@ public class ExecutionListener extends PropertyListenerAdapter {
 
     private final Iteration iteration;
     private final Set<Partition> partitions = new HashSet<>();
-    private final Set<Instruction> currentInstructions = new HashSet<>();
 
     private Partition currentPartition;
 
@@ -50,7 +46,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
 
     protected boolean isInMethodToCover = false;
 
-    protected int partitionId =  1;
+    protected int partitionNr =  1;
 
     public ExecutionListener(Iteration iteration, DifferencingParameters parameters) {
         this.iteration = iteration;
@@ -59,10 +55,8 @@ public class ExecutionListener extends PropertyListenerAdapter {
         this.runSpec = MethodSpec.createMethodSpec("*.IDiff" + parameters.getToolName() + iteration.iteration + ".run");
 
         this.currentPartition = new Partition(
-            this.iteration.benchmark,
-            this.iteration.tool,
-            this.iteration.iteration,
-            this.partitionId
+            this.iteration.id,
+            this.partitionNr
         );
     }
 
@@ -128,9 +122,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
                 // -------------------------------------------------------------
 
                 Instruction instruction = new Instruction(
-                    this.currentPartition.benchmark,
-                    this.currentPartition.tool,
-                    this.currentPartition.iteration,
+                    this.iteration.id,
                     mi.getFullName(),
                     executedInstruction.getInstructionIndex(),
                     executedInstruction.toString(),
@@ -139,16 +131,14 @@ public class ExecutionListener extends PropertyListenerAdapter {
                     executedInstruction.getLineNumber()
                 );
 
-                this.currentInstructions.add(instruction);
-
                 // -------------------------------------------------------------
 
                 ExecutionNode node = new ExecutionNode(vm.getStateId(), cg.getNextChoice(), instruction, this.prevNode);
                 node.pathCondition = PathCondition.getPC(vm);
 
                 ExecutionNode n = node;
-                while (n != null && !n.partitionIds.contains(this.partitionId)) {
-                    n.partitionIds.add(this.partitionId);
+                while (n != null && !n.partitionNrs.contains(this.partitionNr)) {
+                    n.partitionNrs.add(this.partitionNr);
                     n = n.prev;
                 }
 
@@ -165,39 +155,47 @@ public class ExecutionListener extends PropertyListenerAdapter {
     }
 
     private void startNextPartition() {
-        Set<PartitionInstruction> partitionInstructions = new HashSet<>();
+        this.currentPartition.id = PartitionRepository.getId(this.currentPartition);
+        PartitionRepository.insertOrUpdate(this.currentPartition);
+
         ExecutionNode node = this.prevNode;
+
+        Set<Instruction> newInstructions = new HashSet<>();
         while (node != null) {
-            partitionInstructions.add(new PartitionInstruction(
-                this.currentPartition.benchmark,
-                this.currentPartition.tool,
-                this.currentPartition.iteration,
-                this.currentPartition.partition,
+            if (node.instruction.id == null) {
+                newInstructions.add(node.instruction);
+            }
+            node = node.prev;
+        }
+
+        InstructionRepository.insertOrUpdate(newInstructions);
+
+        node = this.prevNode;
+
+        Set<PartitionInstruction> newPartitionInstructions = new HashSet<>();
+        while (node != null) {
+            newPartitionInstructions.add(new PartitionInstruction(
+                this.currentPartition.id,
+                node.instruction.id,
                 node.version,
                 node.instruction.method,
                 node.instruction.instructionIndex,
-                this.prevIndex,
+                this.prevIndex, // @TODO: We can't use the same index for all nodes...
                 node.stateId,
                 node.choiceId
             ));
             node = node.prev;
         }
 
-        PartitionRepository.insertOrUpdate(this.currentPartition);
-        InstructionRepository.insertOrUpdate(this.currentInstructions);
-        PartitionInstructionRepository.insertOrUpdate(partitionInstructions);
+        PartitionInstructionRepository.insertOrUpdate(newPartitionInstructions);
 
         this.partitions.add(this.currentPartition);
-        this.partitionId++;
+        this.partitionNr++;
 
         this.currentPartition = new Partition(
-            this.iteration.benchmark,
-            this.iteration.tool,
-            this.iteration.iteration,
-            this.partitionId
+            this.iteration.id,
+            this.partitionNr
         );
-
-        this.currentInstructions.clear();
     }
 
     private static class ExecutionNode {
@@ -205,7 +203,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
         public final int choiceId;
         public final int version;
         public final Instruction instruction;
-        public final Set<Integer> partitionIds = new HashSet<>();
+        public final Set<Integer> partitionNrs = new HashSet<>();
 
         public final ExecutionNode prev;
         public List<ExecutionNode> next = new ArrayList<>();
@@ -242,7 +240,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
             sb.append(", choiceId=" + this.choiceId);
             sb.append(", instruction=" + this.instruction.instruction);
 
-            String partitions = this.partitionIds.stream().map(Object::toString).collect(Collectors.joining(","));
+            String partitions = this.partitionNrs.stream().map(Object::toString).collect(Collectors.joining(","));
             sb.append(", partitionIds=[" + partitions + "]");
 
             if (this.pathCondition != null && this.pathCondition.header != null) {

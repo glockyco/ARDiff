@@ -33,7 +33,7 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
 
     private final Set<Partition> partitions = new HashSet<>();
 
-    private int partitionId =  1;
+    private int partitionNr =  1;
     private Classification partitionClassification = null;
     private ReachabilityCheckResult partitionPcResult = null;
     private EquivalenceCheckResult partitionNeqResult = null;
@@ -304,10 +304,8 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
         }
 
         Partition partition = new Partition(
-            this.iteration.benchmark,
-            this.iteration.tool,
-            this.iteration.iteration,
-            this.partitionId,
+            this.iteration.id,
+            this.partitionNr,
             this.partitionClassification,
             this.partitionPcResult,
             this.partitionNeqResult,
@@ -320,10 +318,11 @@ public class DifferencingListener extends PropertyListenerAdapter implements Aut
             ""
         );
 
+        partition.id = PartitionRepository.getId(partition);
         PartitionRepository.insertOrUpdate(partition);
 
         this.partitions.add(partition);
-        this.partitionId++;
+        this.partitionNr++;
         this.partitionClassification = null;
         this.partitionPcResult = null;
         this.partitionNeqResult = null;

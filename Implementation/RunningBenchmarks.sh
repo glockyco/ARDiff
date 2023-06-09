@@ -20,7 +20,9 @@ clean_db=false
 
 build=true
 
-timeout="300" # seconds
+depth_limits=("10")
+timeouts=("30" "90" "300")
+runs=3
 
 run_base=true
 run_diff=true
@@ -185,13 +187,13 @@ tool_names=(
 )
 
 configurations=(
-  "--tool S --s coral --b 3"
-  "--tool D --s coral --b 3"
-#  "--tool I --s coral --b 3"
-#  "--tool A --s coral --b 3 --H R"
-#  "--tool A --s coral --b 3 --H H3"
-  "--tool A --s coral --b 3 --H H123"
-  "--tool P --s coral --b 3"
+  "--tool S --s coral"
+  "--tool D --s coral"
+#  "--tool I --s coral"
+#  "--tool A --s coral --H R"
+#  "--tool A --s coral --H H3"
+  "--tool A --s coral --H H123"
+  "--tool P --s coral"
 )
 
 # Remove results from previous runs
@@ -224,8 +226,8 @@ if [ "$clean_db" = true ] ; then
 
   touch ${DB_PATH}
   sqlite3 ${DB_PATH} < ${DB_CREATE_TABLES_PATH} > /dev/null
-  sqlite3 ${DB_PATH} < ${DB_CREATE_VIEWS_PATH} > /dev/null
-  sqlite3 ${DB_PATH} < ${DB_CREATE_MATERIALIZED_VIEWS_PATH} > /dev/null
+  #sqlite3 ${DB_PATH} < ${DB_CREATE_VIEWS_PATH} > /dev/null
+  #sqlite3 ${DB_PATH} < ${DB_CREATE_MATERIALIZED_VIEWS_PATH} > /dev/null
 fi
 
 # Build the application JAR files
@@ -266,63 +268,71 @@ fi
 
 # Process the benchmark programs
 
-for d1 in ../benchmarks/* ; do
-  for d2 in "$d1"/* ; do
-    for d3 in "$d2"/* ; do
-      if [[ ! " ${benchmarks[*]} " =~ " ${d3} " ]]; then
-        if [ "$print_skipped" = true ] ; then
-          printf "Skipping %s ...\n" "${d3}"
-        fi
-        continue
-      fi
+for depth_limit in "${depth_limits[@]}"; do
+  for timeout in "${timeouts[@]}"; do
+    for ((run = 1; run <= runs; run++)); do
 
-      if [ "$run_base" = true ] || [ "$run_diff" = true ] ; then
-        printf "Processing %s ..." "${d3}"
-
-        for i in "${!configurations[@]}" ; do
-          # Run base tool(s)
-          if [ "$run_base" = true ] ; then
-            oldV="${d3}/oldV.java"
-            newV="${d3}/newV.java"
-
-            base_command="timeout --verbose --foreground ${timeout}s java -jar '${BASE_JAR_PATH}' --path1 ${oldV} --path2 ${newV} ${configurations[$i]} --b 10 --t $((${timeout} / 4))"
-
-            if [ "$print_commands" = true ] ; then
-              printf "\n%s" "${base_command}"
+      for d1 in ../benchmarks/* ; do
+        for d2 in "$d1"/* ; do
+          for d3 in "$d2"/* ; do
+            if [[ ! " ${benchmarks[*]} " =~ " ${d3} " ]]; then
+              if [ "$print_skipped" = true ] ; then
+                printf "Skipping %s ...\n" "${d3}"
+              fi
+              continue
             fi
 
-            if [ "$dry_run" = false ] ; then
+            if [ "$run_base" = true ] || [ "$run_diff" = true ] ; then
+              printf "Processing %s ..." "${d3}"
+
+              for i in "${!configurations[@]}" ; do
+                # Run base tool(s)
+                if [ "$run_base" = true ] ; then
+                  oldV="${d3}/oldV.java"
+                  newV="${d3}/newV.java"
+
+                  base_command="timeout --verbose --foreground ${timeout}s java -jar '${BASE_JAR_PATH}' --path1 ${oldV} --path2 ${newV} ${configurations[$i]} --b ${depth_limit} --t ${timeout}"
+
+                  if [ "$print_commands" = true ] ; then
+                    printf "\n%s" "${base_command}"
+                  fi
+
+                  if [ "$dry_run" = false ] ; then
+                    printf "\n"
+                    mkdir -p "${d3}/instrumented/"
+                    eval "${base_command}"
+                    # Kill any leftover z3 / RunJPF.jar processes
+                    # that were started by the base tool.
+                    # This is necessary in case the base tool was
+                    # stopped by the timeout and the child processes
+                    # were, therefore, not correctly terminated.
+                    pkill z3
+                    pkill -f RunJPF.jar
+                  fi
+                fi
+
+                # Run diff tool(s)
+                if [ "$run_diff" = true ] ; then
+                  diff_command="timeout --verbose --foreground ${timeout}s java -jar '${DIFF_JAR_PATH}' ${d3} ${tool_names[$i]} ${timeout} ${depth_limit}"
+
+                  if [ "$print_commands" = true ] ; then
+                    printf "\n%s" "${diff_command}"
+                  fi
+
+                  if [ "$dry_run" = false ] ; then
+                    printf "\n"
+                    mkdir -p "${d3}/instrumented/"
+                    eval "${diff_command}"
+                  fi
+                fi
+              done
+
               printf "\n"
-              mkdir -p "${d3}/instrumented/"
-              eval "${base_command}"
-              # Kill any leftover z3 / RunJPF.jar processes
-              # that were started by the base tool.
-              # This is necessary in case the base tool was
-              # stopped by the timeout and the child processes
-              # were, therefore, not correctly terminated.
-              pkill z3
-              pkill -f RunJPF.jar
-            fi
-          fi
-
-          # Run diff tool(s)
-          if [ "$run_diff" = true ] ; then
-            diff_command="timeout --verbose --foreground ${timeout}s java -jar '${DIFF_JAR_PATH}' ${d3} ${tool_names[$i]} ${timeout}"
-
-            if [ "$print_commands" = true ] ; then
-              printf "\n%s" "${diff_command}"
             fi
 
-            if [ "$dry_run" = false ] ; then
-              printf "\n"
-              mkdir -p "${d3}/instrumented/"
-              eval "${diff_command}"
-            fi
-          fi
+          done
         done
-
-        printf "\n"
-      fi
+      done
 
     done
   done
@@ -331,5 +341,5 @@ done
 # Populate "materialized views"
 
 printf "Populating materialized views ... "
-sqlite3 ${DB_PATH} < ${DB_POPULATE_MATERIALIZED_VIEWS_PATH} > /dev/null
+#sqlite3 ${DB_PATH} < ${DB_POPULATE_MATERIALIZED_VIEWS_PATH} > /dev/null
 printf "done!\n"
