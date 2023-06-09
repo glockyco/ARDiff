@@ -133,7 +133,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
 
                 // -------------------------------------------------------------
 
-                ExecutionNode node = new ExecutionNode(vm.getStateId(), cg.getNextChoice(), instruction, this.prevNode);
+                ExecutionNode node = new ExecutionNode(vm.getStateId(), cg.getNextChoice(), this.prevIndex + 1, instruction, this.prevNode);
                 node.pathCondition = PathCondition.getPC(vm);
 
                 ExecutionNode n = node;
@@ -180,7 +180,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
                 node.version,
                 node.instruction.method,
                 node.instruction.instructionIndex,
-                this.prevIndex, // @TODO: We can't use the same index for all nodes...
+                node.executionIndex,
                 node.stateId,
                 node.choiceId
             ));
@@ -202,6 +202,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
         public final int stateId;
         public final int choiceId;
         public final int version;
+        public final int executionIndex;
         public final Instruction instruction;
         public final Set<Integer> partitionNrs = new HashSet<>();
 
@@ -210,9 +211,10 @@ public class ExecutionListener extends PropertyListenerAdapter {
 
         public PathCondition pathCondition;
 
-        public ExecutionNode(int stateId, int choiceId, Instruction instruction, ExecutionNode prev) {
+        public ExecutionNode(int stateId, int choiceId, int executionIndex, Instruction instruction, ExecutionNode prev) {
             this.stateId = stateId;
             this.choiceId = choiceId;
+            this.executionIndex = executionIndex;
             this.version = instruction.method.contains("IoldV") ? 1 : 2;
             this.instruction = instruction;
             this.prev = prev;
@@ -238,6 +240,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
             sb.append(outerIndent);
             sb.append("stateId=" + this.stateId);
             sb.append(", choiceId=" + this.choiceId);
+            sb.append(", executionIndex=" + this.executionIndex);
             sb.append(", instruction=" + this.instruction.instruction);
 
             String partitions = this.partitionNrs.stream().map(Object::toString).collect(Collectors.joining(","));
