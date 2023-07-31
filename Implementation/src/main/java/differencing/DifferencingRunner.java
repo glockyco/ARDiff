@@ -140,7 +140,7 @@ public class DifferencingRunner {
                 TimeRepository.insertOrUpdate(TimeFactory.create(finishedRun, StopWatches.getTimes()));
 
                 systemError.println("TIMEOUT: " + parameters.getTargetDirectory() + " -> " + finishedRun.result);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 e.printStackTrace(systemError);
                 e.printStackTrace(errorStream);
                 throw e;
@@ -226,7 +226,7 @@ public class DifferencingRunner {
                     jpf.run();
 
                     hasSucceeded = true;
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     errors = ExceptionUtils.getStackTrace(e);
                     e.printStackTrace(systemError);
                     e.printStackTrace(errorStream);
@@ -299,7 +299,7 @@ public class DifferencingRunner {
             TimeRepository.insertOrUpdate(TimeFactory.create(finishedRun, StopWatches.getTimes()));
 
             Runtime.getRuntime().removeShutdownHook(shutdownHook);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             Runtime.getRuntime().removeShutdownHook(shutdownHook);
 
             e.printStackTrace(systemError);
@@ -309,7 +309,7 @@ public class DifferencingRunner {
                 Run finishedRun = this.finalizeRun(run, iterations, false, true, ExceptionUtils.getStackTrace(e));
 
                 systemError.println("ERROR: " + parameters.getTargetDirectory() + " -> " + finishedRun.result);
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 ex.printStackTrace(systemError);
                 ex.printStackTrace(errorStream);
             }

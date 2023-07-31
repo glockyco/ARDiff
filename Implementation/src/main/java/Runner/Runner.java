@@ -149,7 +149,7 @@ public class Runner{
                 RunRepository.insertOrUpdate(finishedRun);
 
                 TimeRepository.insertOrUpdate(TimeFactory.create(finishedRun, StopWatches.getTimes()));
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 e.printStackTrace(systemError);
             }
         });
@@ -160,7 +160,7 @@ public class Runner{
         try {
             Runtime.getRuntime().addShutdownHook(shutdownHook);
             runToolInternal(tool, p1, p2, solver, b, solverTimeout, minInt, maxInt, minDouble, maxDouble, strategy);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace(System.err);
             errors = ExceptionUtils.getStackTrace(e);
         } finally {
@@ -339,7 +339,7 @@ public class Runner{
                 PASDA pasda = new PASDA(runner.path, runner.MethodPath1, runner.MethodPath2, "PASDA");
                 return pasda.runTool();
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
         throw new RuntimeException("Tool '" + tool + "' is not supported.");
