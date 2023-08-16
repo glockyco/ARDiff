@@ -37,12 +37,7 @@
 
 package gov.nasa.jpf.symbc.numeric.solvers;
 
-import symlib.SymBool;
-import symlib.SymDouble;
-import symlib.SymInt;
-import symlib.SymLiteral;
-import symlib.SymNumber;
-import symlib.Util;
+import symlib.*;
 import coral.PC;
 import coral.solvers.Env;
 import coral.solvers.Result;
@@ -485,47 +480,119 @@ public class ProblemCoral extends ProblemGeneral {
 
 	@Override
 	public Object and(long value, Object exp) {
-		return Util.and(value==1?Util.TRUE:Util.FALSE, (SymBool)exp);
+		if (exp instanceof SymBool) {
+			return Util.and(value==1?Util.TRUE:Util.FALSE, (SymBool)exp);
+		} else if (exp instanceof SymInt) {
+			return Util.and(Util.createConstant((int)value), (SymInt)exp);
+		} else if (exp instanceof SymLong) {
+			return Util.and(Util.createConstant(value), (SymLong)exp);
+		} else {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	@Override
 	public Object and(Object exp, long value) {
-		return Util.and((SymBool)exp, value==1?Util.TRUE:Util.FALSE);
+		if (exp instanceof SymBool) {
+			return Util.and((SymBool)exp, value==1?Util.TRUE:Util.FALSE);
+		} else if (exp instanceof SymInt) {
+			return Util.and((SymInt)exp, Util.createConstant((int)value));
+		} else if (exp instanceof SymLong) {
+			return Util.and((SymLong) exp, Util.createConstant(value));
+		} else {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	@Override
 	public Object and(Object exp1, Object exp2) {
-		return Util.and((SymBool)exp1, (SymBool)exp2);
+		if (exp1 instanceof SymBool) {
+			return Util.and((SymBool)exp1, (SymBool)exp2);
+		} else if (exp1 instanceof SymInt) {
+			return Util.and((SymInt)exp1, (SymInt)exp2);
+		} else if (exp1 instanceof SymLong) {
+			return Util.and((SymLong) exp1, (SymLong) exp2);
+		} else {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	@Override
 	public Object or(long value, Object exp) {
-		return Util.or(value==1?Util.TRUE:Util.FALSE, (SymBool)exp);
+		if (exp instanceof SymBool) {
+			return Util.or(value==1?Util.TRUE:Util.FALSE, (SymBool)exp);
+		} else if (exp instanceof SymInt) {
+			return Util.or(Util.createConstant((int)value), (SymInt)exp);
+		} else if (exp instanceof SymLong) {
+			return Util.or(Util.createConstant(value), (SymLong)exp);
+		} else {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	@Override
 	public Object or(Object exp, long value) {
-		return Util.or((SymBool)exp, value==1?Util.TRUE:Util.FALSE);
+		if (exp instanceof SymBool) {
+			return Util.or((SymBool)exp, value==1?Util.TRUE:Util.FALSE);
+		} else if (exp instanceof SymInt) {
+			return Util.or((SymInt)exp, Util.createConstant((int)value));
+		} else if (exp instanceof SymLong) {
+			return Util.or((SymLong) exp, Util.createConstant(value));
+		} else {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	@Override
 	public Object or(Object exp1, Object exp2) {
-		return Util.or((SymBool)exp1, (SymBool)exp2);
+		if (exp1 instanceof SymBool) {
+			return Util.or((SymBool)exp1, (SymBool)exp2);
+		} else if (exp1 instanceof SymInt) {
+			return Util.or((SymInt)exp1, (SymInt)exp2);
+		} else if (exp1 instanceof SymLong) {
+			return Util.or((SymLong)exp1, (SymLong)exp2);
+		} else {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	@Override
 	public Object xor(long value, Object exp) {
-		return Util.xor(value==1?Util.TRUE:Util.FALSE, (SymBool)exp);
+		if (exp instanceof SymBool) {
+			return Util.xor(value==1?Util.TRUE:Util.FALSE, (SymBool)exp);
+		} else if (exp instanceof SymInt) {
+			return Util.xor(Util.createConstant((int)value), (SymInt)exp);
+		} else if (exp instanceof SymLong) {
+			return Util.xor(Util.createConstant(value), (SymLong)exp);
+		} else {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	@Override
 	public Object xor(Object exp, long value) {
-		return Util.xor((SymBool)exp, value==1?Util.TRUE:Util.FALSE);
+		if (exp instanceof SymBool) {
+			return Util.xor((SymBool)exp, value==1?Util.TRUE:Util.FALSE);
+		} else if (exp instanceof SymInt) {
+			return Util.xor((SymInt)exp, Util.createConstant((int)value));
+		} else if (exp instanceof SymLong) {
+			return Util.xor((SymLong)exp, Util.createConstant(value));
+		} else {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	@Override
 	public Object xor(Object exp1, Object exp2) {
-		return Util.xor((SymBool)exp1, (SymBool)exp2);
+		if (exp1 instanceof SymBool) {
+			return Util.xor((SymBool)exp1, (SymBool)exp2);
+		} else if (exp1 instanceof SymInt) {
+			return Util.xor((SymInt)exp1, (SymInt)exp2);
+		} else if (exp1 instanceof SymLong) {
+			return Util.xor((SymLong)exp1, (SymLong)exp2);
+		} else {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	@Override
