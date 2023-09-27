@@ -34,6 +34,9 @@ CREATE TABLE IF NOT EXISTS run
     FOREIGN KEY (benchmark) REFERENCES benchmark(benchmark) ON DELETE CASCADE
 );
 
+CREATE INDEX IF NOT EXISTS run__benchmark ON run (benchmark);
+CREATE INDEX IF NOT EXISTS run__result ON run (result);
+
 CREATE TABLE IF NOT EXISTS settings
 (
     run_id INTEGER NOT NULL,
@@ -66,6 +69,8 @@ CREATE TABLE IF NOT EXISTS runtime
     FOREIGN KEY (run_id) REFERENCES run(id) ON DELETE CASCADE
 );
 
+CREATE INDEX IF NOT EXISTS runtime__run_id ON runtime (run_id);
+
 CREATE TABLE IF NOT EXISTS iteration
 (
     id INTEGER NOT NULL,
@@ -84,6 +89,9 @@ CREATE TABLE IF NOT EXISTS iteration
     PRIMARY KEY (id),
     FOREIGN KEY (run_id) REFERENCES run(id) ON DELETE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS iteration__run_id ON iteration (run_id);
+CREATE INDEX IF NOT EXISTS iteration__result ON iteration (result);
 
 CREATE TABLE IF NOT EXISTS partition
 (
@@ -121,6 +129,9 @@ CREATE TABLE IF NOT EXISTS partition
     FOREIGN KEY (iteration_id) REFERENCES iteration(id) ON DELETE CASCADE
 );
 
+CREATE INDEX IF NOT EXISTS partition__iteration_id ON partition (iteration_id);
+CREATE INDEX IF NOT EXISTS partition__result ON partition (result);
+
 CREATE TABLE IF NOT EXISTS instruction
 (
     id INTEGER NOT NULL,
@@ -137,6 +148,8 @@ CREATE TABLE IF NOT EXISTS instruction
     PRIMARY KEY (id),
     FOREIGN KEY (iteration_id) REFERENCES iteration(id) ON DELETE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS instruction__iteration_id ON instruction (iteration_id);
 
 CREATE TABLE IF NOT EXISTS partition_instruction
 (
@@ -155,3 +168,6 @@ CREATE TABLE IF NOT EXISTS partition_instruction
     FOREIGN KEY (partition_id) REFERENCES partition(id) ON DELETE CASCADE,
     FOREIGN KEY (instruction_id) REFERENCES instruction(id) ON DELETE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS partition_instruction__partition_id ON partition_instruction (partition_id);
+CREATE INDEX IF NOT EXISTS partition_instruction__instruction_id ON partition_instruction (instruction_id);
