@@ -4,342 +4,363 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 DB_PATH="${SCRIPT_DIR}/analysis/results/sqlite.db"
 DB_CREATE_TABLES_PATH="${SCRIPT_DIR}/analysis/create-tables.sql"
-DB_CREATE_VIEWS_PATH="${SCRIPT_DIR}/analysis/create-views.sql"
 DB_CREATE_MATERIALIZED_VIEWS_PATH="${SCRIPT_DIR}/analysis/create-materialized-views.sql"
-DB_POPULATE_MATERIALIZED_VIEWS_PATH="${SCRIPT_DIR}/analysis/populate-materialized-views.sql"
+DB_CREATE_TABLES_PAPER_PATH="${SCRIPT_DIR}/analysis/create-tables-paper.sql"
 
 BASE_JAR_PATH="${SCRIPT_DIR}/build/libs/ARDiff-base-1.0-SNAPSHOT-all.jar"
 DIFF_JAR_PATH="${SCRIPT_DIR}/build/libs/ARDiff-diff-1.0-SNAPSHOT-all.jar"
 
-# Configuration settings
-
 dry_run=false
 
-clean_files=false
 clean_db=false
-
-build=true
-
-depth_limits=("10")
-timeouts=("30" "90" "300")
-runs=3
-
-run_base=true
-run_diff=true
-
-print_cleaned=true
-print_skipped=false
+build=false
 print_commands=true
 
+depth_limits=(
+  "10"
+)
+
+timeouts=(
+  "10"
+#  "30"
+#  "90"
+#  "300"
+#  "900"
+#  "3600"
+)
+
+runs=1
+
 benchmarks=(
-  "../benchmarks/Airy/MAX/Eq"
-  "../benchmarks/Airy/MAX/NEq"
-  "../benchmarks/Airy/Sign/Eq"
-  "../benchmarks/Airy/Sign/NEq"
-  "../benchmarks/Bess/SIGN/Eq"
-  "../benchmarks/Bess/SIGN/NEq"
-  "../benchmarks/Bess/SQR/Eq"
-  "../benchmarks/Bess/SQR/NEq"
-  "../benchmarks/Bess/bessi/Eq"
-  "../benchmarks/Bess/bessi/NEq"
-  "../benchmarks/Bess/bessi0/Eq"
-  "../benchmarks/Bess/bessi0/NEq"
-  "../benchmarks/Bess/bessi1/Eq"
-  "../benchmarks/Bess/bessi1/NEq"
-  "../benchmarks/Bess/bessj/Eq"
-  "../benchmarks/Bess/bessj/NEq"
-  "../benchmarks/Bess/bessj0/Eq"
-  "../benchmarks/Bess/bessj0/NEq"
-  "../benchmarks/Bess/bessj1/Eq"
-  "../benchmarks/Bess/bessj1/NEq"
-  "../benchmarks/Bess/bessk/Eq"
-  "../benchmarks/Bess/bessk/NEq"
-  "../benchmarks/Bess/bessk0/Eq"
-  "../benchmarks/Bess/bessk0/NEq"
-  "../benchmarks/Bess/bessk1/Eq"
-  "../benchmarks/Bess/bessk1/NEq"
-  "../benchmarks/Bess/bessy/Eq"
-  "../benchmarks/Bess/bessy/NEq"
-  "../benchmarks/Bess/bessy0/Eq"
-  "../benchmarks/Bess/bessy0/NEq"
-  "../benchmarks/Bess/bessy1/Eq"
-  "../benchmarks/Bess/bessy1/NEq"
-  "../benchmarks/Bess/dawson/Eq"
-  "../benchmarks/Bess/dawson/NEq"
-  "../benchmarks/Bess/probks/Eq"
-  "../benchmarks/Bess/probks/NEq"
-  "../benchmarks/Bess/pythag/Eq"
-  "../benchmarks/Bess/pythag/NEq"
-  "../benchmarks/Ell/brent/Eq"
-  "../benchmarks/Ell/brent/NEq"
-  "../benchmarks/Ell/dbrent/Eq"
-  "../benchmarks/Ell/dbrent/NEq"
-  "../benchmarks/Ell/ell/Eq"
-  "../benchmarks/Ell/ell/NEq"
-  "../benchmarks/Ell/ellpi/Eq"
-  "../benchmarks/Ell/ellpi/NEq"
-  "../benchmarks/Ell/plgndr/Eq"
-  "../benchmarks/Ell/plgndr/NEq"
-  "../benchmarks/Ell/rc/Eq"
-  "../benchmarks/Ell/rc/NEq"
-  "../benchmarks/Ell/rd/Eq"
-  "../benchmarks/Ell/rd/NEq"
-  "../benchmarks/Ell/rf/Eq"
-  "../benchmarks/Ell/rf/NEq"
-  "../benchmarks/Ell/rj/Eq"
-  "../benchmarks/Ell/rj/NEq"
-  "../benchmarks/Ell/zbrent/Eq"
-  "../benchmarks/Ell/zbrent/NEq"
-  "../benchmarks/ModDiff/Eq/Add"
-  "../benchmarks/ModDiff/Eq/Comp"
-  "../benchmarks/ModDiff/Eq/Const"
-  "../benchmarks/ModDiff/Eq/LoopMult10"
-  "../benchmarks/ModDiff/Eq/LoopMult15"
-  "../benchmarks/ModDiff/Eq/LoopMult2"
-  "../benchmarks/ModDiff/Eq/LoopMult20"
-  "../benchmarks/ModDiff/Eq/LoopMult5"
-  "../benchmarks/ModDiff/Eq/LoopSub"
-  "../benchmarks/ModDiff/Eq/LoopUnreach10"
-  "../benchmarks/ModDiff/Eq/LoopUnreach15"
-  "../benchmarks/ModDiff/Eq/LoopUnreach2"
-  "../benchmarks/ModDiff/Eq/LoopUnreach20"
-  "../benchmarks/ModDiff/Eq/LoopUnreach5"
-  "../benchmarks/ModDiff/Eq/Sub"
-  "../benchmarks/ModDiff/Eq/UnchLoop"
-  "../benchmarks/ModDiff/NEq/LoopMult10"
-  "../benchmarks/ModDiff/NEq/LoopMult15"
-  "../benchmarks/ModDiff/NEq/LoopMult2"
-  "../benchmarks/ModDiff/NEq/LoopMult20"
-  "../benchmarks/ModDiff/NEq/LoopMult5"
-  "../benchmarks/ModDiff/NEq/LoopSub"
-  "../benchmarks/ModDiff/NEq/LoopUnreach10"
-  "../benchmarks/ModDiff/NEq/LoopUnreach15"
-  "../benchmarks/ModDiff/NEq/LoopUnreach2"
-  "../benchmarks/ModDiff/NEq/LoopUnreach20"
-  "../benchmarks/ModDiff/NEq/LoopUnreach5"
-  "../benchmarks/ModDiff/NEq/UnchLoop"
-  "../benchmarks/Ran/bnldev/Eq"
-  "../benchmarks/Ran/bnldev/NEq"
-  "../benchmarks/Ran/expdev/Eq"
-  "../benchmarks/Ran/expdev/NEq"
-  "../benchmarks/Ran/gamdev/Eq"
-  "../benchmarks/Ran/gamdev/NEq"
-  "../benchmarks/Ran/gammln/Eq"
-  "../benchmarks/Ran/gammln/NEq"
-  "../benchmarks/Ran/gasdev/Eq"
-  "../benchmarks/Ran/gasdev/NEq"
-  "../benchmarks/Ran/poidev/Eq"
-  "../benchmarks/Ran/poidev/NEq"
-  "../benchmarks/Ran/ran/Eq"
-  "../benchmarks/Ran/ran/NEq"
-  "../benchmarks/Ran/ranzero/Eq"
-  "../benchmarks/Ran/ranzero/NEq"
-  "../benchmarks/caldat/badluk/Eq"
-  "../benchmarks/caldat/badluk/NEq"
-  "../benchmarks/caldat/julday/Eq"
-  "../benchmarks/caldat/julday/NEq"
-  "../benchmarks/dart/test/Eq"
-  "../benchmarks/dart/test/NEq"
-  "../benchmarks/gam/betacf/Eq"
-  "../benchmarks/gam/betacf/NEq"
-  "../benchmarks/gam/betai/Eq"
-  "../benchmarks/gam/betai/NEq"
-  "../benchmarks/gam/ei/Eq"
-  "../benchmarks/gam/ei/NEq"
-  "../benchmarks/gam/erfcc/Eq"
-  "../benchmarks/gam/erfcc/NEq"
-  "../benchmarks/gam/expint/Eq"
-  "../benchmarks/gam/expint/NEq"
-  "../benchmarks/gam/gammp/Eq"
-  "../benchmarks/gam/gammp/NEq"
-  "../benchmarks/gam/gammq/Eq"
-  "../benchmarks/gam/gammq/NEq"
-  "../benchmarks/gam/gcf/Eq"
-  "../benchmarks/gam/gcf/NEq"
-  "../benchmarks/gam/gser/Eq"
-  "../benchmarks/gam/gser/NEq"
-  "../benchmarks/power/test/Eq"
-  "../benchmarks/power/test/NEq"
-  "../benchmarks/sine/mysin/Eq"
-  "../benchmarks/sine/mysin/NEq"
-  "../benchmarks/tcas/NonCrossingBiasedClimb/Eq"
-  "../benchmarks/tcas/NonCrossingBiasedClimb/NEq"
-  "../benchmarks/tcas/NonCrossingBiasedDescend/Eq"
-  "../benchmarks/tcas/NonCrossingBiasedDescend/NEq"
-  "../benchmarks/tcas/altseptest/Eq"
-  "../benchmarks/tcas/altseptest/NEq"
-  "../benchmarks/tsafe/conflict/Eq"
-  "../benchmarks/tsafe/conflict/NEq"
-  "../benchmarks/tsafe/normAngle/Eq"
-  "../benchmarks/tsafe/normAngle/NEq"
-  "../benchmarks/tsafe/snippet/Eq"
-  "../benchmarks/tsafe/snippet/NEq"
+  "Airy/MAX/Eq"
+  "Airy/MAX/NEq"
+  "Airy/Sign/Eq"
+  "Airy/Sign/NEq"
+  "Bess/SIGN/Eq"
+  "Bess/SIGN/NEq"
+  "Bess/SQR/Eq"
+  "Bess/SQR/NEq"
+  "Bess/bessi/Eq"
+  "Bess/bessi/NEq"
+  "Bess/bessi0/Eq"
+  "Bess/bessi0/NEq"
+  "Bess/bessi1/Eq"
+  "Bess/bessi1/NEq"
+  "Bess/bessj/Eq"
+  "Bess/bessj/NEq"
+  "Bess/bessj0/Eq"
+  "Bess/bessj0/NEq"
+  "Bess/bessj1/Eq"
+  "Bess/bessj1/NEq"
+  "Bess/bessk/Eq"
+  "Bess/bessk/NEq"
+  "Bess/bessk0/Eq"
+  "Bess/bessk0/NEq"
+  "Bess/bessk1/Eq"
+  "Bess/bessk1/NEq"
+  "Bess/bessy/Eq"
+  "Bess/bessy/NEq"
+  "Bess/bessy0/Eq"
+  "Bess/bessy0/NEq"
+  "Bess/bessy1/Eq"
+  "Bess/bessy1/NEq"
+  "Bess/dawson/Eq"
+  "Bess/dawson/NEq"
+  "Bess/probks/Eq"
+  "Bess/probks/NEq"
+  "Bess/pythag/Eq"
+  "Bess/pythag/NEq"
+  "Ell/brent/Eq"
+  "Ell/brent/NEq"
+  "Ell/dbrent/Eq"
+  "Ell/dbrent/NEq"
+  "Ell/ell/Eq"
+  "Ell/ell/NEq"
+  "Ell/ellpi/Eq"
+  "Ell/ellpi/NEq"
+  "Ell/plgndr/Eq"
+  "Ell/plgndr/NEq"
+  "Ell/rc/Eq"
+  "Ell/rc/NEq"
+  "Ell/rd/Eq"
+  "Ell/rd/NEq"
+  "Ell/rf/Eq"
+  "Ell/rf/NEq"
+  "Ell/rj/Eq"
+  "Ell/rj/NEq"
+  "Ell/zbrent/Eq"
+  "Ell/zbrent/NEq"
+  "ModDiff/Eq/Add"
+  "ModDiff/Eq/Comp"
+  "ModDiff/Eq/Const"
+  "ModDiff/Eq/LoopMult10"
+  "ModDiff/Eq/LoopMult15"
+  "ModDiff/Eq/LoopMult2"
+  "ModDiff/Eq/LoopMult20"
+  "ModDiff/Eq/LoopMult5"
+  "ModDiff/Eq/LoopSub"
+  "ModDiff/Eq/LoopUnreach10"
+  "ModDiff/Eq/LoopUnreach15"
+  "ModDiff/Eq/LoopUnreach2"
+  "ModDiff/Eq/LoopUnreach20"
+  "ModDiff/Eq/LoopUnreach5"
+  "ModDiff/Eq/Sub"
+  "ModDiff/Eq/UnchLoop"
+  "ModDiff/NEq/LoopMult10"
+  "ModDiff/NEq/LoopMult15"
+  "ModDiff/NEq/LoopMult2"
+  "ModDiff/NEq/LoopMult20"
+  "ModDiff/NEq/LoopMult5"
+  "ModDiff/NEq/LoopSub"
+  "ModDiff/NEq/LoopUnreach10"
+  "ModDiff/NEq/LoopUnreach15"
+  "ModDiff/NEq/LoopUnreach2"
+  "ModDiff/NEq/LoopUnreach20"
+  "ModDiff/NEq/LoopUnreach5"
+  "ModDiff/NEq/UnchLoop"
+  "Ran/bnldev/Eq"
+  "Ran/bnldev/NEq"
+  "Ran/expdev/Eq"
+  "Ran/expdev/NEq"
+  "Ran/gamdev/Eq"
+  "Ran/gamdev/NEq"
+  "Ran/gammln/Eq"
+  "Ran/gammln/NEq"
+  "Ran/gasdev/Eq"
+  "Ran/gasdev/NEq"
+  "Ran/poidev/Eq"
+  "Ran/poidev/NEq"
+  "Ran/ran/Eq"
+  "Ran/ran/NEq"
+  "Ran/ranzero/Eq"
+  "Ran/ranzero/NEq"
+  "caldat/badluk/Eq"
+  "caldat/badluk/NEq"
+  "caldat/julday/Eq"
+  "caldat/julday/NEq"
+  "dart/test/Eq"
+  "dart/test/NEq"
+  "gam/betacf/Eq"
+  "gam/betacf/NEq"
+  "gam/betai/Eq"
+  "gam/betai/NEq"
+  "gam/ei/Eq"
+  "gam/ei/NEq"
+  "gam/erfcc/Eq"
+  "gam/erfcc/NEq"
+  "gam/expint/Eq"
+  "gam/expint/NEq"
+  "gam/gammp/Eq"
+  "gam/gammp/NEq"
+  "gam/gammq/Eq"
+  "gam/gammq/NEq"
+  "gam/gcf/Eq"
+  "gam/gcf/NEq"
+  "gam/gser/Eq"
+  "gam/gser/NEq"
+  "power/test/Eq"
+  "power/test/NEq"
+  "sine/mysin/Eq"
+  "sine/mysin/NEq"
+  "tcas/NonCrossingBiasedClimb/Eq"
+  "tcas/NonCrossingBiasedClimb/NEq"
+  "tcas/NonCrossingBiasedDescend/Eq"
+  "tcas/NonCrossingBiasedDescend/NEq"
+  "tcas/altseptest/Eq"
+  "tcas/altseptest/NEq"
+  "tsafe/conflict/Eq"
+  "tsafe/conflict/NEq"
+  "tsafe/normAngle/Eq"
+  "tsafe/normAngle/NEq"
+  "tsafe/snippet/Eq"
+  "tsafe/snippet/NEq"
 )
 
-tool_names=(
-  "SE"
-  "DSE"
-#  "Imp"
-#  "ARDiffR"
-#  "ARDiffH3"
-  "ARDiff"
-  "PASDA"
+tools=(
+  "PASDA-base"
+  "PASDA-diff"   # PASDA
+#  "ARDiff-base"  # ARDiff
+#  "ARDiff-diff"
+#  "DSE-base"     # DSE
+#  "DSE-diff"
+#  "SE-base"
+#  "SE-diff"      # PRV
 )
 
-configurations=(
-  "--tool S --s coral"
-  "--tool D --s coral"
-#  "--tool I --s coral"
-#  "--tool A --s coral --H R"
-#  "--tool A --s coral --H H3"
-  "--tool A --s coral --H H123"
-  "--tool P --s coral"
-)
-
-# Remove results from previous runs
-
-if [ "$clean_files" = true ] ; then
-  for d1 in ../benchmarks/* ; do
-    for d2 in "$d1"/* ; do
-      for d3 in "$d2"/* ; do
-        if [[ ! " ${benchmarks[*]} " =~ " ${d3} " ]]; then
-          continue
-        fi
-
-        if [ "$print_cleaned" = true ] ; then
-          printf "Cleaning %s ...\n" "${d3}"
-          echo "rm -rf ${d3}/*/"
-        fi
-
-        if [ "$dry_run" = false ] ; then
-          rm -rf "${d3:?}"/*/
-        fi
+newline=$'\n'
+runs_settings=()
+for depth_limit in "${depth_limits[@]}"; do
+  for timeout in "${timeouts[@]}"; do
+    for ((count = 1; count <= runs; count++)); do
+      for benchmark in "${benchmarks[@]}"; do
+        for tool in "${tools[@]}"; do
+          runs_settings+=("${benchmark},${tool},${timeout},${depth_limit}${newline}")
+        done
       done
     done
   done
-fi
+done
+
+# To execute a specific set of benchmark:tool:timeout:depth-limit combinations,
+# uncomment the following lines and add the corresponding configuration settings.
+# This simply overwrites the 'run_settings' variable, so everything above can remain unchanged.
+#IFS=$'\n' read -r -d '' -a runs_settings <<< "Ell/brent/Eq,ARDiff-base,30,10
+#Ell/brent/Eq,ARDiff-base,90,10
+#Ell/brent/Eq,ARDiff-base,90,10"
+
+(IFS=""; echo -e  "${runs_settings[*]}" > "runs_settings.txt")
+
+calculate_time() {
+    local start_time=$1
+    local elapsed_seconds=$((SECONDS - start_time))
+    local days=$((elapsed_seconds / (60 * 60 * 24)))
+    local hours=$((elapsed_seconds / (60 * 60) % 24))
+    local minutes=$((elapsed_seconds / 60 % 60))
+    local seconds=$((elapsed_seconds % 60))
+
+    local total_runs=$2
+    local current_run=$3
+
+    local total_seconds=$((elapsed_seconds * total_runs / current_run))
+    local remaining_seconds=$((total_seconds - elapsed_seconds))
+
+    local remaining_days=$((remaining_seconds / (60 * 60 * 24)))
+    local remaining_hours=$((remaining_seconds / (60 * 60) % 24))
+    local remaining_minutes=$((remaining_seconds / 60 % 60))
+    local remaining_seconds=$((remaining_seconds % 60))
+
+    printf "Elapsed time:             %02d days %02d hours %02d minutes %02d seconds\n" "$days" "$hours" "$minutes" "$seconds"
+    printf "Estimated remaining time: %02d days %02d hours %02d minutes %02d seconds\n" "$remaining_days" "$remaining_hours" "$remaining_minutes" "$remaining_seconds"
+}
 
 # Set up the database
 
 if [ "$clean_db" = true ] ; then
-  rm ${DB_PATH}
+  rm "${DB_PATH}"
+fi
 
-  touch ${DB_PATH}
-  sqlite3 ${DB_PATH} < ${DB_CREATE_TABLES_PATH} > /dev/null
-  #sqlite3 ${DB_PATH} < ${DB_CREATE_VIEWS_PATH} > /dev/null
-  #sqlite3 ${DB_PATH} < ${DB_CREATE_MATERIALIZED_VIEWS_PATH} > /dev/null
+if [ ! -f "${DB_PATH}" ]; then
+  touch "${DB_PATH}"
+  sqlite3 "${DB_PATH}" < "${DB_CREATE_TABLES_PATH}" > /dev/null
 fi
 
 # Build the application JAR files
 
 if [ "$build" = true ] ; then
-  if [ "$run_base" = true ] || [ "$run_diff" = true ] ; then
-    printf "Building JAR files ..."
+  printf "Building JAR files ..."
 
-    if [ "$run_base" = true ] ; then
-      # Build base JAR
-      command="./gradlew -PmainClass=Runner.Runner shadowJar"
+  # Build base JAR
+  command="./gradlew -PmainClass=Runner.Runner shadowJar"
 
-      if [ "$print_commands" = true ] ; then
-        printf "\n%s" "${command}"
-      fi
-
-      if [ "$dry_run" = false ] ; then
-        eval "${command}"
-      fi
-    fi
-
-    if [ "$run_diff" = true ] ; then
-      # Build diff JAR
-      command="./gradlew -PmainClass=differencing.DifferencingRunner shadowJar"
-
-      if [ "$print_commands" = true ] ; then
-        printf "\n%s" "${command}"
-      fi
-
-      if [ "$dry_run" = false ] ; then
-        eval "${command}"
-      fi
-    fi
-
-    printf "\n"
+  if [ "$print_commands" = true ] ; then
+    printf "\n%s" "${command}"
   fi
+
+  if [ "$dry_run" = false ] ; then
+    eval "${command}"
+  fi
+
+  # Build diff JAR
+  command="./gradlew -PmainClass=differencing.DifferencingRunner shadowJar"
+
+  if [ "$print_commands" = true ] ; then
+    printf "\n%s" "${command}"
+  fi
+
+  if [ "$dry_run" = false ] ; then
+    eval "${command}"
+  fi
+
+  printf "\n"
 fi
 
 # Process the benchmark programs
 
-for depth_limit in "${depth_limits[@]}"; do
-  for timeout in "${timeouts[@]}"; do
-    for ((run = 1; run <= runs; run++)); do
+seconds_at_start=$SECONDS
 
-      for d1 in ../benchmarks/* ; do
-        for d2 in "$d1"/* ; do
-          for d3 in "$d2"/* ; do
-            if [[ ! " ${benchmarks[*]} " =~ " ${d3} " ]]; then
-              if [ "$print_skipped" = true ] ; then
-                printf "Skipping %s ...\n" "${d3}"
-              fi
-              continue
-            fi
+current_run=1
+total_runs=${#runs_settings[@]}
 
-            if [ "$run_base" = true ] || [ "$run_diff" = true ] ; then
-              printf "Processing %s ..." "${d3}"
+for run_settings in "${runs_settings[@]}"; do
+  IFS=',' read -r benchmark tool timeout depth_limit <<< "$run_settings"
+  echo "[$(date +"%Y-%m-%d %T")] Run $((current_run++)) of ${total_runs} - Benchmark: ${benchmark}, Tool: ${tool}, Timeout: ${timeout}, Depth-Limit: ${depth_limit}"
 
-              for i in "${!configurations[@]}" ; do
-                # Run base tool(s)
-                if [ "$run_base" = true ] ; then
-                  oldV="${d3}/oldV.java"
-                  newV="${d3}/newV.java"
+  directory="../benchmarks/${benchmark}"
+  if [ ! -d "${directory}" ]; then
+    echo "ERROR: The directory '${directory}' does not exist."
+    continue
+  fi
 
-                  base_command="timeout --verbose --foreground ${timeout}s java -jar '${BASE_JAR_PATH}' --path1 ${oldV} --path2 ${newV} ${configurations[$i]} --b ${depth_limit} --t ${timeout}"
+  oldV="${directory}/oldV.java"
+  if [ ! -f "${oldV}" ]; then
+    echo "ERROR: The file '${oldV}' does not exist."
+    continue
+  fi
 
-                  if [ "$print_commands" = true ] ; then
-                    printf "\n%s" "${base_command}"
-                  fi
+  newV="${directory}/newV.java"
+  if [ ! -f "${newV}" ]; then
+    echo "ERROR: The file '${newV}' does not exist."
+    continue
+  fi
 
-                  if [ "$dry_run" = false ] ; then
-                    printf "\n"
-                    mkdir -p "${d3}/instrumented/"
-                    eval "${base_command}"
-                    # Kill any leftover z3 / RunJPF.jar processes
-                    # that were started by the base tool.
-                    # This is necessary in case the base tool was
-                    # stopped by the timeout and the child processes
-                    # were, therefore, not correctly terminated.
-                    pkill z3
-                    pkill -f RunJPF.jar
-                  fi
-                fi
+  command=""
+  case $tool in
+      "ARDiff-base")
+          command="timeout --verbose --foreground ${timeout}s java -jar '${BASE_JAR_PATH}' --path1 ${oldV} --path2 ${newV} --tool A --s coral --H H123 --b ${depth_limit} --t ${timeout}"
+          ;;
+      "ARDiff-diff")
+          command="timeout --verbose --foreground ${timeout}s java -jar '${DIFF_JAR_PATH}' ${directory} ARDiff ${timeout} ${depth_limit}"
+          ;;
+      "DSE-base")
+          command="timeout --verbose --foreground ${timeout}s java -jar '${BASE_JAR_PATH}' --path1 ${oldV} --path2 ${newV} --tool D --s coral --b ${depth_limit} --t ${timeout}"
+          ;;
+      "DSE-diff")
+          command="timeout --verbose --foreground ${timeout}s java -jar '${DIFF_JAR_PATH}' ${directory} DSE ${timeout} ${depth_limit}"
+          ;;
+      "PASDA-base")
+          command="timeout --verbose --foreground ${timeout}s java -jar '${BASE_JAR_PATH}' --path1 ${oldV} --path2 ${newV} --tool P --s coral --b ${depth_limit} --t ${timeout}"
+          ;;
+      "PASDA-diff")
+          command="timeout --verbose --foreground ${timeout}s java -jar '${DIFF_JAR_PATH}' ${directory} PASDA ${timeout} ${depth_limit}"
+          ;;
+      "SE-base")
+          command="timeout --verbose --foreground ${timeout}s java -jar '${BASE_JAR_PATH}' --path1 ${oldV} --path2 ${newV} --tool S --s coral --b ${depth_limit} --t ${timeout}"
+          ;;
+      "SE-diff")
+          command="timeout --verbose --foreground ${timeout}s java -jar '${DIFF_JAR_PATH}' ${directory} SE ${timeout} ${depth_limit}"
+          ;;
+      *)
+          echo "ERROR: Unknown tool '$tool'."
+          continue
+          ;;
+  esac
 
-                # Run diff tool(s)
-                if [ "$run_diff" = true ] ; then
-                  diff_command="timeout --verbose --foreground ${timeout}s java -jar '${DIFF_JAR_PATH}' ${d3} ${tool_names[$i]} ${timeout} ${depth_limit}"
+  if [ "$print_commands" = true ]; then
+    echo "${command}"
+  fi
 
-                  if [ "$print_commands" = true ] ; then
-                    printf "\n%s" "${diff_command}"
-                  fi
+  if [ "$dry_run" = false ]; then
+    echo ""
+    mkdir -p "${directory}/instrumented"
+    eval "${command}"
 
-                  if [ "$dry_run" = false ] ; then
-                    printf "\n"
-                    mkdir -p "${d3}/instrumented/"
-                    eval "${diff_command}"
-                  fi
-                fi
-              done
+    # Kill any leftover z3 / RunJPF.jar processes
+    # that were started by the base tools.
+    # This is necessary in case a base tool was
+    # stopped by the timeout and the child processes
+    # were, therefore, not correctly terminated.
+    pkill z3
+    pkill -f RunJPF.jar
+  fi
 
-              printf "\n"
-            fi
-
-          done
-        done
-      done
-
-    done
-  done
+  calculate_time "$seconds_at_start" "$total_runs" "$current_run"
+  printf "\n\n"
 done
 
-# Populate "materialized views"
+# Create "materialized views"
 
-printf "Populating materialized views ... "
-#sqlite3 ${DB_PATH} < ${DB_POPULATE_MATERIALIZED_VIEWS_PATH} > /dev/null
+#printf "Creating materialized views ... "
+#sqlite3 "${DB_PATH}" < "${DB_CREATE_MATERIALIZED_VIEWS_PATH}" > /dev/null
+#sqlite3 "${DB_PATH}" < "${DB_CREATE_TABLES_PAPER_PATH}" > /dev/null
+
 printf "done!\n"
