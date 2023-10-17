@@ -8,7 +8,8 @@ FROM --platform=amd64 ubuntu:23.04
 
 RUN apt-get update -y && apt-get install -y \
     openjdk-8-jdk \
-    sqlite3
+    sqlite3 \
+    git
 
 RUN mkdir -p /home/pasda
 
