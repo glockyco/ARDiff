@@ -302,8 +302,8 @@ FROM (
         median(runtime) AS median_runtime,
         avg(CASE WHEN NOT has_timed_out THEN runtime END) AS avg_runtime_no_timeout,
         avg(CASE WHEN has_timed_out THEN runtime END) AS avg_runtime_timeout,
-        stdev(runtime) AS stdev_runtime,
-        stdev(runtime) / avg(runtime) AS stdev_runtime_fraction,
+        stddev(runtime) AS stddev_runtime,
+        stddev(runtime) / avg(runtime) AS stddev_runtime_fraction,
         --
         group_concat(printf('%.2f', runtime), ', ') AS result_runtimes,
         min(result_runtime) AS min_result_runtime,
@@ -316,8 +316,8 @@ FROM (
         median(result_runtime) AS median_result_runtime,
         avg(CASE WHEN NOT has_timed_out THEN result_runtime END) AS avg_res_runtime_no_timeout,
         avg(CASE WHEN has_timed_out THEN result_runtime END) AS avg_res_runtime_timeout,
-        stdev(result_runtime) AS stdev_result_runtime,
-        stdev(result_runtime) / avg(result_runtime) AS stdev_result_runtime_fraction,
+        stddev(result_runtime) AS stddev_result_runtime,
+        stddev(result_runtime) / avg(result_runtime) AS stddev_result_runtime_fraction,
         -- iteration stats:
         group_concat(result_iteration, ', ') AS result_iterations,
         count(DISTINCT result_iteration) AS cnt_distinc_iterations,

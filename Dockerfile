@@ -8,8 +8,10 @@ FROM --platform=amd64 ubuntu:23.04
 
 RUN apt-get update -y && apt-get install -y \
     openjdk-8-jdk \
-    sqlite3 \
     git
+
+COPY docker/sqlean/sqlean-ubuntu /usr/bin/sqlite3
+RUN chmod +x /usr/bin/sqlite3
 
 RUN mkdir -p /home/pasda
 
