@@ -13,7 +13,7 @@ DIFF_JAR_PATH="${SCRIPT_DIR}/build/libs/ARDiff-diff-1.0-SNAPSHOT-all.jar"
 dry_run=false
 
 clean_db=false
-build=false
+force_build=false
 print_commands=true
 
 depth_limits=(
@@ -246,8 +246,8 @@ fi
 
 # Build the application JAR files
 
-if [ "$build" = true ] ; then
-  printf "Building JAR files ..."
+if [ "$force_build" = true ]  || [ ! -f "$BASE_JAR_PATH" ] ; then
+  printf "Building base JAR file ..."
 
   # Build base JAR
   command="./gradlew -PmainClass=Runner.Runner shadowJar"
@@ -259,6 +259,12 @@ if [ "$build" = true ] ; then
   if [ "$dry_run" = false ] ; then
     eval "${command}"
   fi
+
+  printf "\n"
+fi
+
+if [ "$force_build" = true ]  || [ ! -f "$DIFF_JAR_PATH" ] ; then
+  printf "Building diff JAR file ..."
 
   # Build diff JAR
   command="./gradlew -PmainClass=differencing.DifferencingRunner shadowJar"
