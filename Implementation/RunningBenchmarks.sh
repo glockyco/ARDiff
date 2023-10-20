@@ -179,7 +179,7 @@ benchmarks=(
 tools=(
   "PASDA-base"
   "PASDA-diff"   # PASDA
-#  "ARDiff-base"  # ARDiff
+  "ARDiff-base"  # ARDiff
 #  "ARDiff-diff"
 #  "DSE-base"     # DSE
 #  "DSE-diff"
