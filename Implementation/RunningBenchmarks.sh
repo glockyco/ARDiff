@@ -208,7 +208,7 @@ done
 #Ell/brent/Eq,ARDiff-base,90,10
 #Ell/brent/Eq,ARDiff-base,90,10"
 
-(IFS=""; echo -e  "${runs_settings[*]}" > "runs_settings.txt")
+#(IFS=""; echo -e  "${runs_settings[*]}" > "runs_settings.txt")
 
 calculate_time() {
     local start_time=$1
