@@ -282,6 +282,10 @@ public class DifferencingRunner {
                     }
                 }
 
+                if (iteration.partitionCount == 0) {
+                    throw new RuntimeException("No partitions found for '" + run.benchmark + "' (run ID: " + run.id + ", iteration ID: " + iteration.id + ").");
+                }
+
                 StopWatches.stop("iteration-" + iteration.iteration + ":refinement");
                 StopWatches.stop("iteration-" + iteration.iteration);
             } while (shouldKeepIterating);
