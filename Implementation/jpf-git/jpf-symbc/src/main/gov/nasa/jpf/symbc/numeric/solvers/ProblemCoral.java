@@ -821,20 +821,23 @@ public class ProblemCoral extends ProblemGeneral {
 
 	@Override
 	public Object rem(Object exp1, Object exp2) {
-		// TODO Auto-generated method stub
-		return null;
+		if (exp1 instanceof SymDouble) {
+			return Util.mod((SymDouble)exp1, (SymDouble)exp2);
+		} else if (exp1 instanceof SymInt) {
+			return Util.mod((SymInt)exp1, (SymInt)exp2);
+		} else {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	@Override
 	public Object rem(long exp1, Object exp2) {
-		// TODO Auto-generated method stub
-		return null;
+		return Util.mod(Util.createConstant((int) exp1), (SymInt)exp2);
 	}
 
 	@Override
 	public Object rem(Object exp1, long exp2) {
-		// TODO Auto-generated method stub
-		return null;
+		return Util.mod((SymInt)exp1, Util.createConstant((int) exp2));
 	}
 	
 }
