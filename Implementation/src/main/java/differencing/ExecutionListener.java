@@ -114,7 +114,7 @@ public class ExecutionListener extends PropertyListenerAdapter {
             this.startNextPartition();
         }
 
-        if (this.isInMethodToCover & !vm.getSystemState().isIgnored() && !currentThread.isFirstStepInsn()) {
+        if (this.isInMethodToCover && !vm.getSystemState().isIgnored() && !currentThread.isFirstStepInsn()) {
             if (this.methodToCoverSpec.matchesClass(executedInstruction.getMethodInfo().getClassInfo().getName())) {
                 assert vm.getChoiceGenerator() instanceof PCChoiceGenerator;
                 PCChoiceGenerator cg = vm.getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
